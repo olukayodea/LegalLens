@@ -1,0 +1,1 @@
+﻿User-Agent: *Disallow: /managesubscriptionSitemap: http://legallens.com.ng/sitemap.xml

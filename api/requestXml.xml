@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Checkout>
+	<order_code>1234567</order_code>
+	<customer_name>customer_name 1</customer_name>
+	<customer_email> customer_email 1</customer_email>
+	<customer_number>customer_number 1</customer_number>
+	<delivery_address> delivery_address 1</delivery_address>
+	<products>
+		<product>
+			<order_id>1</order_id >
+			<product_id>VT02H05A506CG</product_id >
+			<quantity>2</quantity >
+			<price>100</price>
+		</product>
+		<product>
+			<order_id>1</order_id >
+			<product_id>VT02H05A506CG</product_id >
+			<quantity>2</quantity >
+			<price>100</price>
+		</product>
+	</products>
+<Checkout>

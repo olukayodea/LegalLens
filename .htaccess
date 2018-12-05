@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^legallens\.net$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.legallens\.net$
+RewriteRule ^/?$ "http\:\/\/legallens\.com\.ng\/" [R=301,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule api/(.*)$ api/homePage.php?request=$1 [QSA,NC,L]
+RewriteRule regulations/(.*?)$ regulations.php?id=$1
+RewriteRule articles/(.*?)$ articles.php?id=$1
+RewriteRule category/([a-zA-Z)([0-9]+)/(.*?)/$ Forum.topics.php?id=$1
+RewriteRule topics/([a-zA-Z)([0-9]+)/(.*?)/$ Forum.post.php?id=$1
+RewriteRule news/([a-zA-Z)([0-9]+)/(.*?)/$ news_post.php?id=$1
+RewriteRule help/([a-zA-Z)([0-9]+)/(.*?)/$ helpAndSupport.php?t=$1
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php
+
+IndexIgnore *
+</IfModule>

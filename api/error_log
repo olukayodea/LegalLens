@@ -1,0 +1,3 @@
+[05-Jan-2017 15:23:41 Africa/Lagos] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/legallen/public_html/includes/classes/users.php:187) in /home/legallen/public_html/includes/classes/api.php on line 206
+[28-Mar-2017 16:38:18 Africa/Lagos] PHP Fatal error:  Call to a member function sortAll() on null in /home/legallen/public_html/includes/classes/api.php on line 137
+[08-Feb-2018 23:51:49 Africa/Lagos] PHP Warning:  mysql_connect(): Access denied for user 'root'@'localhost' (using password: YES) in /home/legallen/public_html/includes/classes/config.php on line 4
