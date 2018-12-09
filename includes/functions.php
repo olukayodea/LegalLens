@@ -5,7 +5,6 @@
 	$pageUR1 = $_SERVER["SERVER_NAME"];
 	$curdomain = str_replace("www.", "", $pageUR1);
 
-	if (($curdomain == "legallens.com.ng/") || ($curdomain == "legallens.com.ng") ) {
 		ini_set("session.cookie_domain", ".legallens.com.ng/");
 		define("URL", "https://legallens.com.ng/", true);
 		define("servername", "localhost", true);
