@@ -10,11 +10,36 @@
 			
 			if ($upload['info'] == "Done") {
 				$media_file = $upload['msg'];
-				$sql = mysql_query("INSERT INTO `advert` (`title`, `status`, `duration`, `url`, `media_file`, `create_time`, `modify_time`) VALUES ('".$title."','".$status."','".$duration."','".$url."','".$media_file."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `title` = '".$title."', `status` = '".$status."', `duration` = '".$duration."', `url` = '".$url."', `modify_time` = '".$modify_time."'") or die (mysql_error());
-			
+
+				global $db;
+				$value_array = array(
+								':title' => $title, 
+								':status' => $status,
+								':duration' => $duration,
+								':url' => $url,
+								':media_file' => $media_file,
+								':create_time' => $create_time,
+								':modify_time' => $modify_time
+								);		
+				
+				try {
+					$sql = $db->prepare("INSERT INTO `advert` (`title`, `status`, `duration`, `url`, `media_file`, `create_time`, `modify_time`)
+					VALUES (:title, :status, :duration, :url, :media_file, :create_time, :modify_time)
+						ON DUPLICATE KEY UPDATE 
+							`status` = :status,
+							`duration` = :duration,
+							`url` = :url,
+							`media_file` = :media_file,
+							`create_time` = :create_time,
+							`modify_time` = :modify_time
+						");
+					$sql->execute($value_array);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+							
 				if ($sql) {
-					$id = mysql_insert_id();
-					
+					$id = $db->lastInsertId();
 					//add to log
 					$logArray['object'] = get_class($this);
 					$logArray['object_id'] = $id;
@@ -35,7 +60,6 @@
 		}
 		
 		function upload($files, $width_pix=400, $height_pix=400) {
-			
 			$valid_formats = array("jpg", "png", "gif", "bmp","jpeg");
 			define ("MAX_SIZE","9000"); 
 			$uploaddir = "../advert/"; //a directory inside
@@ -93,13 +117,23 @@
 			return false;
 		   }
 		}
-	
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
 			$data = $this->getOne($id);
 			$media_url = $data['media_url'];
-			$sql = mysql_query("DELETE FROM `advert` WHERE ref = '".$id."'") or die (mysql_error());
+
+			@unlink("../advert/".$data['file']);
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `advert` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 				
 			if ($sql) {
 				//add to log
@@ -120,8 +154,19 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `advert` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `advert` SET  `".$tag."` = :value, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				//add to log
@@ -140,13 +185,18 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `advert` ORDER BY `ref` ASC") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `advert` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucfirst(strtolower($row['title']));
 					$result[$count]['duration'] = $row['duration'];
@@ -162,19 +212,20 @@
 		}
 		
 		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $orderby = "ref", $dir="ASC", $limit=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
+
 			if ($limit == true) {
 				$limitTag = " LIMIT ".$limit;
 			} else {
@@ -186,14 +237,22 @@
 			} else {
 				$order = "`".$orderby."`".$dir;
 			}
-						
-			$sql = mysql_query("SELECT * FROM `advert` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY ".$order.$limitTag) or die (mysql_error());
+
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `advert` WHERE `".$tag."` = :id".$sqlTag." ORDER BY ".$order.$limitTag);
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucfirst(strtolower($row['title']));
 					$result[$count]['duration'] = $row['duration'];
@@ -210,24 +269,32 @@
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `advert` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM advert WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
 			if ($sql) {
 				$result = array();
 				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['title'] = ucfirst(strtolower($row['title']));
-					$result['duration'] = $row['duration'];
-					$result['status'] = $row['status'];
-					$result['url'] = $row['url'];
-					$result['media_file'] = $row['media_file'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+				$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				$result['ref'] = $row['ref'];
+				$result['title'] = ucfirst(strtolower($row['title']));
+				$result['duration'] = $row['duration'];
+				$result['status'] = $row['status'];
+				$result['url'] = $row['url'];
+				$result['media_file'] = $row['media_file'];
+				$result['create_time'] = $row['create_time'];
+				$result['modify_time'] = $row['modify_time'];
+				$count++;
+				
+				return $this->out_prep($result);
 			}
 		}
 		
@@ -238,13 +305,19 @@
 		
 		function showAd($limit) {
 			$type = $this->mysql_prep($type);
-			$sql = mysql_query("SELECT * FROM `advert` WHERE `status` = 'active' AND `duration` > '".time()."' ORDER BY RAND() LIMIT ".$limit) or die (mysql_error());
+			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `advert` WHERE `status` = 'active' AND `duration` > '".time()."' ORDER BY RAND() LIMIT ".$limit);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucfirst(strtolower($row['title']));
 					$result[$count]['duration'] = $row['duration'];
@@ -260,7 +333,6 @@
 		}
 	}
 	
-	
 	class slider extends advert {
 		function add_s($array, $file) {
 			$status = $this->mysql_prep($array['status']);
@@ -270,11 +342,32 @@
 			
 			if ($upload['info'] == "Done") {
 				$media_file = $upload['msg'];
-				$sql = mysql_query("INSERT INTO `slider` (`status`, `url`, `media_file`, `create_time`, `modify_time`) VALUES ('".$status."','".$url."','".$media_file."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `status` = '".$status."', `url` = '".$url."', `modify_time` = '".$modify_time."'") or die (mysql_error());
-			
+				global $db;
+				$value_array = array(
+								':status' => $status,
+								':url' => $url,
+								':media_file' => $media_file,
+								':create_time' => $create_time,
+								':modify_time' => $modify_time
+								);		
+				
+				try {
+					$sql = $db->prepare("INSERT INTO `slider` (`status`, `url`, `media_file`, `create_time`, `modify_time`)
+					VALUES (:status, :url, :media_file, :create_time, :modify_time)
+						ON DUPLICATE KEY UPDATE 
+							`status` = :status,
+							`url` = :url,
+							`media_file` = :media_file,
+							`create_time` = :create_time,
+							`modify_time` = :modify_time
+						");
+					$sql->execute($value_array);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+
 				if ($sql) {
-					$id = mysql_insert_id();
-					
+					$id = $db->lastInsertId();					
 					//add to log
 					$logArray['object'] = get_class($this);
 					$logArray['object_id'] = $id;
@@ -298,7 +391,18 @@
 			$id = $this->mysql_prep($id);
 			$data = $this->getOne($id);
 			$media_url = $data['media_url'];
-			$sql = mysql_query("DELETE FROM `slider` WHERE ref = '".$id."'") or die (mysql_error());
+
+			@unlink("../advert/".$data['file']);
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `slider` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 				
 			if ($sql) {
 				//add to log
@@ -306,7 +410,7 @@
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
 				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = "removed slider Item with Ref ".$id;
+				$logArray['desc'] = "removed advert Item with Ref ".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -317,39 +421,33 @@
 		}
 		
 		function listAll_s() {
-			$sql = mysql_query("SELECT * FROM `slider` ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['url'] = $row['url'];
-					$result[$count]['media_file'] = $row['media_file'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `slider` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function sortAll_s($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $orderby = "ref", $dir="ASC", $limit=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
+
 			if ($limit == true) {
 				$limitTag = " LIMIT ".$limit;
 			} else {
@@ -361,45 +459,38 @@
 			} else {
 				$order = "`".$orderby."`".$dir;
 			}
-						
-			$sql = mysql_query("SELECT * FROM `slider` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY ".$order.$limitTag) or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['url'] = $row['url'];
-					$result[$count]['media_file'] = $row['media_file'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `slider` WHERE `".$tag."` = :id".$sqlTag." ORDER BY ".$order.$limitTag);
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOne_s($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `slider` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['status'] = $row['status'];
-					$result['url'] = $row['url'];
-					$result['media_file'] = $row['media_file'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM slider WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField_s($id, $tag="ref", $ref="title") {
@@ -409,23 +500,16 @@
 		
 		function showAd_s($limit) {
 			$type = $this->mysql_prep($type);
-			$sql = mysql_query("SELECT * FROM `slider` WHERE `status` = 'active' ORDER BY RAND() LIMIT ".$limit) or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['url'] = $row['url'];
-					$result[$count]['media_file'] = $row['media_file'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `slider` WHERE `status` = 'active' ORDER BY RAND() LIMIT ".$limit);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 	}
 ?>

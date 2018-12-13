@@ -9,6 +9,43 @@
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);
 			
+			global $db;
+			$value_array = array(
+							':regulations' => $regulations, 
+							':section_no' => $section_no, 
+							':section_content' => $section_content, 
+							':tags' => $tags, 
+							':status' => $status, 
+							':create_time' => $create_time,
+							':modify_time' => $modify_time
+							);
+			if ($ref != "") {
+				$firstpart = "`ref`, ";
+				$secondPArt = ":ref, ";
+				$value_array[':ref'] = $ref;
+				$log = "Modified object ".$section_no;
+			} else {
+				$firstpart = "";
+				$secondPArt = "";
+				$log = "Created object ".$section_no;
+			}			
+			
+			try {
+				$sql = $db->prepare("INSERT INTO `regulations_sections` (".$firstpart."`regulations`, `status`, `section_no`,`section_content`, `tags`, `create_time`, `modify_time`) 
+				VALUES (".$secondPArt.":regulations, :status, :section_no, :section_content, :tags, :create_time, :modify_time)
+					ON DUPLICATE KEY UPDATE 
+						`regulations` = :regulations,
+						`section_no` = :section_no,
+						`section_content` = :section_content,
+						`tags` = :tags,
+						`status` = :status,
+						`modify_time` = :modify_time
+					");
+				$sql->execute($value_array);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($ref != "") {
 				$firstpart = "`ref`, ";
 				$secondPArt = "'".$ref."', ";
@@ -22,7 +59,7 @@
 			$sql = mysql_query("INSERT INTO `regulations_sections` (".$firstpart."`regulations`,`section_no`, `section_content`,`tags`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$regulations."','".$section_no."','".$section_content."','".$tags."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `section_no` = '".$section_no."', `section_content` = '".$section_content."', `status` = '".$status."', `tags` = '".$tags."', `modify_time` = '".$modify_time."'") or die (mysql_error());
 			
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				if ($ref == "") {
 					$doc = new regulations;
 					$doc->modifyOne("status", "active", $regulations);
@@ -45,11 +82,17 @@
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("DELETE FROM `regulations_sections` WHERE ref = '".$id."'") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `regulations_sections` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
-			
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -68,11 +111,19 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `regulations_sections` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `regulations_sections` SET  `".$tag."` = :value, `modify_time` = :modify_time WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modify_time' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
-				
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -89,107 +140,77 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `regulations_sections` ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['regulations'] = $row['regulations'];
-					$result[$count]['section_no'] = $row['section_no'];
-					$result[$count]['section_content'] = $row['section_content'];
-					$result[$count]['tags'] = $row['tags'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `regulations_sections` ORDER BY `ref` DESC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function lisstMultiple($array) {
 			$list = implode(",", $array);
-			$sql = mysql_query("SELECT * FROM `regulations_sections` WHERE ref IN (".$list.") ORDER BY `section_no` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['regulations'] = $row['regulations'];
-					$result[$count]['section_no'] = $row['section_no'];
-					$result[$count]['section_content'] = $row['section_content'];
-					$result[$count]['tags'] = $row['tags'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `regulations_sections` WHERE ref IN (".$list.") ORDER BY `section_no` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order='ref', $dir="ASC") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
 			
-			$sql = mysql_query("SELECT * FROM `regulations_sections` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['regulations'] = $row['regulations'];
-					$result[$count]['section_no'] = $row['section_no'];
-					$result[$count]['section_content'] = $row['section_content'];
-					$result[$count]['tags'] = $row['tags'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `regulations_sections` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ".$dir);
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `regulations_sections` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['regulations'] = $row['regulations'];
-					$result['section_no'] = $row['section_no'];
-					$result['section_content'] = $row['section_content'];
-					$result['tags'] = $row['tags'];
-					$result['status'] = $row['status'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM regulations_sections WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag="ref", $ref="section_no") {

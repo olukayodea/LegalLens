@@ -10,7 +10,18 @@
 			$change = self::updatePassword($array);
 			
 			if ($change){
-				$sql = mysql_query("UPDATE `users` SET status = 'ACTIVE', modify_time = '".$modify_time."' WHERE ref = '".$ref."'") or die (mysql_error());
+				global $db;
+				try {
+					$sql = $db->prepare("UPDATE `users` SET `status` = 'ACTIVE', `modify_time` = :modifyTime WHERE `ref`=:id");
+					$sql->execute(
+						array(
+						':modifyTime' => time(),
+						':id' => $ref)
+					);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+
 				if ($sql) {
 					$_SESSION['users']['status'] = "ACTIVE";
 					return true;
@@ -27,10 +38,19 @@
 			if ($check == 1) {
 				$data = $this->listOne($email, "email");
 				$password = $this->createRandomPassword();
-				
-				$sql = mysql_query("UPDATE users SET password = '".sha1($password)."', `status` ='NEW', modify_time = '".$timeStamp."' WHERE ref = '".$data['ref']."'") or die (mysql_error());
-				
-				
+								
+				global $db;
+				try {
+					$sql = $db->prepare("UPDATE `users` SET `password` = :password, `status` = 'NEW', `modify_time` = :modifyTime WHERE `ref`=:id");
+					$sql->execute(
+						array(
+						':password' => sha1($password),
+						':modifyTime' => time(),
+						':id' => $data['ref'])
+					);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
 				$client = $data['name'];
 				$subjectToClient = "Password Reset Notification";
 				$contact = "LegalLens <".replyMail.">";
@@ -68,8 +88,18 @@
 		function deactivate($ref) {
 			$ref = $this->mysql_prep($ref);
 			$modify_time = time();
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `users` SET `status` = 'INACTIVE', `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':modifyTime' => time(),
+					':id' => $ref)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
-			$sql = mysql_query("UPDATE `users` SET status = 'INACTIVE', modify_time = '".$modify_time."' WHERE ref = '".$ref."'") or die (mysql_error());
 			if ($sql) {
 				return true;
 			} else {
@@ -80,8 +110,19 @@
 		function delete($ref) {
 			$ref = $this->mysql_prep($ref);
 			$modify_time = time();
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `users` SET `status` = 'DELETED', `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':modifyTime' => time(),
+					':id' => $ref)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
-			$sql = mysql_query("UPDATE `users` SET status = 'DELETED', modify_time = '".$modify_time."' WHERE ref = '".$ref."'") or die (mysql_error());
 			if ($sql) {
 				return true;
 			} else {
@@ -94,11 +135,20 @@
 			$hash = htmlspecialchars_decode($_COOKIE['hash']);
 			$id = $usersControl->getOneField($hash, "hash", "user");
 			
-			if (intval($id) > 0) {			
-				$sql = mysql_query("SELECT * FROM `users` WHERE `ref` = '".$id."' AND `status` != 'DELETED'") or die (mysql_error());
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
+			if (intval($id) > 0) {				
+				global $db;
+				try {
+					$sql = $db->prepare("SELECT * FROM users WHERE `ref`= :ref AND `status` != 'DELETED'");
+					$sql->execute(
+						array(
+						':ref' => $id)
+					);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+				if ($sql->rowCount() == 1) {
+					$usersControl = new usersControl;
+					$row = $sql->fetch(PDO::FETCH_ASSOC);
 					$_SESSION['users']['status'] = $row['status'];
 					$_SESSION['users']['email'] = $row['email'];
 					$_SESSION['users']['username'] = $row['username'];
@@ -128,19 +178,29 @@
 		function login($array) {
 			$email = $this->mysql_prep($array['email']);
 			$password = $this->mysql_prep($array['password']);
-			$sql = mysql_query("SELECT * FROM `users` WHERE email = '".$email."' AND password = '".sha1($password)."' AND `status` != 'DELETED'") or die (mysql_error());
 			
-			if (mysql_num_rows($sql) == 1) {
-				$usersControl = new usersControl;
-				$row = mysql_fetch_array($sql);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `users` WHERE `email`= :email AND `password` = :password AND `status` != 'DELETED'");
+				$sql->execute(
+					array(
+					':email' => $email,
+					':password' => sha1($password))
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql->rowCount() == 1) {
+				global $usersControl;
+				$row = $sql->fetch(PDO::FETCH_ASSOC);
 				$chechLoc = $usersControl->login($row['ref']);
 				if ($chechLoc['status'] == 0) {
 					$this->logout();
 					return 10;
 				} else {
 					$this->addLog($row['ref']);
-					//$hash = $this->encode($row['ref']);
-					//setcookie("login_check", $hash, time()+(60*60*24*180), "/");
+					$hash = $this->encode($row['ref']);
+					setcookie("login_check", $hash, time()+(60*60*24*180), "/");
 					$status = $row['status'];
 					$_SESSION['users']['status'] = $row['status'];
 					$_SESSION['users']['email'] = $row['email'];
@@ -174,12 +234,22 @@
 		function loginMobile($array) {
 			$email = $this->mysql_prep($array['email']);
 			$password = $this->mysql_prep($array['password']);
-			$mobile = $this->mysql_prep($array['mobile']);
-			$sql = mysql_query("SELECT * FROM `users` WHERE email = '".$email."' AND password = '".sha1($password)."' AND `status` != 'DELETED'") or die (mysql_error());
-			
-			if (mysql_num_rows($sql) == 1) {
+			$mobile = $this->mysql_prep($array['mobile']);			
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM users WHERE `email`= :email AND `password` = :password AND `status` != 'DELETED'");
+				$sql->execute(
+					array(
+					':email' => $email,
+					':password' => sha1($password))
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql->rowCount() == 1) {
 				$usersControl = new usersControl;
-				$row = mysql_fetch_array($sql);
+				$row = $sql->fetch(PDO::FETCH_ASSOC);
 				$chechLoc = $usersControl->login($row['ref'], $mobile);
 				if ($chechLoc['status'] == 0) {
 					$this->logoutApp($mobile);
@@ -237,10 +307,17 @@
 		
 		function checkAccount($email) {
 			$email = $this->mysql_prep($email);
-			$sql = mysql_query("SELECT `ref` FROM `users` WHERE email = '".$email."'") or die (mysql_error());
-			$result = mysql_num_rows($sql);
-			
-			return $result;
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT `ref` FROM users WHERE `email`= :email");
+				$sql->execute(
+					array(
+					':email' => $email)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			return $sql->rowCount();
 		}
 		
 		function create($array) {
@@ -256,10 +333,28 @@
 			$modify_time = time();
 			
 			if ($this->checkAccount($email) == 0) {
-				
-				$sql = mysql_query("INSERT INTO `users` (password,`username`, last_name, other_names, email, phone,  subscription_type,  subscription, `status`, date_time, modify_time) VALUES ('".sha1($password)."','".$username."', '".$last_name."', '".$other_names."', '".$email."', '".$phone."', '".$subscription_type."', '".$subscription."', 'ACTIVE', '".$date_time."', '".$modify_time."')") or die (mysql_error());
-				
-				$ref = mysql_insert_id();
+
+				global $db;
+				try {
+					$sql = $db->prepare("INSERT INTO `users` (`last_name`,`password`,`username`,`other_names`,`email`,`phone`,`subscription_type`,`subscription`,`status`,`date_time`,`modify_time`) VALUES (:last_name,:password,:username,:other_names,:email,:phone,:subscription_type,:subscription,:status,:date_time,:modify_time)");
+					$sql->execute(array(
+								':last_name' => $last_name, 
+								':password' => sha1($password), 
+								':username' => $username,
+								':other_names' => $other_names,
+								':email' => $email,
+								':phone' => $phone,
+								':subscription_group' => $subscription_group,
+								':subscription_type' => $subscription_type,
+								':subscription' => $subscription,
+								':status' => $status,
+								':date_time' => $date_time,
+								':modify_time' => $modify_time));
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+							
+				$id = $db->lastInsertId();
 				
 				$client = $last_name." ".$other_names." <".$email.">";
 				$subjectToClient = "LegalLens User Account";
@@ -295,11 +390,18 @@
 		}
 		
 		function modifyOne($tag, $value, $id) {
-			$value = $this->mysql_prep($value);
-			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `users` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `users` SET  `".$tag."` = :value, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				return true;
 			} else {
@@ -315,9 +417,24 @@
 			$phone = $this->mysql_prep($array['phone']);
 			$address = $this->mysql_prep($array['address']);
 			$modify_time = time();
-			
-			$sql = mysql_query("UPDATE `users` SET last_name = '".$last_name."', `other_names` = '".$other_names."', email = '".$email."', phone = '".$phone."', `address` = '".$address."', modify_time = '".$modify_time."' WHERE ref = '".$ref."'") or die (mysql_error());
-			
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `users` SET `last_name` = :last_name, `other_names` = :other_names, `email` = :email, `phone` = :phone, `address` = :address, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':last_name' => $last_name,
+					':other_names' => $other_names,
+					':email' => $email,
+					':phone' => $phone,
+					':address' => $address,
+					':modifyTime' => time(),
+					':id' => $ref)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+						
 			if ($sql) {
 				if ($ref == $result['ref']) {
 					$_SESSION['users']['email'] = $email;
@@ -335,9 +452,20 @@
 			$ref = $this->mysql_prep($array['ref']);
 			$password = $this->mysql_prep(trim($array['password']));
 			$modify_time = time();
-			
-			$sql = mysql_query("UPDATE `users` SET password = '".sha1($password)."', modify_time = '".$modify_time."' WHERE ref = '".$ref."'") or die (mysql_error());
-			
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `users` SET `password` = :password, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':password' => sha1($password),
+					':modifyTime' => time(),
+					':id' => $ref)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+						
 			if ($sql) {
 				return true;
 			} else {
@@ -351,147 +479,77 @@
 			} else {
 				$add = "";
 			}
-			$sql = mysql_query("SELECT * FROM `users` WHERE status != 'DELETED' ORDER BY `ref` ASC".$add) or die (mysql_error());
 			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['last_name'] = $row['last_name'];
-					$result[$count]['other_names'] = $row['other_names'];
-					$result[$count]['username'] = $row['username'];
-					$result[$count]['email'] = $row['email'];
-					$result[$count]['phone'] = $row['phone'];
-					$result[$count]['address'] = $row['address'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['subscription_type'] = $row['subscription_type'];
-					$result[$count]['subscription_group'] = $row['subscription_group'];
-					$result[$count]['subscription_group_onwer'] = $row['subscription_group_onwer'];
-					$result[$count]['subscription_order'] = $row['subscription_order'];
-					$result[$count]['subscription'] = $row['subscription'];
-					$result[$count]['date_time'] = $row['date_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$result[$count]['last_login'] = $row['last_login'];
-					$result[$count]['login_time'] = $row['login_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
-			} else {
-				return false;
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `users` WHERE status != 'DELETED' ORDER BY `ref` ASC".$add);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function listAllActive() {
-			$sql = mysql_query("SELECT * FROM `users` WHERE status != 'DELETED' AND `subscription` > '".time()."' ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['last_name'] = $row['last_name'];
-					$result[$count]['other_names'] = $row['other_names'];
-					$result[$count]['username'] = $row['username'];
-					$result[$count]['email'] = $row['email'];
-					$result[$count]['phone'] = $row['phone'];
-					$result[$count]['address'] = $row['address'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['subscription_type'] = $row['subscription_type'];
-					$result[$count]['subscription_group'] = $row['subscription_group'];
-					$result[$count]['subscription_group_onwer'] = $row['subscription_group_onwer'];
-					$result[$count]['subscription_order'] = $row['subscription_order'];
-					$result[$count]['subscription'] = $row['subscription'];
-					$result[$count]['date_time'] = $row['date_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$result[$count]['last_login'] = $row['last_login'];
-					$result[$count]['login_time'] = $row['login_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
-			} else {
-				return false;
+		function listAllActive() {			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `users` WHERE status != 'DELETED' AND `subscription` > '".time()."' ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order="ref") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
-			$sql = mysql_query("SELECT * FROM `users` WHERE `".$tag."` = '".$id."'".$sqlTag."  AND `status` != 'DELETED' ORDER BY `ref` ASC".$add) or die (mysql_error());
 			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['last_name'] = $row['last_name'];
-					$result[$count]['other_names'] = $row['other_names'];
-					$result[$count]['username'] = $row['username'];
-					$result[$count]['email'] = $row['email'];
-					$result[$count]['phone'] = $row['phone'];
-					$result[$count]['address'] = $row['address'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['subscription_type'] = $row['subscription_type'];
-					$result[$count]['subscription_group'] = $row['subscription_group'];
-					$result[$count]['subscription_group_onwer'] = $row['subscription_group_onwer'];
-					$result[$count]['subscription_order'] = $row['subscription_order'];
-					$result[$count]['subscription'] = $row['subscription'];
-					$result[$count]['date_time'] = $row['date_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$result[$count]['last_login'] = $row['last_login'];
-					$result[$count]['login_time'] = $row['login_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
-			} else {
-				return false;
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `users` WHERE `".$tag."` = :id".$sqlTag." AND `status` != 'DELETED' ORDER BY `".$order."` ASC");
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
 		
 		function listOne($ref, $tag='ref') {
 			$ref = $this->mysql_prep($ref);
-			$sql = mysql_query("SELECT * FROM `users` WHERE `".$tag."` = '".$ref."'") or die (mysql_error());
-						
-			if ($sql) {
-				$result = array();
-				
-				$row = mysql_fetch_array($sql);
-				$result['ref'] = $row['ref'];
-				$result['last_name'] = $row['last_name'];
-				$result['other_names'] = $row['other_names'];
-				$result['username'] = $row['username'];
-				$result['email'] = $row['email'];
-				$result['phone'] = $row['phone'];
-				$result['address'] = $row['address'];
-				$result['status'] = $row['status'];
-				$result['subscription_type'] = $row['subscription_type'];
-				$result['subscription'] = $row['subscription'];
-				$result['subscription_group'] = $row['subscription_group'];
-				$result['subscription_group_onwer'] = $row['subscription_group_onwer'];
-				$result['subscription_order'] = $row['subscription_order'];
-				$result['date_time'] = $row['date_time'];
-				$result['modify_time'] = $row['modify_time'];
-				$result['last_login'] = $row['last_login'];
-				$result['login_time'] = $row['login_time'];
-				
-				return $this->out_prep($result);
-			} else {
-				return false;
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM users WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $ref)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag="ref", $ref="last_name") {
@@ -515,9 +573,26 @@
 				$date_time = $modify_time = time();
 				
 				if ($this->checkAccount($email) == 0) {
-					$sql = mysql_query("INSERT INTO `users` (password, last_name, `username`, other_names, email, subscription_group,  subscription_type,  subscription, `subscription_group_onwer`, date_time, modify_time) VALUES ('".sha1($password)."', '".$last_name."','".$username."', '".$other_names."', '".$email."', '".$subscription_group."', '".$subscription_type."', '".$subscription."', '".$subscription_group_onwer."', '".$date_time."', '".$modify_time."')") or die (mysql_error());
-					
-					$id = mysql_insert_id();
+					global $db;
+					try {
+						$sql = $db->prepare("INSERT INTO `users` (`last_name`,`password`,`username`,`other_names`,`email`,`subscription_group`,`subscription_type`,`subscription`,`subscription_group_onwer`,`date_time`,`modify_time`) VALUES (:last_name,:password,:username,other_names,email,subscription_group,subscription_type,subscription,subscription_group_onwer,:date_time,:modify_time)");
+						$sql->execute(array(
+									':last_name' => $last_name, 
+									':password' => $password, 
+									':username' => $username,
+									':other_names' => $other_names,
+									':email' => $email,
+									':subscription_group' => $subscription_group,
+									':subscription_type' => $subscription_type,
+									':subscription' => $subscription,
+									':subscription_group_onwer' => $subscription_group_onwer,
+									':date_time' => $date_time,
+									':modify_time' => $modify_time));
+					} catch(PDOException $ex) {
+						echo "An Error occured! ".$ex->getMessage(); 
+					}
+								
+					$id = $db->lastInsertId();
 					
 					//add to log
 					$logArray['object'] = get_class($this);
@@ -619,8 +694,17 @@
 		
 		function confirmUnique($key) {
 			$key = $this->mysql_prep($key);
-			$sql = mysql_query("SELECT * FROM users WHERE `username` = '".$key."'") or die (mysql_error()."sch");
-			if (mysql_num_rows($sql) == 0) {
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM users WHERE `username`= :key");
+				$sql->execute(
+					array(
+					':key' => $key)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql->rowCount() == 0) {
 				return $key;
 			} else {
 				return $this->confirmUnique($this->createUnique($key));

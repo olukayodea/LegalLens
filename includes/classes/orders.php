@@ -11,12 +11,28 @@
 			$order_subscription_type = $this->mysql_prep($array['order_subscription_type']);
 			$order_users = $this->mysql_prep($array['order_users']);
 			$payment_type = $this->mysql_prep($array['payment_type']);
-			$create_time = $modify_time = time();
-						
-			$sql = mysql_query("INSERT INTO `orders` (`order_owner`,`order_amount_net`,`order_subscription`,`order_amount_discount`,`order_amount_gross`,`order_subscription_type`,`payment_type`,`order_users`,`create_time`,`modify_time`) VALUES ('".$order_owner."','".$order_amount_net."','".$order_subscription."','".$order_amount_discount."','".$order_amount_gross."','".$order_subscription_type."','".$payment_type."','".$order_users."','".$create_time."','".$modify_time."')") or die (mysql_error());
-			
+			$create_time = $modify_time = time();			
+
+			global $db;
+			try {
+				$sql = $db->prepare("INSERT INTO `orders` (`order_owner`,`order_amount_net`,`order_subscription`,`order_amount_discount`,`order_amount_gross`,`order_subscription_type`,`payment_type`,`order_users`,`create_time`,`modify_time`) 
+				VALUES (:order_owner,:order_amount_net,:order_subscription,:order_amount_discount,:order_amount_gross,:order_subscription_type,:payment_type,:order_users,:create_time,:modify_time)");
+				$sql->execute(array(
+							':order_owner' => $order_owner, 
+							':order_amount_net' => $order_amount_net, 
+							':order_subscription' => $order_subscription,
+							':order_amount_discount' => $order_amount_discount,
+							':order_amount_gross' => $order_amount_gross,
+							':order_subscription_type' => $order_subscription_type,
+							':payment_type' => $payment_type,
+							':order_users' => $order_users,
+							':create_time' => $create_time,
+							':modify_time' => $modify_time));
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				$notification = new notification;
 				if ($payment_type != "Online") {
 					$notification_array['type'] = "orders";
@@ -49,8 +65,19 @@
 		function updateOne($tag, $value, $id) {
 			$id = $this->mysql_prep($id);
 			$value = $this->mysql_prep($value);
-			$sql = mysql_query("UPDATE orders SET `".$tag."` = '".$value."', `modify_time` = '".time()."' WHERE ref = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `orders` SET  `".$tag."` = :value, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -73,131 +100,77 @@
 			} else {
 				$add = "";
 			}
-			$sql = mysql_query("SELECT * FROM `orders` ORDER BY `ref` DESC".$add) or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['order_owner'] = $row['order_owner'];
-					$result[$count]['order_amount_net'] = $row['order_amount_net'];
-					$result[$count]['order_subscription'] = $row['order_subscription'];
-					$result[$count]['order_amount_discount'] = $row['order_amount_discount'];
-					$result[$count]['order_amount_gross'] = $row['order_amount_gross'];
-					$result[$count]['order_subscription_type'] = $row['order_subscription_type'];
-					$result[$count]['payment_type'] = $row['payment_type'];
-					$result[$count]['order_users'] = $row['order_users'];
-					$result[$count]['order_status'] = $row['order_status'];
-					$result[$count]['last_modified_by'] = $row['last_modified_by'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `orders` ORDER BY `ref` DESC".$add);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function dataRange($from, $to) {
-			$sql = mysql_query("SELECT * FROM `orders` WHERE `modify_time` BETWEEN '".$from."' AND '".$to."' ORDER BY `modify_time` DESC".$add) or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['order_owner'] = $row['order_owner'];
-					$result[$count]['order_amount_net'] = $row['order_amount_net'];
-					$result[$count]['order_subscription'] = $row['order_subscription'];
-					$result[$count]['order_amount_discount'] = $row['order_amount_discount'];
-					$result[$count]['order_amount_gross'] = $row['order_amount_gross'];
-					$result[$count]['order_subscription_type'] = $row['order_subscription_type'];
-					$result[$count]['payment_type'] = $row['payment_type'];
-					$result[$count]['order_users'] = $row['order_users'];
-					$result[$count]['order_status'] = $row['order_status'];
-					$result[$count]['last_modified_by'] = $row['last_modified_by'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `orders` WHERE `modify_time` BETWEEN '".$from."' AND '".$to."' ORDER BY `modify_time` DESC".$add);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function sortAll($tag, $id, $limit=false, $id2=false, $tag2=false, $id3=false, $tag3=false) {
-			$id = $this->mysql_prep($id);
-			if ($limit = true) {
-				$tag_limit = " LIMIT ".$limit;
-			} else {
-				$tag_limit = "";
-			}
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($tag, $id, $limit=false, $id2=false, $tag2=false, $id3=false, $tag3=false, $order="ref") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
-				
-			$sql = mysql_query("SELECT * FROM `orders` WHERE `".$tag."`  = '".$id."'".$sqlTag."  ORDER BY `ref` DESC".$tag_limit) or die (mysql_error());
 			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['order_owner'] = $row['order_owner'];
-					$result[$count]['order_amount_net'] = $row['order_amount_net'];
-					$result[$count]['order_subscription'] = $row['order_subscription'];
-					$result[$count]['order_amount_discount'] = $row['order_amount_discount'];
-					$result[$count]['order_amount_gross'] = $row['order_amount_gross'];
-					$result[$count]['order_subscription_type'] = $row['order_subscription_type'];
-					$result[$count]['payment_type'] = $row['payment_type'];
-					$result[$count]['order_users'] = $row['order_users'];
-					$result[$count]['order_status'] = $row['order_status'];
-					$result[$count]['last_modified_by'] = $row['last_modified_by'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `orders` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `orders` WHERE `".$tag."` = '".$id."'") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				
-				$row = mysql_fetch_array($sql);
-				if ($row > 0) {
-					$result['ref'] = $row['ref'];
-					$result['order_owner'] = $row['order_owner'];
-					$result['order_amount_net'] = $row['order_amount_net'];
-					$result['order_subscription'] = $row['order_subscription'];
-					$result['order_amount_discount'] = $row['order_amount_discount'];
-					$result['order_amount_gross'] = $row['order_amount_gross'];
-					$result['order_subscription_type'] = $row['order_subscription_type'];
-					$result['payment_type'] = $row['payment_type'];
-					$result['order_users'] = $row['order_users'];
-					$result['order_status'] = $row['order_status'];
-					$result['last_modified_by'] = $row['last_modified_by'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-				}
-				
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM orders WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
                 
 		function getOneField($id, $tag="ref", $ref="order_amount_net") {

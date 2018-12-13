@@ -57,14 +57,14 @@
 		} else if ($login == 1) {
 			header("location: ?confirm");
 		} else if ($login == 2) {
-			header("location: ".$tagLink);
+           header("location: ".$tagLink);
 		} else if ($login == 3) {
 		} else if ($login == 10) {
 			$er = "you are signed in on up to 3 devices, please logout from one device to continue";
 			
 			header("location: ./?error=".urlencode($er));
 		}
-	}
+    }
 	
 	if (isset($_POST['registerButton'])) {
 		$add = $users->create($_POST);

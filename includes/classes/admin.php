@@ -10,7 +10,16 @@
 			$change = self::updatePassword($array);
 			
 			if ($change){
-				$sql = mysql_query("UPDATE admin SET status = 'ACTIVE', timeStamp = '".$timeStamp."' WHERE id = '".$id."'") or die (mysql_error());
+				global $db;
+				try {
+					$sql = $db->prepare("UPDATE `admin` SET  status = 'ACTIVE', `timeStamp`=:timeStamp WHERE `id`=:id");
+					$sql->execute(
+						array(':timeStamp' => $timeStamp, ':id' => $id)
+					);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+
 				if ($sql) {
 					$_SESSION['admin']['status'] = "ACTIVE";
 					
@@ -33,8 +42,17 @@
 		function deactivate($id) {
 			$id = $this->mysql_prep($id);
 			$timeStamp = time();
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `admin` SET  status = 'INACTIVE', `timeStamp`=:timeStamp WHERE `id`=:id");
+				$sql->execute(
+					array(':timeStamp' => $timeStamp, ':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
-			$sql = mysql_query("UPDATE admin SET status = 'INACTIVE', timeStamp = '".$timeStamp."' WHERE id = '".$id."'") or die (mysql_error());
 			if ($sql) {
 				
 				//add to log
@@ -55,8 +73,17 @@
 		function delete($id) {
 			$id = $this->mysql_prep($id);
 			$timeStamp = time();
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `admin` SET  status = 'DELETED', `timeStamp`=:timeStamp WHERE `id`=:id");
+				$sql->execute(
+					array(':timeStamp' => $timeStamp, ':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
-			$sql = mysql_query("UPDATE admin SET status = 'DELETED', timeStamp = '".$timeStamp."' WHERE id = '".$id."'") or die (mysql_error());
 			if ($sql) {
 				
 				//add to log
@@ -77,10 +104,17 @@
 		function login($array) {
 			$username = $this->mysql_prep($array['username']);
 			$password = $this->mysql_prep($array['password']);
-			$sql = mysql_query("SELECT * FROM admin WHERE (`username` = '".$username."' OR `email` = '".$username."') AND password = '".sha1($password)."' AND `status` != 'DELETED'") or die (mysql_error());
-			
-			if (mysql_num_rows($sql) == 1) {
-				$row = mysql_fetch_array($sql);
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `admin` WHERE (`username` = :username OR `email` = :username) AND `password` = :password AND `status` != 'DELETED'");
+				$sql->execute(array(':username' => $username,
+									':password' => sha1($password)));
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql->rowCount() == 1) {
+				$row = $sql->fetch(PDO::FETCH_ASSOC);
 				$status = $row['status'];
 				$_SESSION['admin']['status'] = $row['status'];
 				$_SESSION['admin']['username'] = $row['username'];
@@ -143,11 +177,16 @@
 		}
 		
 		function checkAccount($email) {
-			$email = $this->mysql_prep($email);
-			$sql = mysql_query("SELECT `id` FROM `admin` WHERE email = '".$email."' AND `status` != 'DELETED'") or die (mysql_error());
-			$result = mysql_num_rows($sql);
-			
-			return $result;
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT `id` FROM `admin` WHERE `email` = :email AND `status` != 'DELETED'");
+				$sql->execute(array(':email' => $email));
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
+			return $sql->rowCount();
 		}
 		
 		function create ($array) {
@@ -165,9 +204,23 @@
 			$timeStamp = time();
 			
 			if ($this->checkAccount($email) == 0) {
-				$sql = mysql_query("INSERT INTO admin (`username`, `password`, `name`, `email`, `adminType`, `phone`, `date_time`, `timeStamp`) VALUES ('".$username."', '".sha1($password)."', '".$name."', '".$email."', '".$adminType."', '".$phone."', '".$date_time."', '".$timeStamp."')") or die (mysql_error());
-				
-				$id = mysql_insert_id();
+
+				try {
+					$sql = $db->prepare("INSERT INTO `admin` (`username`, `password`, `name`, `email`, `adminType`, `phone`, `date_time`, `timeStamp`) VALUES (:username, :password, :name, :email, :adminType, :phone, :date_time, :timeStamp)");
+					$sql->execute(
+						array(	':username' => $username,
+								':password' => sha1($password),
+								':name' => $name,
+								':email' => $email,
+								':adminType' => $adminType,
+								':phone' => $phone,
+								':date_time' => $date_time,
+								':timeStamp' => $timeStamp)
+							);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+				$id = $db->lastInsertId();
 				
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -211,12 +264,43 @@
 		}
 		
 		function confirmUnique($key) {
-			$key = $this->mysql_prep($key);
-			$sql = mysql_query("SELECT * FROM admin WHERE `username` = '".$key."'") or die (mysql_error()."sch");
-			if (mysql_num_rows($sql) == 0) {
+				
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT `id` FROM `admin` WHERE `username` = :username AND `status` != 'DELETED'");
+				$sql->execute(array(':username' => $key));
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
+			if ($sql->rowCount() == 0) {
 				return $key;
 			} else {
 				return $this->confirmUnique($this->createUnique($key));
+			}
+		}
+
+		function modifyOne($tag, $value, $id) {
+			$value = $this->mysql_prep($value);
+			$id = $this->mysql_prep($id);
+			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `admin` SET  `".$tag."` = :value, `timeStamp` = :modifyTime WHERE `id`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
+			if ($sql) {
+				return true;
+			} else {
+				return false;
 			}
 		}
 		
@@ -227,7 +311,21 @@
 			$phone = $this->mysql_prep($array['phone']);
 			$adminType = $this->mysql_prep($array['adminType']);
 			$timeStamp = time();
-			$sql = mysql_query("UPDATE admin SET name = '".$name."', `adminType` = '".$adminType."', email = '".$email."', phone = '".$phone."', timeStamp = '".$timeStamp."' WHERE id = '".$id."'") or die (mysql_error());
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `admin` SET  name = :name, `adminType`=:adminType, `email`=:email, `phone`=:phone, `timeStamp`=:timeStamp WHERE `id`=:id");
+				$sql->execute(
+					array(':timeStamp' => time(), 
+					':name' => $name,
+					':adminType' => $adminType,
+					':email' => $email,
+					':phone' => $phone,
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				if ($_SESSION['admin']['id'] == $id) {
@@ -237,7 +335,6 @@
 					$_SESSION['admin']['adminType'] = $read;
 					$_SESSION['admin']['timeStamp'] = $timeStamp;
 				}
-				
 				
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -261,9 +358,18 @@
 			if ($check == 1) {
 				$data = $this->listOne($email, "email");
 				$password = $this->createRandomPassword();
-				
-				$sql = mysql_query("UPDATE admin SET password = '".sha1($password)."', timeStamp = '".$timeStamp."' WHERE id = '".$data['id']."'") or die (mysql_error());
-				
+									
+				global $db;
+				try {
+					$sql = $db->prepare("UPDATE `admin` SET  password = :password,`timeStamp`=:timeStamp WHERE `id`=:id");
+					$sql->execute(
+						array(':timeStamp' => time(), 
+						':password' => sha1($password),
+						':id' => $data['id'])
+					);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}				
 				
 				$client = $data['name'];
 				$subjectToClient = "Password Reset Notification";
@@ -302,8 +408,18 @@
 			$id = $this->mysql_prep($array['id']);
 			$password = $this->mysql_prep(trim($array['password']));
 			$timeStamp = time();
-			
-			$sql = mysql_query("UPDATE admin SET password = '".sha1($password)."', timeStamp = '".$timeStamp."' WHERE id = '".$id."'") or die (mysql_error());
+	
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `admin` SET  password = :password,`timeStamp`=:timeStamp WHERE `id`=:id");
+				$sql->execute(
+					array(':timeStamp' => time(), 
+					':password' => sha1($password),
+					':id' => $data['id'])
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				
@@ -342,83 +458,68 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM admin WHERE status != 'DELETED'") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['id'] = $row['id'];
-					$result[$count]['username'] = $row['username'];
-					$result[$count]['name'] = $row['name'];
-					$result[$count]['email'] = $row['email'];
-					$result[$count]['phone'] = $row['phone'];
-					$result[$count]['adminType'] = $row['adminType'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['date_time'] = $row['date_time'];
-					$result[$count]['timeStamp'] = $row['timeStamp'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			if (isset($_SESSION['admin']['country'])) {
+				$added = "`adminType` IN (SELECT `id` FROM `admintypes` WHERE `country` LIKE '%".$_SESSION['admin']['country']."%' ) AND ";
+			} else {
+				$added = "";
 			}
+			try {
+				$sql = $db->query("SELECT * FROM `admin` WHERE `status` != 'DELETED'");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function countAl() {
-			$sql = mysql_query("SELECT COUNT(*) FROM admin WHERE status != 'DELETED'") or die (mysql_error());
-			if ($sql) {				
-				$row = mysql_fetch_array($sql);
-				return $row[0];
+			global $db;
+			try {
+				$sql = $db->query("SELECT COUNT(*) FROM admin WHERE status != 'DELETED'");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+						
+			return $sql->rowCount();
 		}
 		
 		function sortList($tag, $id) {
-			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM admin WHERE `".$tag."` = '".$id."'") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['id'] = $row['id'];
-					$result[$count]['username'] = $row['username'];
-					$result[$count]['name'] = $row['name'];
-					$result[$count]['email'] = $row['email'];
-					$result[$count]['phone'] = $row['phone'];
-					$result[$count]['adminType'] = $row['adminType'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['date_time'] = $row['date_time'];
-					$result[$count]['timeStamp'] = $row['timeStamp'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM admin WHERE `".$tag."` = :id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function listOne($id, $tag='id') {
-			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM admin WHERE `".$tag."` = '".$id."' AND `status` != 'DELETED'") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				
-				$row = mysql_fetch_array($sql);
-				$result['id'] = $row['id'];
-				$result['username'] = $row['username'];
-				$result['password'] = $row['password'];
-				$result['name'] = $row['name'];
-				$result['email'] = $row['email'];
-				$result['adminType'] = $row['adminType'];
-				$result['status'] = $row['status'];
-				$result['phone'] = $row['phone'];
-				$result['date_time'] = $row['date_time'];
-				$result['timeStamp'] = $row['timeStamp'];
-				
-				return $this->out_prep($result);
-			} else {
-				return false;
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM admin WHERE `".$tag."` = :id AND `status` != 'DELETED'");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag='id', $ref='name') {
@@ -427,20 +528,22 @@
 		}
 		
 		function createAdminType($array) {
-			$title = $this->mysql_prep($array['title']);
-			$read = $this->mysql_prep($array['read']);
-			$write = $this->mysql_prep($array['write']);
-			$modify = $this->mysql_prep($array['modify']);
-			$mainPage = $this->mysql_prep($array['mainPage']);
-			$level = $this->mysql_prep($array['level']);
-			$id = $this->mysql_prep($array['id']);
-			$pages = implode(",", $array['pages']);
-			$createTime = $modifyTime = time();
-			$creator = $lastModified = $_SESSION['admin']['id'];
-			
+			global $db;
+			$value_array = array(':title' => $array['title'], 
+							':level' => $array['level'], 
+							':read' => intval($array['read']), 
+							':write' => intval($array['write']), 
+							':modify' => intval($array['modify']), 
+							':mainPage' => $array['mainPage'], 
+							':pages' => $pages, 
+							':createTime' => $createTime, 
+							':modifyTime' => $modifyTime, 
+							':creator' => $creator, 
+							':lastModified' => $lastModified);
 			if ($id != "") {
 				$firstpart = "`id`, ";
-				$secondPArt = "'".$id."', ";
+				$secondPArt = ":id, ";
+				$value_array[':id'] = $id;
 				$log = "Modified admin type ".$title;
 			} else {
 				$firstpart = "";
@@ -448,10 +551,28 @@
 				$log = "created new admin type ".$title;
 			}
 			
-			$sql = mysql_query("INSERT INTO admintypes (".$firstpart."`title`, `level`, `read`, `write`, `modify`, `mainPage`, `pages`, `createTime`, `modifyTime`, `creator`, `lastModified`) VALUES (".$secondPArt."'".$title."', '".$level."', '".$read."', '".$write."', '".$modify."', '".$mainPage."', '".$pages."', '".$createTime."', '".$modifyTime."', '".$creator."', '".$lastModified."') ON DUPLICATE KEY UPDATE `title` = '".$title."', `read` = '".$read."', `write` = '".$write."', `modify` = '".$modify."', `mainPage` = '".$mainPage."', `pages` = '".$pages."', `level` = '".$level."', `lastModified` = '".$lastModified."', `modifyTime` = '".$modifyTime."'") or die (mysql_error());
-			
+			try {
+				$sql = $db->prepare("INSERT INTO `admintypes` (".$firstpart."`title`,`level`,`read`,`write`,`modify`,`mainPage`,`pages`,`createTime`,`modifyTime`,`creator`,`lastModified`) VALUES (".$secondPArt.":title,:level,:read,:write,:modify,:mainPage,:pages,:createTime,:modifyTime,:creator,:lastModified)
+					ON DUPLICATE KEY UPDATE 
+						`title` = :title,
+						`level` = :level,
+						`read` = :read,
+						`write` = :write,
+						`modify` = :modify,
+						`mainPage` = :mainPage,
+						`pages` = :pages,
+						`modifyTime` = :modifyTime,
+						`creator` = :creator,
+						`lastModified` = :lastModified
+					
+					");
+				$sql->execute($value_array);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId(); 
 				
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -469,55 +590,35 @@
 		}
 		
 		function listAdmintypes() {
-			$sql = mysql_query("SELECT * FROM admintypes ORDER BY `title` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['id'] = $row['id'];
-					$result[$count]['title'] = $row['title'];
-					$result[$count]['read'] = $row['read'];
-					$result[$count]['write'] = $row['write'];
-					$result[$count]['modify'] = $row['modify'];
-					$result[$count]['level'] = $row['level'];
-					$result[$count]['mainPage'] = $row['mainPage'];
-					$result[$count]['pages'] = $row['pages'];
-					$result[$count]['creator'] = $row['creator'];
-					$result[$count]['lastModified'] = $row['lastModified'];
-					$result[$count]['createTime'] = $row['createTime'];
-					$result[$count]['modifyTime'] = $row['modifyTime'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM admintypes ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function listOneType($id) {
-			$sql = mysql_query("SELECT * FROM admintypes WHERE id = '".$id."'") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				
-				$row = mysql_fetch_array($sql);
-				$result['id'] = $row['id'];
-				$result['title'] = $row['title'];
-				$result['read'] = $row['read'];
-				$result['write'] = $row['write'];
-				$result['modify'] = $row['modify'];
-				$result['pages'] = $row['pages'];
-				$result['level'] = $row['level'];
-				$result['mainPage'] = $row['mainPage'];
-				$result['creator'] = $row['creator'];
-				$result['lastModified'] = $row['lastModified'];
-				$result['createTime'] = $row['createTime'];
-				$result['modifyTime'] = $row['modifyTime'];
-				
-				return $this->out_prep($result);
-			} else {
-				return false;
+		function listOneType($id, $tag='id') {
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM admintypes WHERE `".$tag."` = :id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneTypeField($id, $tag='id', $ref='title') {

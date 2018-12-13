@@ -48,11 +48,32 @@
 			$loc_lat = $this->mysql_prep($array['loc_lat']);
 			$loc_long = $this->mysql_prep($array['loc_long']);
 			$create_time = $last_login = time();
-			
-			$sql = mysql_query("INSERT INTO `browser_log` (`user`, `hash`, `address`, `browser_name`,  `browser_number`, `os`, `os_number`, `loc_city`, `loc_region`, `loc_country`, `loc_continent`, `loc_lat`, `loc_long`, `create_time`, `last_login`) VALUES ('".$user."','".$hash."','".$address."','".$browser_name."','".$browser_number."','".$os."', '".$os_number."', '".$loc_city."', '".$loc_region."', '".$loc_country."', '".$loc_continent."', '".$loc_lat."', '".$loc_long."', '".$create_time."', '".$last_login."') ") or die (mysql_error()."hhhh");
-			
+						
+			global $db;
+			try {
+				$sql = $db->prepare("INSERT INTO `browser_log` (`user`,`hash`,`address`,`browser_name`,`browser_number`,`os`,`os_number`,`loc_city`,`loc_region`,`loc_country`,`loc_continent`,`loc_lat`,`loc_long`,`create_time`,`last_login`) 
+				VALUES (:user,:hash,:address,:browser_name,:browser_number,:os,:os_number,:loc_city,:loc_region,:loc_country,:loc_continent,:loc_lat,:loc_long,:create_time,:last_login)");
+				$sql->execute(array(
+							':user' => $user, 
+							':hash' => $hash, 
+							':address' => $address,
+							':browser_name' => $browser_name,
+							':browser_number' => $browser_number,
+							':os' => $os,
+							':os_number' => $os_number,
+							':loc_city' => $loc_city,
+							':loc_region' => $loc_region,
+							':loc_country' => $loc_country,
+							':loc_continent' => $loc_continent,
+							':loc_lat' => $loc_lat,
+							':loc_long' => $loc_long,
+							':create_time' => $create_time,
+							':last_login' => $last_login));
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -72,9 +93,18 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `browser_log` SET `".$tag."` = '".$value."' WHERE ref = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `browser_log` SET  `".$tag."` = :value WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -109,13 +139,16 @@
 		}
 		
 		function getActive() {
-			$sql = mysql_query("SELECT * FROM `browser_log` GROUP BY `user` ORDER BY `ref` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `browser_log` GROUP BY `user` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
 				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['user'] = $row['user'];
 					$count++;
@@ -125,64 +158,39 @@
 		}
 		
 		function listUser($tag, $id) {
-			$sql = mysql_query("SELECT * FROM `browser_log` WHERE `".$tag."` = '".$id."' ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['user'] = $row['user'];
-					$result[$count]['hash'] = $row['hash'];
-					$result[$count]['browser_name'] = $row['browser_name'];
-					$result[$count]['browser_number'] = $row['browser_number'];
-					$result[$count]['os'] = $row['os'];
-					$result[$count]['os_number'] = $row['os_number'];
-					$result[$count]['address'] = $row['address'];
-					$result[$count]['loc_city'] = $row['loc_city'];
-					$result[$count]['loc_region'] = $row['loc_region'];
-					$result[$count]['loc_country'] = $row['loc_country'];
-					$result[$count]['loc_continent'] = $row['loc_continent'];
-					$result[$count]['loc_lat'] = $row['loc_lat'];
-					$result[$count]['loc_long'] = $row['loc_long'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['last_login'] = $row['last_login'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `browser_log` WHERE `".$tag."` = :id ORDER BY `ref` ASC");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `browser_log` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['user'] = $row['user'];
-					$result['hash'] = $row['hash'];
-					$result['browser_name'] = $row['browser_name'];
-					$result['browser_number'] = $row['browser_number'];
-					$result['os'] = $row['os'];
-					$result['os_number'] = $row['os_number'];
-					$result['address'] = $row['address'];
-					$result['loc_city'] = $row['loc_city'];
-					$result['loc_region'] = $row['loc_region'];
-					$result['loc_country'] = $row['loc_country'];
-					$result['loc_continent'] = $row['loc_continent'];
-					$result['loc_lat'] = $row['loc_lat'];
-					$result['loc_long'] = $row['loc_long'];
-					$result['create_time'] = $row['create_time'];
-					$result['last_login'] = $row['last_login'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM browser_log WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag="ref", $ref="title") {
@@ -191,7 +199,7 @@
 		}
 		
 		function login($id, $mobile=false) {
-			$users = new users;
+			global $users;
 			if ($mobile == true) {
 				$hash = $mobile;
 			} else if (isset($_COOKIE['hash'])) {
@@ -299,7 +307,16 @@
 			}
 			$data = $this->listUser("hash", $hash);
 			
-			$sql = mysql_query("DELETE FROM `browser_log` WHERE `".$tag."` = '".$hash."'") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `browser_log` WHERE `".$tag."` =:hash");
+				$sql->execute(
+					array(
+					':hash' => $hash)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			setcookie("hash", "", time()-42000);
 			unset($_COOKIE['hash']);
 			if ($sql) {

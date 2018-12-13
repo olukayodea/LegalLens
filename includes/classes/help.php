@@ -22,10 +22,25 @@ class help extends common {
 			}
 			
 			if ($good == true) {
-				$sql = mysql_query("INSERT INTO `help` (`category`,`content`, `parent_id`, `user_id`,`admin_id`,`response_id`,`create_time`,`modify_time`,`file`) VALUES ('".$category."','".$content."','".$parent_id."', '".$user_id."','".$admin_id."','".$response_id."','".$create_time."','".$modify_time."','".$upload_file."')") or die (mysql_error());
-				
+				global $db;
+				try {
+					$sql = $db->prepare("INSERT INTO `help` (`category`,`content`,`parent_id`,`user_id`,`admin_id`,`response_id`,`file`,`create_time`,`modify_time`) 
+					VALUES (:category,:content,:parent_id,:user_id,:admin_id,:response_id,:file,:create_time,:modify_time)");
+					$sql->execute(array(
+								':category' => $category, 
+								':content' => $content, 
+								':parent_id' => $parent_id,
+								':user_id' => $user_id,
+								':admin_id' => $admin_id,
+								':response_id' => $response_id,
+								':file' => $file,
+								':create_time' => $create_time,
+								':modify_time' => $modify_time));
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
 				if ($sql) {
-					$id = mysql_insert_id();
+					$id = $db->lastInsertId();
 					
 					$this->statusMail($id);
 					if ($adm == false) {
@@ -106,9 +121,16 @@ class help extends common {
 			$id = $this->mysql_prep($id);
 			$modDate = time();
 			
-			$data = $this->getOne($id);
-			
-			$sql = mysql_query("DELETE FROM `help` WHERE ref = '".$id."'") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `help` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}			
 			
 			if ($sql) {
 				return true;
@@ -120,9 +142,19 @@ class help extends common {
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `help` SET `".$tag."` = '".$value."' WHERE ref = '".$id."'") or die (mysql_error());
-			
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `help` SET  `".$tag."` = :value WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				return true;
 			} else {
@@ -132,10 +164,18 @@ class help extends common {
 		
 		function close($id) {
 			$id = $this->mysql_prep($id);
-			$modDate = time();
 			$this->modifyOne("status", "2", $id);
-			$sql = mysql_query("UPDATE `help` SET `status` = '2' WHERE parent_id = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `help` SET  `status` = '2' WHERE `parent_id`=:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				return true;
 			} else {
@@ -144,94 +184,63 @@ class help extends common {
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `help` ORDER BY `ref`, `status` DESC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['category'] = $row['category'];
-					$result[$count]['content'] = $row['content'];
-					$result[$count]['user_id'] = $row['user_id'];
-					$result[$count]['parent_id'] = $row['parent_id'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['admin_id'] = $row['admin_id'];
-					$result[$count]['response_id'] = $row['response_id'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$result[$count]['file'] = $row['file'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `help` ORDER BY `ref`, `status` DESC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order='ref', $dir="ASC") {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
 			
-			
-			$sql = mysql_query("SELECT * FROM `help` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `".$order."` ".$dir) or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['category'] = $row['category'];
-					$result[$count]['content'] = $row['content'];
-					$result[$count]['user_id'] = $row['user_id'];
-					$result[$count]['parent_id'] = $row['parent_id'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['admin_id'] = $row['admin_id'];
-					$result[$count]['response_id'] = $row['response_id'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$result[$count]['file'] = $row['file'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `help` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ".$dir);
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `help` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['category'] = $row['category'];
-					$result['content'] = $row['content'];
-					$result['user_id'] = $row['user_id'];
-					$result['parent_id'] = $row['parent_id'];
-					$result['admin_id'] = $row['admin_id'];
-					$result['response_id'] = $row['response_id'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					$result['file'] = $row['file'];
-					$result['status'] = $row['status'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM help WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag="ref", $cat_id="category") {

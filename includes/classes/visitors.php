@@ -41,7 +41,12 @@
 			$curdomain  = str_replace("www.", "", $pageUR1);
 			
 			if (!isset($_COOKIE['visit'])) {
-				mysql_query("INSERT INTO `visitors` (`address`, `referer`, `unique_id`, `loc_city`, `loc_region`, `loc_country`, `loc_continent`, `loc_lat`, `loc_long`, `time_stamp`) VALUES ('".$ip."','".$curdomain."','".$unique_id."','".$loc_city."','".$loc_region."','".$loc_country."','".$loc_continent."','".$loc_lat."','".$loc_long."','".time()."')") or die (mysql_error());
+				global $db;
+				try {
+					$sql = $db->query("INSERT INTO `visitors` (`address`, `referer`, `unique_id`, `loc_city`, `loc_region`, `loc_country`, `loc_continent`, `loc_lat`, `loc_long`, `time_stamp`) VALUES ('".$ip."','".$curdomain."','".$unique_id."','".$loc_city."','".$loc_region."','".$loc_country."','".$loc_continent."','".$loc_lat."','".$loc_long."','".time()."')");
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
 				
 				setcookie("visit", true, time()+(60*60), "/");
 			}
@@ -50,74 +55,59 @@
 		}
 		
 		function countAl() {
-			$sql = mysql_query("SELECT COUNT(*) FROM visitors GROUP BY `unique_id`") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT COUNT(*) FROM visitors GROUP BY `unique_id`");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {				
-				$row = mysql_fetch_array($sql);
-				return $row[0];
+				return $sql->fetchColumn;
 			}
 		}
 		
 		function purge() {
 			$time = time()-(60*60*24*180);
-			$sql = mysql_query("DELETE FROM `visitors` WHERE `time_stamp` < '".$time."'") or die (mysql_error());
+
+			global $db;
+			try {
+				$sql = $db->query("DELETE FROM `visitors` WHERE `time_stamp` < '".$time."'");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 		}
 		
 		function getUnigue($from, $to) {
 			$from = $this->mysql_prep($from);
 			$to = $this->mysql_prep($to);
-			$sql = mysql_query("SELECT * FROM `visitors` WHERE `time_stamp` BETWEEN '".$from."' AND '".$to."' GROUP BY `unique_id` ORDER BY `time_stamp` DESC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['address'] = $row['address'];
-					$result[$count]['referer'] = $row['referer'];
-					$result[$count]['unique_id'] = $row['unique_id'];
-					$result[$count]['loc_city'] = $row['loc_city'];
-					$result[$count]['loc_region'] = $row['loc_region'];
-					$result[$count]['loc_country'] = $row['loc_country'];
-					$result[$count]['loc_continent'] = $row['loc_continent'];
-					$result[$count]['loc_lat'] = $row['loc_lat'];
-					$result[$count]['loc_long'] = $row['loc_long'];
-					$result[$count]['time_stamp'] = $row['time_stamp'];
-					$count++;
-				}
-				return $this->out_prep($result);
-			} else {
-				return false;
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `visitors` WHERE `time_stamp` BETWEEN '".$from."' AND '".$to."' GROUP BY `unique_id` ORDER BY `time_stamp` DESC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getVisit($from, $to) {
 			$from = $this->mysql_prep($from);
 			$to = $this->mysql_prep($to);
-			$sql = mysql_query("SELECT * FROM `visitors` WHERE `time_stamp` BETWEEN '".$from."' AND '".$to."'") or die (mysql_error());
 			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['address'] = $row['address'];
-					$result[$count]['referer'] = $row['referer'];
-					$result[$count]['unique_id'] = $row['unique_id'];
-					$result[$count]['loc_city'] = $row['loc_city'];
-					$result[$count]['loc_region'] = $row['loc_region'];
-					$result[$count]['loc_country'] = $row['loc_country'];
-					$result[$count]['loc_continent'] = $row['loc_continent'];
-					$result[$count]['loc_lat'] = $row['loc_lat'];
-					$result[$count]['loc_long'] = $row['loc_long'];
-					$result[$count]['time_stamp'] = $row['time_stamp'];
-					$count++;
-				}
-				return $this->out_prep($result);
-			} else {
-				return false;
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `visitors` WHERE `time_stamp` BETWEEN '".$from."' AND '".$to."'");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 	}
 ?>

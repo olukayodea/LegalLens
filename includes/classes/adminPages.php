@@ -207,7 +207,7 @@
 		<?php }
 		
 		function sidebar($active) {
-			$notification = new notification;
+			global $notification;
 			$default = "mm";
 			$size = 35;
 			$grav_url = "http://www.gravatar.com/avatar/".md5(strtolower(trim($_SESSION['admin']['name'])))."?d=".$default."&s=".$size; ?>

@@ -7,11 +7,22 @@
 			$owner_id = $this->mysql_prep($array['owner_id']);
 			$desc = $this->mysql_prep($array['desc']);
 			$create_time = time();
-			
-			$sql = mysql_query("INSERT INTO `system_log` (`object`, `object_id`, `owner`, `owner_id`, `desc`, `create_time`) VALUES ('".$object."', '".$object_id."', '".$owner."', '".$owner_id."', '".$desc."', '".$create_time."')") or (mysql_error());
-			
+
+			global $db;
+			try {
+				$sql = $db->prepare("INSERT INTO `system_log` (`object`,`object_id`,`owner`,`owner_id`,`desc`,`create_time`) VALUES (:object,:object_id,:owner,:owner_id,:desc,:create_time)");
+				$sql->execute(array(
+							':object' => $object, 
+							':object_id' => $object_id, 
+							':owner' => $owner,
+							':owner_id' => $owner_id,
+							':desc' => $desc,
+							':create_time' => $create_time));
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				return $id;
 			} else {
 				return false;
@@ -19,88 +30,89 @@
 		}
 		
 		function countAl() {
-			$sql = mysql_query("SELECT COUNT(*) FROM system_log") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT COUNT(*) FROM `system_log`");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {				
-				$row = mysql_fetch_array($sql);
-				return $row[0];
+				return $sql->fetchColumn;
 			}
 		}
 		
 		function purge() {
 			$time = time()-(60*60*24*180);
-			$sql = mysql_query("DELETE FROM `system_log` WHERE `create_time` < '".$time."'") or die (mysql_error());
+
+			global $db;
+			try {
+				$sql = $db->query("DELETE FROM `system_log` WHERE `create_time` < '".$time."'");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `system_log` ORDER BY `ref` DESC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['object'] = $row['object'];
-					$result[$count]['object_id'] = $row['object_id'];
-					$result[$count]['owner'] = $row['owner'];
-					$result[$count]['owner_id'] = $row['owner_id'];
-					$result[$count]['desc'] = $row['desc'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `system_log` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function sortAll($tag,$id, $tag2=false, $id2=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order="ref") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
-			
-			$sql = mysql_query("SELECT * FROM `system_log` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` DESC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['object'] = $row['object'];
-					$result[$count]['object_id'] = $row['object_id'];
-					$result[$count]['owner'] = $row['owner'];
-					$result[$count]['owner_id'] = $row['owner_id'];
-					$result[$count]['desc'] = $row['desc'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$count++;
-				}
-				return $result;
+			if ($tag3 != false) {
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
+			} else {
+				$sqlTag .= "";
 			}
+			
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `system_log` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
-		
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `system_log` WHERE `".$tag."` = '".$id."'") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				
-				$row = mysql_fetch_array($sql);
-				$result['ref'] = $row['ref'];
-				$result['object'] = $row['object'];
-				$result['object_id'] = $row['object_id'];
-				$result['owner'] = $row['owner'];
-				$result['owner_id'] = $row['owner_id'];
-				$result['desc'] = $row['desc'];
-				$result['create_time'] = $row['create_time'];
-				
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM system_log WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
+
 		function getOneField($id, $tag="ref", $ref="title") {
 			$data = $this->getOne($id, $tag);
 			return $data[$ref];

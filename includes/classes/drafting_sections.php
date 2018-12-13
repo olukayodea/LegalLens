@@ -21,7 +21,7 @@
 			$sql = mysql_query("INSERT INTO `drafting_sections` (".$firstpart."`drafting`, `section_content`,`tags`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$drafting."','".$section_content."','".$tags."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `section_content` = '".$section_content."', `status` = '".$status."', `tags` = '".$tags."', `modify_time` = '".$modify_time."'") or die (mysql_error());
 			
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				if ($ref == "") {
 					$doc = new drafting;
 					$doc->modifyOne("status", "active", $drafting);

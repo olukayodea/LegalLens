@@ -26,13 +26,22 @@
 			$high_band5 = $this->mysql_prep($array['high_band5']);
 			$status5 = $this->mysql_prep($array['status5']);
 			$discount5 = $this->mysql_prep($array['discount5']);
-			$sql = mysql_query("
-			INSERT INTO `volume` (`ref`, `low_band`, `high_band`,`discount`, `status`)
-			VALUES (".$ref.", ".$low_band.", ".$high_band.", ".$discount.", '".$status."'), (".$ref2.", ".$low_band2.", ".$high_band2.", ".$discount2.", '".$status2."'), (".$ref3.", ".$low_band3.", ".$high_band3.", ".$discount3.", '".$status3."'), (".$ref4.", ".$low_band4.", ".$high_band4.", ".$discount4.", '".$status4."'), (".$ref5.", ".$low_band5.", ".$high_band5.", ".$discount5.", '".$status5."') ON DUPLICATE KEY UPDATE `ref` = VALUES(`ref`), `low_band` = VALUES(`low_band`), `high_band` = VALUES(`high_band`), `discount` = VALUES(`discount`), `status` = VALUES(`status`)") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("
+				INSERT INTO `volume` (`ref`, `low_band`, `high_band`,`discount`, `status`)
+				VALUES (".$ref.", ".$low_band.", ".$high_band.", ".$discount.", '".$status."'), 
+				(".$ref2.", ".$low_band2.", ".$high_band2.", ".$discount2.", '".$status2."'), 
+				(".$ref3.", ".$low_band3.", ".$high_band3.", ".$discount3.", '".$status3."'), 
+				(".$ref4.", ".$low_band4.", ".$high_band4.", ".$discount4.", '".$status4."'), 
+				(".$ref5.", ".$low_band5.", ".$high_band5.", ".$discount5.", '".$status5."') 
+				ON DUPLICATE KEY UPDATE `ref` = VALUES(`ref`), `low_band` = VALUES(`low_band`), `high_band` = VALUES(`high_band`), `discount` = VALUES(`discount`), `status` = VALUES(`status`)");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
-				$id = mysql_insert_id();
-				
+				$id = $db->lastInsertId();
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -49,29 +58,27 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `volume` ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['low_band'] = $row['low_band'];
-					$result[$count]['high_band'] = $row['high_band'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['discount'] = $row['discount'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `volume` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getRange($val) {
 			$val = $this->mysql_prep($val);
-			$sql = mysql_query("SELECT `discount` FROM `volume` WHERE (".$val." BETWEEN `low_band` AND `high_band`) AND `status` = 'active'") or die (mysql_error());
-			$row = mysql_fetch_array($sql);
-			return $row[0];
+			global $db;
+			try {
+				$sql = $db->query("SELECT `discount` FROM `volume` WHERE (".$val." BETWEEN `low_band` AND `high_band`) AND `status` = 'active'");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			return $sql->fetchColumn;
 		}
 	}
 ?>

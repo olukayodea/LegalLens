@@ -9,12 +9,38 @@
 				return false;
 			} else {
 				if ($this->checkDuplicate($array)) {
-					$sql = mysql_query("INSERT INTO `friendzone` (`user`, `friend_id`,`status`,`create_time`, `modify_time`) VALUES ('".$ref."','".$id."','1','".$create_time."', '".$modify_time."')") or die (mysql_error());
+					global $db;
+					try {
+						$sql = $db->prepare("INSERT INTO `friendzone` (`user`, `friend_id`,`status`,`create_time`, `modify_time`) 
+						VALUES (:user, :friend_id, :status, :create_time, :modify_time )");
+						$sql->execute(
+							array(
+								'::user, ' => $ref,
+								':friend_id' => $id,
+								':status' => 1,
+								':create_time' => $create_time,
+								':modify_time' => $modify_time)
+						);
+					} catch(PDOException $ex) {
+						echo "An Error occured! ".$ex->getMessage(); 
+					}
 					if ($sql) {
-						
-						$ref_id = mysql_insert_id();
-						$sql = mysql_query("INSERT INTO `friendzone` (`user`, `friend_id`,`status`,`ref_id`,`create_time`, `modify_time`) VALUES ('".$id."','".$ref."','0',".$ref_id.",'".$create_time."', '".$modify_time."')") or die (mysql_error());
-						
+						$ref_id = $db->lastInsertId();
+						try {
+							$sql = $db->prepare("INSERT INTO `friendzone` (`user`, `friend_id`,`ref_id`,`status`,`create_time`, `modify_time`) 
+							VALUES (:user, :friend_id, :ref_id, :status, :create_time, :modify_time )");
+							$sql->execute(
+								array(
+									'::user, ' => $id,
+									':friend_id' => $ref,
+									':ref_id' => $ref_id,
+									':status' => 0,
+									':create_time' => $create_time,
+									':modify_time' => $modify_time)
+							);
+						} catch(PDOException $ex) {
+							echo "An Error occured! ".$ex->getMessage(); 
+						}
 						//send email
 						$users = new users;
 						$client = $users->getOneField($id, "ref", "last_name")." ".$users->getOneField($id, "ref", "other_names")." <".$users->getOneField($id, "ref", "email").">";
@@ -48,10 +74,14 @@
 		function checkDuplicate($array) {
 			$ref = $this->mysql_prep($array['ref']);
 			$id = $this->mysql_prep($array['id']);
-			
-			$sql = mysql_query("SELECT * FROM `friendzone` WHERE `user` = '".$ref."' AND `friend_id` = '".$id."' ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if (mysql_num_rows($sql) > 0) {
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `friendzone` WHERE `user` = '".$ref."' AND `friend_id` = '".$id."' ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql->rowCount() == 1) {			
 				return false;
 			} else {
 				return true;
@@ -75,8 +105,17 @@
 		}
 		
 		function remove($id) {
-			$sql = mysql_query("DELETE FROM `friendzone` WHERE ref = '".$id."'") or die (mysql_error());
-				
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `friendzone` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				return true;
 			} else {
@@ -87,8 +126,19 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `friendzone` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
+
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `friendzone` SET  `".$tag."` = :value, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				return true;
@@ -98,35 +148,34 @@
 		}
 		
 		function getList($id) {
-			
-			$sql = mysql_query("SELECT * FROM `friendzone` WHERE `user` = '".$id."' ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['user'] = $row['user'];
-					$result[$count]['friend_id'] = $row['friend_id'];
-					$result[$count]['ref_id'] = $row['ref_id'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM friendzone WHERE `user` = :id ORDER BY `ref` ASC");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
 		
 		function findName($value) {
-			$sql = mysql_query("SELECT * FROM `users` WHERE (`last_name` LIKE '%".$value."%' OR `other_names` LIKE '%".$value."%' OR `email` LIKE '%".$value."%' OR `phone` LIKE '%".$value."%') AND status != 'DELETED' AND `subscription` > '".time()."' ORDER BY `last_name` ASC") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `users` WHERE (`last_name` LIKE '%".$value."%' OR `other_names` LIKE '%".$value."%' OR `email` LIKE '%".$value."%' OR `phone` LIKE '%".$value."%') AND status != 'DELETED' AND `subscription` > '".time()."' ORDER BY `last_name` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['last_name'] = $row['last_name'];
 					$result[$count]['other_names'] = $row['other_names'];
@@ -139,61 +188,51 @@
 		}
 		
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
-			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
-			} else {
-				$sqlTag = "";
-			}
-			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
-			} else {
-				$sqlTag .= "";
-			}
-			
-			$sql = mysql_query("SELECT * FROM `friendzone` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['user'] = $row['user'];
-					$result[$count]['friend_id'] = $row['friend_id'];
-					$result[$count]['ref_id'] = $row['ref_id'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order="ref") {
+				$token = array(':id' => $id);
+				if ($tag2 != false) {
+					$sqlTag = " AND `".$tag2."` = :id2";
+					$token[':id2'] = $id2;
+				} else {
+					$sqlTag = "";
 				}
-				return $this->out_prep($result);
-			}
+				if ($tag3 != false) {
+					$sqlTag = " AND `".$tag3."` = :id3";
+					$token[':id3'] = $id3;
+				} else {
+					$sqlTag .= "";
+				}
+				
+				global $db;
+				try {
+					$sql = $db->prepare("SELECT * FROM `friendzone` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+									
+					$sql->execute($token);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+				
+				$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `friendzone` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['user'] = $row['user'];
-					$result['friend_id'] = $row['friend_id'];
-					$result['ref_id'] = $row['ref_id'];
-					$result['status'] = $row['status'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM pages WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 	}
 ?>
