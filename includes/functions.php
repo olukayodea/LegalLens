@@ -23,9 +23,6 @@
 	define("limit", 20, true);
 	
 	include_once("classes/config.php");
-	$sqldb = new sql;
-	$connectDb = $sqldb->connect();
-	
 	$config = new config;
 	$db = $config->connect();
 	
