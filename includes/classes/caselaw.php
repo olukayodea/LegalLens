@@ -32,27 +32,58 @@
 				$op_file = true;
 			}
 			
-			if ($ref != "") {
-				$firstpart = "`ref`, ";
-				echo $secondPArt = "'".$ref."', ";
-				$log = "Modified object ".$section_no;
-			} else {
-				$firstpart = "";
-				$secondPArt = "";
-				$log = "Created object ".$section_no;
-			}
-			
-			if ($file_data != "") {
-				$firstpart .= "`file`, ";
-				$secondPArt .= "'".$file_data."', ";
-				$dupPart .= "`file` = '".$file_data."', ";
-			}
-			
 			if ($op_file == true) {
-					$sql = mysql_query("INSERT INTO `caselaw` (".$firstpart."`title`,`areas`,`owner`, `status`, `court`,`year`, `reporter`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$title."','".$areas."','".$owner."','".$status."','".$court."','".$year."','".$reporter."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE ".$dupPart."`title` = '".$title."', `areas`='".$areas."',`status` = '".$status."', `court` = '".$court."', `reporter` = '".$reporter."', `year`='".$year."',`owner` = '".$owner."', `modify_time` = '".$modify_time."'") or die (mysql_error());
 				
+				global $db;
+				$value_array = array(
+								':title' => $title, 
+								':areas' => $areas, 
+								':status' => $status, 
+								':court' => $court, 
+								':reporter' => $reporter, 
+								':year' => $year, 
+								':owner' => $owner, 
+								':create_time' => $create_time,
+								':modify_time' => $modify_time
+								);
+				if ($ref != "") {
+					$firstpart = "`ref`, ";
+					$secondPArt = ":ref, ";
+					$value_array[':ref'] = $ref;
+					$log = "Modified object ".$title;
+				} else {
+					$firstpart = "";
+					$secondPArt = "";
+					$log = "Created object ".$title;
+				}	
+				
+				if ($file_data != "") {
+					$firstpart .= "`file`, ";
+					$secondPArt .= "'".$file_data."', ";
+					$dupPart .= "`file` = '".$file_data."', ";
+				}
+				
+				try {
+					$sql = $db->prepare("INSERT INTO `caselaw` (".$firstpart."`title`,`areas`,`owner`, `status`, `court`,`year`, `reporter`, `create_time`, `modify_time`)
+					VALUES (".$secondPArt.":title, :areas, :owner, :status, :court, :year, :reporter, :create_time, :modify_time)
+						ON DUPLICATE KEY UPDATE 
+							".$dupPart."
+							`title` = :title,
+							`areas` = :areas,
+							`status` = :status,
+							`court` = :court,
+							`reporter` = :reporter,
+							`year` = :year,
+							`owner` = :owner,
+							`modify_time` = :modify_time
+						");
+					$sql->execute($value_array);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+							
 				if ($sql) {
-					$id = mysql_insert_id();
+					$id = $db->lastInsertId();
 					//add to log
 					$logArray['object'] = get_class($this);
 					$logArray['object_id'] = $id;
@@ -136,10 +167,19 @@
 			$data = $this->getOne($id);
 			
 			@unlink("../library/caselaws/".$data['file']);
-			$sql = mysql_query("DELETE FROM `caselaw` WHERE ref = '".$id."'") or die (mysql_error());
+
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `caselaw` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
-			if ($sql) {
-			
+			if ($sql) {			
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -168,11 +208,21 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `caselaw` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
+			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `caselaw` SET  `".$tag."` = :value, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
-				
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -189,28 +239,16 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `caselaw` ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['title'] = $row['title'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['court'] = $row['court'];
-					$result[$count]['areas'] = $row['areas'];
-					$result[$count]['owner'] = $row['owner'];
-					$result[$count]['year'] = $row['year'];
-					$result[$count]['reporter'] = $row['reporter'];
-					$result[$count]['file'] = $row['file'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `caselaw` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function listAllHome($court=false, $filter="title") {
@@ -224,11 +262,15 @@
 			$listReg = $caselaw_area->sortAll("active", "status");
 			$result = array();
 			for ($i = 0; $i < count($listReg); $i++) {
-				$tag = $listReg[$i]['title'];
-				$sql = mysql_query("SELECT * FROM `caselaw` WHERE ".$addition."`status` = 'active' AND `areas` LIKE '%".$tag."%' ORDER BY `title` ASC") or die (mysql_error());
-				
+				$tag = $listReg[$i]['title'];				
+				global $db;
+				try {
+					$sql = $db->query("SELECT * FROM `caselaw` WHERE ".$addition."`status` = 'active' AND `areas` LIKE '%".$tag."%' ORDER BY `title` ASC");
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
 				if ($sql) {
-					while ($row = mysql_fetch_array($sql)) {
+					foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 						$count = count($result[$tag]);
 						$result[$tag][$count]['ref'] = $row['ref'];
 						$result[$tag][$count]['section_ref'] = 0;
@@ -256,13 +298,18 @@
 			} else {
 				$addition = "";
 			}
-			$sql = mysql_query("SELECT `caselaw`.`areas`, `caselaw`.`title`, `caselaw`.`ref`, `caselaw_sections`.`section_content`, `caselaw_sections`.`tags`, `caselaw`.`reporter`, `caselaw_sections`.`ref` AS 'section_ID' FROM `caselaw`, `caselaw_sections` WHERE `caselaw`.`ref` = `caselaw_sections`.`caselaw` AND `caselaw`.`status` = 'active' AND `caselaw_sections`.`status` = 'active' AND ".$addition."(`caselaw_sections`.`citation` LIKE '%".$val."%' OR `caselaw_sections`.`areas` LIKE '%".$val."%' OR `caselaw`.`areas` LIKE '%".$val."%' OR `caselaw_sections`.`tags` LIKE '%".$val."%' OR `caselaw_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`caselaw_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `title` ASC LIMIT 20") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT `caselaw`.`areas`, `caselaw`.`title`, `caselaw`.`ref`, `caselaw_sections`.`section_content`, `caselaw_sections`.`tags`, `caselaw`.`reporter`, `caselaw_sections`.`ref` AS 'section_ID' FROM `caselaw`, `caselaw_sections` WHERE `caselaw`.`ref` = `caselaw_sections`.`caselaw` AND `caselaw`.`status` = 'active' AND `caselaw_sections`.`status` = 'active' AND ".$addition."(`caselaw_sections`.`citation` LIKE '%".$val."%' OR `caselaw_sections`.`areas` LIKE '%".$val."%' OR `caselaw`.`areas` LIKE '%".$val."%' OR `caselaw_sections`.`tags` LIKE '%".$val."%' OR `caselaw_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`caselaw_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `title` ASC LIMIT 20");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['label'] = ucwords(strtolower($row['title']));
 					$result[$count]['category'] = "Sections in ".$row['title']."s";
 					$result[$count]['code'] = $row['ref'];
@@ -280,13 +327,19 @@
 			} else {
 				$addition = "";
 			}
-			$sql = mysql_query("SELECT * FROM `caselaw` WHERE (`reporter` LIKE '%".$val."%' OR `year` LIKE '%".$val."%' OR `title` LIKE '%".$val."%' OR `areas` LIKE '%".$val."%') AND ".$addition."`status` = 'active' ORDER BY `title` ASC LIMIT 20") or die (mysql_error());
-			
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `caselaw` WHERE (`reporter` LIKE '%".$val."%' OR `year` LIKE '%".$val."%' OR `title` LIKE '%".$val."%' OR `areas` LIKE '%".$val."%') AND ".$addition."`status` = 'active' ORDER BY `title` ASC LIMIT 20");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['label'] = ucwords(strtolower($row['title']));
 					$result[$count]['category'] = trim($row['title']);
 					$result[$count]['code'] = $row['ref'];
@@ -309,10 +362,15 @@
 			$result = array();
 			for ($i = 0; $i < count($listReg); $i++) {
 				$tag = $listReg[$i]['title'];
-				$sql = mysql_query("SELECT `caselaw`.`areas`, `caselaw`.`title`, `caselaw`.`court`, `caselaw`.`file`,  `caselaw`.`year`, `caselaw`.`create_time`, `caselaw`.`modify_time`, `caselaw`.`ref`, `caselaw_sections`.`section_content`, `caselaw_sections`.`tags`, `caselaw_sections`.`ref` AS 'section_ID' FROM `caselaw`, `caselaw_sections` WHERE `caselaw`.`ref` = `caselaw_sections`.`caselaw` AND `caselaw`.`status` = 'active' AND `caselaw_sections`.`status` = 'active' AND ".$addition."(`caselaw`.`court` LIKE '%".$val."%' OR `caselaw`.`year` LIKE '%".$val."%' OR `caselaw`.`areas` LIKE '%".$val."%' OR `caselaw_sections`.`areas` LIKE '%".$val."%' OR `caselaw`.`title` LIKE '%".$val."%' OR `caselaw_sections`.`tags` LIKE '%".$val."%' OR `caselaw_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`caselaw_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `caselaw`.`".$filter."` ASC") or die (mysql_error());
+				global $db;
+				try {
+					$sql = $db->query("SELECT `caselaw`.`areas`, `caselaw`.`title`, `caselaw`.`court`, `caselaw`.`file`,  `caselaw`.`year`, `caselaw`.`create_time`, `caselaw`.`modify_time`, `caselaw`.`ref`, `caselaw_sections`.`section_content`, `caselaw_sections`.`tags`, `caselaw_sections`.`ref` AS 'section_ID' FROM `caselaw`, `caselaw_sections` WHERE `caselaw`.`ref` = `caselaw_sections`.`caselaw` AND `caselaw`.`status` = 'active' AND `caselaw_sections`.`status` = 'active' AND ".$addition."(`caselaw`.`court` LIKE '%".$val."%' OR `caselaw`.`year` LIKE '%".$val."%' OR `caselaw`.`areas` LIKE '%".$val."%' OR `caselaw_sections`.`areas` LIKE '%".$val."%' OR `caselaw`.`title` LIKE '%".$val."%' OR `caselaw_sections`.`tags` LIKE '%".$val."%' OR `caselaw_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`caselaw_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `caselaw`.`".$filter."` ASC");
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
 				
 				if ($sql) {
-					while ($row = mysql_fetch_array($sql)) {
+					foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 						$count = count($result[$tag]);
 						$result[$tag][$count]['ref'] = $row['ref'];
 						$result[$tag][$count]['section_ref'] = intval($row['section_ID']);
@@ -345,12 +403,17 @@
 			//for ($i = 0; $i < count($listReg); $i++) {
 				$tag = $listReg[$i]['title'];
 				//$sql = mysql_query("SELECT * FROM `caselaw` WHERE `title` LIKE '".$val."%' AND ".$addition."`status` = 'active' AND `areas` LIKE '%".$tag."%' ORDER BY `title` ASC") or die (mysql_error());
-				$sql = mysql_query("SELECT * FROM `caselaw` WHERE `areas` LIKE '".$val."%' AND ".$addition."`status` = 'active' ORDER BY `title` ASC") or die (mysql_error());
 				
-				if ($sql) {
-					
+				global $db;
+				try {
+					$sql = $db->query("SELECT * FROM `caselaw` WHERE `areas` LIKE '".$val."%' AND ".$addition."`status` = 'active' ORDER BY `title` ASC");
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+								
+				if ($sql) {	
 					$count = 0;
-					while ($row = mysql_fetch_array($sql)) {
+					foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 						//$count = count($result[$tag]);
 						$result[$row['areas']][$count]['ref'] = $row['ref'];
 						$result[$row['areas']][$count]['section_ref'] = 0;
@@ -374,93 +437,63 @@
 		
 		function lisstMultiple($array) {
 			$list = implode(",", $array);
-			$sql = mysql_query("SELECT * FROM `caselaw` WHERE ref IN (".$list.") ORDER BY `section_no` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['title'] = $row['title'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['court'] = $row['court'];
-					$result[$count]['owner'] = $row['owner'];
-					$result[$count]['year'] = $row['year'];
-					$result[$count]['areas'] = $row['areas'];
-					$result[$count]['reporter'] = $row['reporter'];
-					$result[$count]['file'] = $row['file'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `caselaw` WHERE ref IN (".$list.") ORDER BY `section_no` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
-			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
-			} else {
-				$sqlTag = "";
-			}
-			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
-			} else {
-				$sqlTag .= "";
-			}
-			
-			$sql = mysql_query("SELECT * FROM `caselaw` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['title'] = $row['title'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['court'] = $row['court'];
-					$result[$count]['year'] = $row['year'];
-					$result[$count]['owner'] = $row['owner'];
-					$result[$count]['areas'] = $row['areas'];
-					$result[$count]['reporter'] = $row['reporter'];
-					$result[$count]['file'] = $row['file'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order="ref") {
+				$token = array(':id' => $id);
+				if ($tag2 != false) {
+					$sqlTag = " AND `".$tag2."` = :id2";
+					$token[':id2'] = $id2;
+				} else {
+					$sqlTag = "";
 				}
-				return $this->out_prep($result);
-			}
+				if ($tag3 != false) {
+					$sqlTag = " AND `".$tag3."` = :id3";
+					$token[':id3'] = $id3;
+				} else {
+					$sqlTag .= "";
+				}
+				
+				global $db;
+				try {
+					$sql = $db->prepare("SELECT * FROM `caselaw` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+									
+					$sql->execute($token);
+				} catch(PDOException $ex) {
+					echo "An Error occured! ".$ex->getMessage(); 
+				}
+				
+				$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `caselaw` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['title'] = $row['title'];
-					$result['status'] = $row['status'];
-					$result['court'] = $row['court'];
-					$result['areas'] = $row['areas'];
-					$result['owner'] = $row['owner'];
-					$result['year'] = $row['year'];
-					$result['reporter'] = $row['reporter'];
-					$result['file'] = $row['file'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM caselaw WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag="ref", $ref="title") {
@@ -469,13 +502,17 @@
 		}
 		
 		function listCourt() {
-			$sql = mysql_query("SELECT `court` FROM `caselaw` GROUP BY `court` ORDER BY `court`") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT `court` FROM `caselaw` GROUP BY `court` ORDER BY `court`");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['title'] = ucwords(strtolower($row['court']));
 					$count++;
 				}
@@ -484,18 +521,21 @@
 		}
 		
 		function counter($id, $from=false, $to=false) {
-			
 			if ($from != false) {
 				$ad = " AND `date_time` BETWEEN ".$from." AND ".$to;
 			}
 			
-			$sql = mysql_query("SELECT * FROM `counter_log` WHERE `type` = 'caseLaw' AND `id` IN (SELECT `ref` FROM `caselaw` WHERE `owner` = '".$id."')".$ad);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `counter_log` WHERE `type` = 'caseLaw' AND `id` IN (SELECT `ref` FROM `caselaw` WHERE `owner` = '".$id."')".$ad);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['id'] = $row['id'];
 					$result[$count]['user_id'] = $row['user_id'];

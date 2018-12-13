@@ -22,7 +22,7 @@
 			$sql = mysql_query("INSERT INTO `drafting` (".$firstpart."`title`,`type`,`owner`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$title."','".$type."','".$owner."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `title` = '".$title."',`type`='".$type."',`status`='".$status."', `modify_time` = '".$modify_time."'") or die (mysql_error());
 			
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				
 				//add to log
 				$logArray['object'] = get_class($this);

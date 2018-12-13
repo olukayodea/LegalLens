@@ -4,9 +4,18 @@
 			$title = ucfirst(strtolower($this->mysql_prep($array['title'])));
 			$users = $this->mysql_prep($array['users']);
 			$create_time = time();
-			
-			$sql = mysql_query("INSERT IGNORE INTO `search_history` (".$firstpart."`title`, `users`, `create_time`) VALUES ('".$title."','".$users."', '".$create_time."')") or die (mysql_error());
-			
+						
+			global $db;
+			try {
+				$sql = $db->prepare("INSERT IGNORE INTO `search_history` (`title`,`users`,`create_time`) 
+				VALUES (:title,:users,:create_time)");
+				$sql->execute(array(
+							':title' => $title, 
+							':users' => $users, 
+							':create_time' => $create_time));
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				return true;
 			} else {
@@ -16,10 +25,17 @@
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
-			$data = $this->getOne($id);
-			$media_url = $data['media_url'];
-			$sql = mysql_query("DELETE FROM `search_history` WHERE ref = '".$id."'") or die (mysql_error());
-				
+
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `search_history` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -39,9 +55,18 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `search_history` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `search_history` SET  `".$tag."` = :value WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				return true;
 			} else {
@@ -50,13 +75,15 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `search_history` ORDER BY `ref` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `search_history` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
 					$result[$count]['users'] = $row['users'];
@@ -68,14 +95,15 @@
 		}
 		
 		function searchAll($val) {
-			$val = $this->mysql_prep($val);
-			$sql = mysql_query("SELECT * FROM `search_history` WHERE `title` LIKE '%".$val."%' ORDER BY `ref` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `search_history` WHERE `title` LIKE '%".$val."%' ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
 					$result[$count]['users'] = $row['users'];
@@ -86,39 +114,34 @@
 			}
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $orderby = "ref", $dir="DESC", $limit=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order="ref") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
-			if ($limit == true) {
-				$limitTag = " LIMIT ".$limit;
-			} else {
-				$limitTag = "";
-			}
 			
-			if ($orderby == "rand") {
-				$order = "RAND()";
-			} else {
-				$order = "`".$orderby."`".$dir;
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `search_history` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
 						
-			$sql = mysql_query("SELECT * FROM `search_history` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY ".$order.$limitTag) or die (mysql_error());
-			
 			if ($sql) {
 				$result = array();
 				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
 					$result[$count]['users'] = $row['users'];
@@ -130,20 +153,26 @@
 		}
 		
 		function getOne($id, $tag='ref') {
-			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `search_history` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM search_history WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
+				if ($sql->rowCount() == 1) {
+					$row = $sql->fetch(PDO::FETCH_ASSOC);
 					$result['ref'] = $row['ref'];
 					$result['title'] = ucwords(strtolower($row['title']));
 					$result['users'] = $row['users'];
 					$result['create_time'] = $row['create_time'];
 					return $this->out_prep($result);
-				} else {
-					return false;
 				}
 			}
 		}

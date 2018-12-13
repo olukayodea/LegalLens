@@ -16,22 +16,22 @@
 			$city = $this->mysql_prep($array['city']);
 			$state = $this->mysql_prep($array['state']);
 			$country = $this->mysql_prep($array['country']);
-			
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$page_view."' WHERE `title` = 'page_view'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$instagram."' WHERE `title` = 'instagram'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$facebook."' WHERE `title` = 'facebook'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$flickr."' WHERE `title` = 'flickr'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$google."' WHERE `title` = 'google'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$linkedin."' WHERE `title` = 'linkedin'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$rss."' WHERE `title` = 'rss'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$skype."' WHERE `title` = 'skype'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$twitter."' WHERE `title` = 'twitter'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$email."' WHERE `title` = 'email'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$phone."' WHERE `title` = 'phone'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$address."' WHERE `title` = 'address'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$city."' WHERE `title` = 'city'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$state."' WHERE `title` = 'state'") or die (mysql_error());
-			$sql = mysql_query("UPDATE `settings` SET `value` = '".$country."' WHERE `title` = 'country'") or die (mysql_error());
+
+			$this->modify("page_view", $page_view);
+			$this->modify("instagram", $instagram);
+			$this->modify("facebook", $facebook);
+			$this->modify("flickr", $flickr);
+			$this->modify("google", $google);
+			$this->modify("linkedin", $linkedin);
+			$this->modify("rss", $rss);
+			$this->modify("skype", $skype);
+			$this->modify("twitter", $twitter);
+			$this->modify("email", $email);
+			$this->modify("phone", $phone);
+			$this->modify("address", $address);
+			$this->modify("city", $city);
+			$this->modify("state", $state);
+			$this->modify("country", $country);
 			
 			//add to log
 			$logArray['object'] = get_class($this);
@@ -44,40 +44,68 @@
 			$system_log->create($logArray);
 			return true;
 		}
-		
-		function listAll() {
-			$sql = mysql_query("SELECT * FROM `settings` ORDER BY `title` DESC") or die (mysql_error());
+
+
+		function modify($title, $value) {
+			global $db;
+			$created = $modified = time();
+			
+			try {
+				$sql = $db->prepare("INSERT INTO `settings` (
+						`title`,
+						`value`) 
+					VALUES (
+						:title,
+						:value
+					)
+					ON DUPLICATE KEY UPDATE 
+						`value` = :value
+					");
+				$sql->execute(
+					array(	':title' => $title, 
+							':value' => $value)
+						);
+						
+						
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage()." at ".$title;
+			}
 			
 			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['title'] = $row['title'];
-					$result[$count]['value'] = $row['value'];
-					$count++;
-				}
-				return $this->out_prep($result);
+				return true;
+			} else {
+				return false;
 			}
+		}
+		
+		function listAll() {
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `settings` ORDER BY `title` DESC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
+			$result = array();
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOne($id) {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT `value` FROM `settings` WHERE `title` = '".$id."'") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result = $row[0];
-					
-					return $result;
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT `value` FROM `settings` WHERE `title` =:id");
+				$sql->execute(
+						array(':id' => $id)
+					);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+
+			$row = $sql->fetchColumn();
+			return $this->out_prep($row);
 		}
 	}
 ?>

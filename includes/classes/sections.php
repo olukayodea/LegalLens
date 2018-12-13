@@ -21,10 +21,51 @@
 				$log = "Created object ".$section_no;
 			}
 			
-			$sql = mysql_query("INSERT INTO `sections` (".$firstpart."`document`,`section_no`, `section_content`,`tags`,`court`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$document."','".$section_no."','".$section_content."','".$tags."','".$court."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `section_no` = '".$section_no."', `section_content` = '".$section_content."', `status` = '".$status."', `tags` = '".$tags."', `court` = '".$court."', `modify_time` = '".$modify_time."'") or die (mysql_error());
+			$sql = mysql_query("INSERT INTO `sections` (".$firstpart."`document`,`section_no`, `section_content`,`tags`,`court`, `status`, `create_time`, `modify_time`) 
+			VALUES (".$secondPArt."'".$document."','".$section_no."','".$section_content."','".$tags."','".$court."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE 
+			`section_no` = '".$section_no."', `section_content` = '".$section_content."', `status` = '".$status."', `tags` = '".$tags."', `court` = '".$court."', `modify_time` = '".$modify_time."'") or die (mysql_error());
 			
+
+			global $db;
+			$value_array = array(
+							':document' => $document, 
+							':section_no' => $section_no,
+							':section_content' => $section_content,
+							':tags' => $tags,
+							':court' => $court,
+							':status' => $status, 
+							':create_time' => $create_time,
+							':modify_time' => $modify_time
+							);
+			if ($ref != "") {
+				$firstpart = "`ref`, ";
+				$secondPArt = ":ref, ";
+				$value_array[':ref'] = $ref;
+				$log = "Modified object ".$section_no;
+			} else {
+				$firstpart = "";
+				$secondPArt = "";
+				$log = "Created object ".$section_no;
+			}			
+			
+			try {
+				$sql = $db->prepare("INSERT INTO `sections` (".$firstpart."`document`, `court`, `section_content`, `tags`, `section_no`, `status`, `create_time`, `modify_time`) 
+				VALUES (".$secondPArt.":document, :section_no, :section_content, :tags, :court, :status, :create_time, :modify_time)
+					ON DUPLICATE KEY UPDATE 
+						`section_no` = :section_no,
+						`section_content` = :section_content,
+						`tags` = :tags,
+						`court` = :court,
+						`status` = :status,
+						`modify_time` = :modify_time
+					");
+				$sql->execute($value_array);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				if ($ref == "") {
 					$doc = new documents;
 					$doc->modifyOne("status", "active", $document);
@@ -47,11 +88,18 @@
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("DELETE FROM `sections` WHERE ref = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `sections` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}			
 			if ($sql) {
-			
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -70,9 +118,18 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `sections` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `sections` SET  `".$tag."` = :value, `modify_time` = '".$modDate."' WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modify_time' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				
 				//add to log
@@ -91,13 +148,15 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `sections` ORDER BY `ref` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `sections` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['document'] = $row['document'];
 					$result[$count]['section_no'] = $row['section_no'];
@@ -117,13 +176,15 @@
 		
 		function lisstMultiple($array) {
 			$list = implode(",", $array);
-			$sql = mysql_query("SELECT * FROM `sections` WHERE ref IN (".$list.") ORDER BY `section_no` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `sections` WHERE ref IN (".$list.") ORDER BY `section_no` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['document'] = $row['document'];
 					$result[$count]['section_no'] = $row['section_no'];
@@ -141,28 +202,35 @@
 			}
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order='ref', $dir="ASC") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
 			
-			$sql = mysql_query("SELECT * FROM `sections` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` ASC") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `sections` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ".$dir);
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['document'] = $row['document'];
 					$result[$count]['section_no'] = $row['section_no'];
@@ -182,12 +250,23 @@
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `sections` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM sections WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
 				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
+				if ($sql->rowCount() == 1) {
+					$row = $sql->fetch(PDO::FETCH_ASSOC);
 					$result['ref'] = $row['ref'];
 					$result['document'] = $row['document'];
 					$result['section_no'] = $row['section_no'];
@@ -217,11 +296,24 @@
 			} else if ($dir == "-") {
 				$sign = "<";
 			}
-			$sql = mysql_query("SELECT `ref` FROM `sections` WHERE `ref` ".$sign." '".$id."' LIMIT 1") or die (mysql_error());
-			
-			if ($sql) {				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT `ref` FROM `sections` WHERE `ref` ".$sign." '".$id."' LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
+			if ($sql) {
+				$result = array();
+				
+				if ($sql->rowCount() == 1) {
+					$row = $sql->fetch(PDO::FETCH_ASSOC);
+
 					$result = $row['ref'];
 					return $result;
 				} else {

@@ -24,7 +24,7 @@
 			$sql = mysql_query("INSERT INTO `list_db` (".$firstpart."`title`, `pref`,`type`,`year`, `court`,`state`,`details`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$title."','".$pref."','".$type."','".$year."','".$court."','".$state."','".$details."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `title` = '".$title."', `pref` = '".$pref."', `type` = '".$type."', `court` = '".$court."',`state`='".$state."',`status`='".$status."',`year` = '".$year."',`details`='".$details."', `modify_time` = '".$modify_time."'") or die (mysql_error());
 			
 			if ($sql) {
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				
 				mysql_query("ALTER TABLE list_db ADD FULLTEXT (details);") or die (mysql_error());
 				//add to log

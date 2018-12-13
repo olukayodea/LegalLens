@@ -60,8 +60,10 @@
 		}
 		
 		function out_prep($array) {
-			if (count($array) > 0) {
-				array_walk_recursive($array, array($this, 'get_prep2'));
+			if (is_array($array)) {
+				if (count($array) > 0) {
+					array_walk_recursive($array, array($this, 'get_prep2'));
+				}
 			}
 			return $array;
 		}

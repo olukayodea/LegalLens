@@ -161,7 +161,7 @@
 			if ($this->checkAccount($email) == 0) {
 				$sql = mysql_query("INSERT INTO clients (`password`, `name`, `email`, `company`, `phone`,`create_time`, `modify_time`) VALUES ('".sha1($password)."', '".$name."', '".$email."', '".$company."', '".$phone."','".$create_time."', '".$modify_time."')") or die (mysql_error());
 				
-				$id = mysql_insert_id();
+				$id = $db->lastInsertId();
 				
 				//add to log
 				$logArray['object'] = get_class($this);

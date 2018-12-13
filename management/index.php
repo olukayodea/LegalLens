@@ -1,7 +1,7 @@
 <?php
 	$redirect = "index";
 	include_once("../includes/functions.php");
-	include_once("session.php");
+	//include_once("session.php");
 	
 	$registered_users = $users->listAll();
 	$new_users = $users->sortAll("NEW", "status");
@@ -30,7 +30,7 @@
     <div class="wrapper">
 
       <?php $adminPages->topHeader();
-	  $adminPages->sidebar("home"); ?>
+	    $adminPages->sidebar("home"); ?>
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">

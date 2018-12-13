@@ -10,8 +10,11 @@
 	
 	if (isset($_REQUEST['paymentStatus'])) {
 		$orderStatus = $common->get_prep($_REQUEST['paymentStatus']);
-		if ($_REQUEST['paymentStatus'] == "CANCELLED") {
-			$orders->reverseal($id);
+		if ($_REQUEST['paymentStatus'] == "CANCELLED") {      
+      $orders->updateOne("order_status", "CANCELLED", $id);
+      $orders->updateOne("payment_status", "CANCELLED", $id);
+			$transData = $transactions->getOne($id, "order_id");
+			$transactions->updateOne("transaction_status", "CANCELLED", $transData['ref']);
 		} else if ($_REQUEST['paymentStatus'] == "PAID") {
 			$orders->updateOne("order_status", "COMPLETE", $id);
 			$transData = $transactions->getOne($id, "order_id");
@@ -26,7 +29,6 @@
 		
 		header("location: ?done&ref=".$id);
 	}
-	
 	
 	$data = $orders->getOne($id);
 	$userData = $users->listOne($data['order_owner'], "ref");

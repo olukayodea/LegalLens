@@ -1,6 +1,5 @@
 <?php
 	$urlData = explode("?", $_SERVER['REQUEST_URI']);
-	
 	$chkDevice = $usersControl->checkLogin();
 	if ($chkDevice != true) {
 		$users->logout();

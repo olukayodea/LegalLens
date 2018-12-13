@@ -90,20 +90,20 @@
     enable_page_level_ads: true
   });
 </script>
-                <!-- META TAGS -->
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- META TAGS -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title>Quick Find </title>
-    <?php $pages->head(); ?>
+<title>Quick Find </title>
+<?php $pages->head(); ?>
 
-                <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-                <!--[if lt IE 9]>
-                <script src="js/html5.js"></script>
-                <![endif]-->
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+<script src="js/html5.js"></script>
+<![endif]-->
 
-        <script src="SpryAssets/SpryValidationCheckbox.js" type="text/javascript"></script>
-        <script src="SpryAssets/SpryTabbedPanels.js" type="text/javascript"></script>
+<script src="SpryAssets/SpryValidationCheckbox.js" type="text/javascript"></script>
+<script src="SpryAssets/SpryTabbedPanels.js" type="text/javascript"></script>
 <link href="SpryAssets/SpryValidationCheckbox.css" rel="stylesheet" type="text/css">
 <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
 <script>
@@ -550,4 +550,3 @@ window.onload = function() {
 
 
 </html>
-

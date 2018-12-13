@@ -5,6 +5,7 @@
 	$pageUR1 = $_SERVER["SERVER_NAME"];
 	$curdomain = str_replace("www.", "", $pageUR1);
 
+	if (($curdomain == "legallens.com.ng/") || ($curdomain == "legallens.com.ng") || ($curdomain == "dev.legallens.net/") || ($curdomain == "dev.legallens.net") ) {
 		ini_set("session.cookie_domain", ".legallens.com.ng/");
 		define("URL", "https://legallens.com.ng/", true);
 		define("servername", "localhost", true);
@@ -22,14 +23,16 @@
 	define("limit", 20, true);
 	
 	include_once("classes/config.php");
-	$db = new sql;
-	$connectDb = $db->connect();
+	$sqldb = new sql;
+	$connectDb = $sqldb->connect();
+	
+	$config = new config;
+	$db = $config->connect();
 	
 	define("URLAdmin", URL."management/", true);
 	define("URLClients", URL."clients/", true);
 	define("replyMail", "do-not-reply@legallens.com.ng", true);
 	define("NGN", "&#8358;", true);
-	
 	include_once("classes/common.php");
 	$common = new common;
 
@@ -149,5 +152,5 @@
 	
 	$page_content = new page_content;
 	$pages = new pages;
-	$adminPages = new adminPages;	
+	$adminPages = new adminPages;
 ?>
