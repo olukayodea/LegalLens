@@ -11,22 +11,60 @@
 			$details = $this->mysql_prep($array['details']);
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);
-			
+				
+			global $db;
+			$value_array = array(
+							':title' => $title, 
+							':pref' => $pref, 
+							':status' => $status, 
+							':court' => $court, 
+							':type' => $type, 
+							':details' => $details,
+							':year' => $year, 
+							':state' => $state, 
+							':create_time' => $create_time,
+							':modify_time' => $modify_time
+							);
 			if ($ref != "") {
 				$firstpart = "`ref`, ";
-				$secondPArt = "'".$ref."', ";
+				$secondPArt = ":ref, ";
+				$value_array[':ref'] = $ref;
 				$log = "Modified object ".$title;
 			} else {
 				$firstpart = "";
 				$secondPArt = "";
 				$log = "Created object ".$title;
-			}
-			$sql = mysql_query("INSERT INTO `list_db` (".$firstpart."`title`, `pref`,`type`,`year`, `court`,`state`,`details`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$title."','".$pref."','".$type."','".$year."','".$court."','".$state."','".$details."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `title` = '".$title."', `pref` = '".$pref."', `type` = '".$type."', `court` = '".$court."',`state`='".$state."',`status`='".$status."',`year` = '".$year."',`details`='".$details."', `modify_time` = '".$modify_time."'") or die (mysql_error());
+			}	
 			
+			if ($file_data != "") {
+				$firstpart .= "`file`, ";
+				$secondPArt .= "'".$file_data."', ";
+				$dupPart .= "`file` = '".$file_data."', ";
+			}
+			
+			try {
+				$sql = $db->prepare("INSERT INTO `list_db` (".$firstpart."`title`,`pref`,`state`, `status`, `court`,`year`, `type`, `details`, `create_time`, `modify_time`)
+				VALUES (".$secondPArt.":title, :pref, :state, :status, :court, :year, :type, :details, :create_time, :modify_time)
+					ON DUPLICATE KEY UPDATE 
+						".$dupPart."
+						`title` = :title,
+						`pref` = :pref,
+						`status` = :status,
+						`court` = :court,
+						`type` = :type,
+						`year` = :year,
+						`state` = :state,
+						`details` = :details,
+						`modify_time` = :modify_time
+					");
+				$sql->execute($value_array);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$id = $db->lastInsertId();
 				
-				mysql_query("ALTER TABLE list_db ADD FULLTEXT (details);") or die (mysql_error());
+				//mysql_query("ALTER TABLE list_db ADD FULLTEXT (details);") or die (mysql_error());
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -44,9 +82,17 @@
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("DELETE FROM `list_db` WHERE ref = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `list_db` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -66,9 +112,19 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `list_db` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `list_db` SET  `".$tag."` = :value, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				//add to log
 				$logArray['object'] = get_class($this);
@@ -86,28 +142,16 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `list_db` ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['pref'] = $row['pref'];
-					$result[$count]['title'] = (($row['title']));
-					$result[$count]['type'] = $row['type'];
-					$result[$count]['year'] = $row['year'];
-					$result[$count]['court'] = $row['court'];
-					$result[$count]['state'] = $row['state'];
-					$result[$count]['details'] = $row['details'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `list_db` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function listAllHome($type, $sort=false, $sortType=false, $filter="title") {
@@ -116,12 +160,18 @@
 			} else {
 				$addition = "";
 			}
-			$sql = mysql_query("SELECT * FROM `list_db` WHERE `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `list_db` WHERE `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
+				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					if ($filter == "title") {
 						$tag = substr(ucwords(strtolower($row['title'])), 0, 1);
 					} else if ($filter == "state") {
@@ -154,13 +204,19 @@
 			} else {
 				$addition = "";
 			}
-			$sql = mysql_query("SELECT * FROM `list_db` WHERE (`title` LIKE '%".$val."%' OR `court` LIKE '%".$val."%' OR `state` LIKE '%".$val."%' OR `details` LIKE '%".$val."%' OR MATCH(details) AGAINST ('".$val."')) AND `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC") or die (mysql_error());
-			
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `list_db` WHERE (`title` LIKE '%".$val."%' OR `court` LIKE '%".$val."%' OR `state` LIKE '%".$val."%' OR `details` LIKE '%".$val."%' OR MATCH(details) AGAINST ('".$val."')) AND `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['title'] = (($row['title']));
 					$count++;
 				}
@@ -175,12 +231,18 @@
 			} else {
 				$addition = "";
 			}
-			$sql = mysql_query("SELECT * FROM `list_db` WHERE (`title` LIKE '%".$val."%' OR `court` LIKE '%".$val."%' OR `state` LIKE '%".$val."%' OR `details` LIKE '%".$val."%' OR MATCH(details) AGAINST ('".$val."')) AND `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `list_db` WHERE (`title` LIKE '%".$val."%' OR `court` LIKE '%".$val."%' OR `state` LIKE '%".$val."%' OR `details` LIKE '%".$val."%' OR MATCH(details) AGAINST ('".$val."')) AND `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
+				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					if ($filter == "title") {
 						$tag = substr(ucwords(strtolower($row['title'])), 0, 1);
 					} else if ($filter == "state") {
@@ -213,12 +275,19 @@
 			} else {
 				$addition = "";
 			}
-			$sql = mysql_query("SELECT * FROM `list_db` WHERE `title` LIKE '".$val."%' AND `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC") or die (mysql_error());
-			
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `list_db` WHERE `title` LIKE '".$val."%' AND `type` = '".$type."' AND ".$addition."`status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
+				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					if ($filter == "title") {
 						$tag = substr(ucwords(strtolower($row['title'])), 0, 1);
 					} else if ($filter == "state") {
@@ -246,93 +315,63 @@
 		
 		function lisstMultiple($array) {
 			$list = implode(",", $array);
-			$sql = mysql_query("SELECT * FROM `list_db` WHERE ref IN (".$list.") ORDER BY `title` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['pref'] = $row['pref'];
-					$result[$count]['title'] = (($row['title']));
-					$result[$count]['type'] = $row['type'];
-					$result[$count]['year'] = $row['year'];
-					$result[$count]['court'] = $row['court'];
-					$result[$count]['state'] = $row['state'];
-					$result[$count]['details'] = $row['details'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `list_db` WHERE ref IN (".$list.") ORDER BY `section_no` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order="ref") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
 			
-			$sql = mysql_query("SELECT * FROM `list_db` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['pref'] = $row['pref'];
-					$result[$count]['title'] = (($row['title']));
-					$result[$count]['type'] = $row['type'];
-					$result[$count]['year'] = $row['year'];
-					$result[$count]['court'] = $row['court'];
-					$result[$count]['state'] = $row['state'];
-					$result[$count]['details'] = $row['details'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `list_db` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `list_db` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['pref'] = $row['pref'];
-					$result['title'] = (($row['title']));
-					$result['type'] = $row['type'];
-					$result['year'] = $row['year'];
-					$result['court'] = $row['court'];
-					$result['state'] = $row['state'];
-					$result['details'] = $row['details'];
-					$result['status'] = $row['status'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM list_db WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag="ref", $ref="title") {
@@ -341,13 +380,17 @@
 		}
 		
 		function listCourt() {
-			$sql = mysql_query("SELECT `court` FROM `list_db` GROUP BY `court` ORDER BY `court`") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT `court` FROM `list_db` GROUP BY `court` ORDER BY `court`");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['title'] = (($row['court']));
 					$count++;
 				}
