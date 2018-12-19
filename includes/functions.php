@@ -5,9 +5,16 @@
 	$pageUR1 = $_SERVER["SERVER_NAME"];
 	$curdomain = str_replace("www.", "", $pageUR1);
 
-	if (($curdomain == "legallens.com.ng/") || ($curdomain == "legallens.com.ng") || ($curdomain == "dev.legallens.net/") || ($curdomain == "dev.legallens.net") ) {
+	if (($curdomain == "legallens.com.ng/") || ($curdomain == "legallens.com.ng")) {
 		ini_set("session.cookie_domain", ".legallens.com.ng/");
 		define("URL", "https://legallens.com.ng/", true);
+		define("servername", "localhost", true);
+		define("dbusername", "legallen_main", true);
+		define("dbpassword", "=uS%2bMuBS+(", true);
+		define("dbname", "legallen_main", true);
+	} else if (($curdomain == "dev.legallens.net/") || ($curdomain == "dev.legallens.net") ) {
+		ini_set("session.cookie_domain", ".legallens.com.ng/");
+		define("URL", "http://dev.legallens.net/", true);
 		define("servername", "localhost", true);
 		define("dbusername", "legallen_main", true);
 		define("dbpassword", "=uS%2bMuBS+(", true);
