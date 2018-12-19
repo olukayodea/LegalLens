@@ -22,7 +22,6 @@
 		$_GET['case_law'] = 1;
 		$_GET['reg_circular'] = 1;
 		$_GET['dic'] = 1;
-		$_GET['forum'] = 1;
 		$_GET['case_law'] = 1;
 		
 		for ($i = 0; $i < count($list); $i++) {
@@ -155,8 +154,6 @@ window.onload = function() {
             &nbsp;Court Rules&nbsp;-->
             <input type="checkbox" name="dic" id="dic" checked value="1" />
             &nbsp;Dictionary&nbsp;
-            <input type="checkbox" name="forum" id="forum" value="1" />
-            &nbsp;Forum&nbsp;
             <br>
             <span class="checkboxRequiredMsg">Please make a selection.</span></span>
             </div>
