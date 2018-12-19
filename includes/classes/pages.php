@@ -213,11 +213,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <ul>
 <li><a href="<?php echo URL; ?>home">Quick Find</a></li>
  <?php for ($i = 0; $i < count($list); $i++) {
-		echo "<li><a href='".URL."document?sort=".$list[$i]['ref']."'>".$list[$i]['title']."</a>";
+		echo "<li><a href='".URL."documentHome?sort=".$list[$i]['ref']."'>".$list[$i]['title']."</a>";
 		echo $categories->gettreeHome($list[$i]['ref']);
 		echo "</li>";
 	} ?>
-<li><a href="<?php echo URL; ?>caseLaw">Case law</a>
+<li><a href="<?php echo URL; ?>caseLawHome">Case law</a>
   <ul>
   <?php for ($i = 0; $i < count($caseCOurt); $i++) { ?>
   <li><a href="<?php echo URL; ?>caseLaw?sort=<?php echo urlencode($caseCOurt[$i]['title']); ?>"><?php echo $caseCOurt[$i]['title']; ?></a></li>

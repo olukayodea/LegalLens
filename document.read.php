@@ -19,7 +19,7 @@
 	}
 	
 	$data = $documents->getOne($id);
-	$list = $sections->getOne($read);
+	$list = $sections->getOne($read); 
 	$subList = $sections->sortAll($read, "document", "status", "active");
 	$common->updateCounter($id, $read, "document");
 	$prev = $sections->gettPrevNext($read, "-");

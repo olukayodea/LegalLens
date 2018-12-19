@@ -1,34 +1,24 @@
 <?php
-	$redirect = "document";
+	$redirect = "caseLawHome";
 	include_once("includes/functions.php");
 	include_once("includes/session.php");
-	
+    
 	if (isset($_REQUEST['sort'])) {
-		$id = $common->get_prep($_REQUEST['sort']);
-		$tag = "Documents in ".$categories->getOneField($id);
-		$tag2 = " in ".$id;
-	} else {
-		$id = false;
-		$tag = "All Documents";
-		$tag2 = " in ".$tag;
-	}
+        $id = $common->get_prep($_REQUEST['sort']);
+        header("location: caseLaw?sort=".urlencode($_REQUEST['sort']));
+    } else {
+        $id = false;
+        $tag = "All Areas of Law";
+        $tag2 = " in ".$tag;
+    }
 	
 	if (isset($_REQUEST['filter'])) {
 		$filter = $common->get_prep($_REQUEST['filter']);
 	} else {
-		$filter = "title";
+		$filter = false;
 	}
-		
-	if (isset($_REQUEST['s'])) {
-		$s = $common->get_prep($_REQUEST['s']);
-		$list = $documents->fullSearch($s, "Law", $id, "cat");
-		$tag = "Search Result for <strong>'".$s."'</strong>";
-	} else if (isset($_REQUEST['q'])) {
-		$q = $common->get_prep($_REQUEST['q']);
-		$list = $documents->indexSearch($q, "Law", $id, "cat", $filter);
-	} else {
-		$list = $documents->listAllHome("Law", $id, "cat", $filter);
-	}
+	
+    $list = $caselaw->listCourt()
 ?>
 <!doctype html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -96,8 +86,8 @@
 <div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
-       <h4 style="" align="center"><?php echo $categories->showLink($id); ?> </h4>
-		<form id="search-form2" class="search-form2 clearfix" method="post" action="" autocomplete="off">
+       <h4 style="" align="center">Case Law </h4>
+		<form id="search-form2" class="search-form2 clearfix" method="post" action="caseLaw" autocomplete="off">
 		        <input class="search-term2 required" type="text" id="s" name="s" placeholder="Type your search terms here" title="* Please enter a search term!" />
 		        <input class="search-btn" type="submit" value="Search" />
 		        <span style="margin-left:-30px;margin-top:10px;">
@@ -109,21 +99,13 @@
 		<?php if (isset($_REQUEST['s'])) { ?>
         <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
         <?php } ?>
-        <p><a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=a">A</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=b">B</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=c">C</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=d">D</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=e">E</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=f">F</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=g">G</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=h">H</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=i">I</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=j">J</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=k">K</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=l">L</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=m">M</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=n">N</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=o">O</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=p">P</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=q">Q</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=r">R</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=s">S</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=t">T</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=u">U</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=v">V</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=w">W</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=x">X</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=y">Y</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=z">Z</a></p>
         <div id="easyPaginate">
-			<?php foreach ($list as $key => $value) { ?>
-                    <h4><?php echo $key; ?></h4>
-                    <?php for ($i = 0; $i < count($list[$key]); $i++) {
-                        $section_list = $sections->sortAll($list[$key][$i]['ref'], "document", "status", "active"); ?>
+            <?php for ($i = 0; $i < count($list); $i++) {?>
                 <span>
                     <strong>
-                    <a href="<?php echo URL; ?>document.view?view=Document&id=<?php echo $list[$key][$i]['ref']; ?>&jump=<?php echo intval($list[$key][$i]['section_ref']); ?>"><?php echo $list[$key][$i]['title']; ?></a></strong><br>
-                    <?php for ($j= 0; $j < count($section_list); $j++) { ?>
-                    <a href="<?php echo URL; ?>document.read?id=<?php echo $list[$key][$i]['ref']; ?>&read=<?php echo $section_list[$j]['ref']; ?>"><?php echo nl2br(($section_list[$j]['section_no'])); ?></a>  
-                    <br>
-                    <?php } ?></p>
-				</span>
-                    <?php } ?>
+                    <a href="<?php echo URL; ?>caseLaw?sort=<?php echo urlencode($list[$i]['title']); ?>"><?php echo $list[$i]['title']; ?></a>
+                    </strong><br>
+                </span>
             <?php } ?>
         </div>
 	 </div>
@@ -170,19 +152,18 @@
 	<script>
         $(function() {
 			$('#easyPaginate').easyPaginate({
-				paginateElement: 'span',
+				paginateElement: 'dataGrid2',
 				elementsPerPage: 3,
 				effect: 'climb'
 			});
             $( "#s" ).catcomplete({
       		  delay: 0,
-              source: "includes/scripts/auto_complete_doc.php?sort=<?php echo $id; ?>&type=Law",
+              source: "includes/scripts/auto_complete_case.php?type=<?php echo $id; ?>",
 				select: function( event, ui ) {
-					window.location='document.view?id='+ui.item.code+"&view="+ui.item.type;
+					window.location='caselaw.view?id='+ui.item.code+"&jump="+ui.item.section;
 				}
             });
-        });
-		
+		});
 		$.widget( "custom.catcomplete", $.ui.autocomplete, {
 		_create: function() {
 		  this._super();
@@ -204,8 +185,6 @@
 		  });
 		}
 		});
-		
-		
     </script>
 
         </body>
