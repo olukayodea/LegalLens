@@ -13,10 +13,6 @@
 		$reg = $add['reg'];
 		$case_law = $add['case_law'];
 		$dic = $add['dic'];
-		$forum_cat = $add['forum']['cat'];
-		$forum_title = $add['forum']['title'];
-		$forum_post = $add['forum']['post'];
-		$forum_count = count($forum_cat)+count($forum_title)+count($forum_post);
 		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
 		$postData = base64_encode(json_encode($_POST));
@@ -30,8 +26,8 @@
 		$_GET['case_law'] = 1;
 		
 		for ($i = 0; $i < count($list); $i++) {
-            $_GET['parameter'][] =  $list[$i]['ref']; 
-        }
+      $_GET['parameter'][] =  $list[$i]['ref']; 
+    }
 		
 		$curTime = microtime(true);
 		$add = $search->create($_GET);
@@ -39,10 +35,6 @@
 		$reg = $add['reg'];
 		$case_law = $add['case_law'];
 		$dic = $add['dic'];
-		$forum_cat = $add['forum']['cat'];
-		$forum_title = $add['forum']['title'];
-		$forum_post = $add['forum']['post'];
-		$forum_count = count($forum_cat)+count($forum_title)+count($forum_post);
 		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
 		$postData = base64_encode(json_encode($_GET));
@@ -58,15 +50,12 @@
 		$reg = $add['reg'];
 		$dic = $add['dic'];
 		$case_law = $add['case_law'];
-		$forum_cat = $add['forum']['cat'];
-		$forum_title = $add['forum']['title'];
-		$forum_post = $add['forum']['post'];
-		$forum_count = count($forum_cat)+count($forum_title)+count($forum_post);
 		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
 		$postData = "";
-		$result = true;
-	}
+    $result = true;
+  }
+  $jsLisst = "";
 ?>
 <!doctype html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -178,145 +167,16 @@ window.onload = function() {
        <h4 style="" align="center">Search Result</h4>
        <p>Your search for "<?php echo $search_data; ?>" brought <?php echo number_format($total); ?> results in <?php echo number_format($timeConsumed, 3)." seconds"; ?>, <a href="Javascript:void(0)" onClick="saveResult()">click here to save search result</a>
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#1" data-toggle="tab">All (<?php echo number_format($total); ?>)</a></li>
-            <li><a href="#2" data-toggle="tab">Legislation (<?php echo number_format(count($doc)); ?>)</a></li>
-            <li><a href="#3" data-toggle="tab">Case Law (<?php echo number_format(count($case_law)); ?>)</a></li>
-            <li><a href="#4" data-toggle="tab">Regulations (<?php echo number_format(count($reg)); ?>)</a></li>
-            <li><a href="#5" data-toggle="tab">Dictionary (<?php echo number_format(count($dic)); ?>)</a></li>
-            <li><a href="#6" data-toggle="tab">Forum (<?php echo number_format(count($forum_count)); ?>)</a></li>
+            <li class="active"><a href="#1" data-toggle="tab">Case Law (<?php echo number_format(count($case_law)); ?>)</a></li>
+            <?php foreach ($doc as $key => $value) { ?>
+            <li><a href="#2_<?php echo $key; ?>" data-toggle="tab"><?php echo $categories->getOneField($key); ?> (<?php echo number_format(count($doc[$key])); ?>)</a></li>
+            <?php } ?>
+            <li><a href="#3" data-toggle="tab">Regulations (<?php echo number_format(count($reg)); ?>)</a></li>
+            <li><a href="#4" data-toggle="tab">Dictionary (<?php echo number_format(count($dic)); ?>)</a></li>
         </ul>
     
         <div class="tab-content">
             <div class="tab-pane active" id="1">
-				<?php if($total > 0 ) { ?>
-                
-                    <table width="100%" border="0" id="example1">
-                    <thead>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                    </thead>
-                    <tbody>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($doc); $i++) {
-						  $count++ ?>
-                       <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>document.read?id=<?php echo $doc[$i]['ref']; ?>&read=<?php echo $doc[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $doc[$i]['title']; ?></a></strong><br>
-                      <strong style="color:#00F"><?php echo nl2br($common->getLine($doc[$i]['section_no'])); ?></strong><br>
-                       <?php 
-                           echo nl2br($common->truncate($doc[$i]['section_content'], 150));
-                        ?></p></td>
-                          </tr>
-                      <?php } ?>
-					  <?php for ($i = 0; $i < count($case_law); $i++) {
-						  $count++  ?>
-                       <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><p><a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
-                   <cite><?php echo $case_law[$i]['citation']; ?></cite><br>
-                   <strong style="color:#00F"><?php echo $common->getLine($case_law[$i]['section_content']); ?></strong><br></a>
-                   <?php echo nl2br($common->truncate($case_law[$i]['section_content'], 250)); ?><br>
-                   <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">read more</a></p></td></tr>
-                    <?php } ?>
-                      <?php for ($i = 0; $i < count($reg); $i++) {
-						  $count++  ?>
-                       <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>regulations.view?id=<?php echo $reg[$i]['ref']; ?>&read=<?php echo $reg[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $reg[$i]['title']; ?></a></strong><br>
-                   <?php 
-                   if ($reg[$i]['section_no'] == "") {
-                       echo nl2br($common->truncate($reg[$i]['section_content'], 200));
-                   } else {
-                       echo nl2br($common->getLine($reg[$i]['section_no']));
-					   echo "<br>";
-                       echo nl2br($common->truncate($reg[$i]['section_content'], 200));
-                   } ?></p></td>
-                          </tr>
-                      <?php } ?>
-                      <?php for ($i = 0; $i < count($dic); $i++) {
-						  $count++  ?>
-                       <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><p><strong style="color:#006"><?php echo $dic[$i]['title']; ?></strong><br> <?php echo $dic[$i]['details']; ?></p></td></tr>
-                      <?php } ?>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($forum_cat); $i++) {
-						  $count++ ?>
-                          <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><a href="<?php echo $common->seo($forum_cat[$i]['cat_id'], "category"); ?>"><?php echo $forum_cat[$i]['cat_name']; ?></a> in Categories</td>
-                          </tr>
-                      <?php } ?>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($forum_title); $i++) {
-						  $count++ ?>
-                          <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><a href="<?php echo $common->seo($forum_title[$i]['topic_id'], "topic"); ?>"><?php echo $forum_title[$i]['topic_subject']; ?></a></td>
-                          </tr>
-                      <?php } ?>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($forum_post); $i++) {
-						  $count++ ?>
-                          <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><a href="<?php echo URL."Forum.post#".$forum_post[$i]['ref']; ?>"><?php echo $forum_post[$i]['post_content']; ?></a></td>
-                          </tr>
-                      <?php } ?>
-                    </tbody>
-                    <tfoot>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                    </tfoot>
-                    </table>
-                <?php } else { ?>
-                    <p>No result for this item now</p>
-                <?php } ?>
-            </div>
-            <div class="tab-pane" id="2">
-				<?php if (count($doc) > 0) { ?>
-                    <table width="100%" border="0" id="example3">
-                    <thead>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                    </thead>
-                    <tbody>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($doc); $i++) {
-						  $count++ ?>
-                       <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>document.read?id=<?php echo $doc[$i]['ref']; ?>&read=<?php echo $doc[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $doc[$i]['title']; ?></a></strong><br>
-                  <strong style="color:#00F"><?php echo nl2br($common->getLine($doc[$i]['section_no'])); ?></strong><br>
-                   <?php 
-                       echo nl2br($common->truncate($doc[$i]['section_content'], 150));
-                    ?></p></td>
-                          </tr>
-                      <?php } ?>
-                    </tbody>
-                    <tfoot>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                    </tfoot>
-                    </table>
-                <?php } else { ?>
-                    <p>No result for this item now</p>
-                <?php } ?>
-            </div>
-            <div class="tab-pane" id="3">
 				<?php if (count($case_law) > 0) { ?>
                     <table width="100%" border="0" id="example4">
                     <thead>
@@ -331,7 +191,7 @@ window.onload = function() {
 					  for ($i = 0; $i < count($case_law); $i++) {
 						  $count++ ?>
                        <tr>
-                       <td><?php echo $count; ?></td>
+                       <td valign="top"><strong><?php echo $count; ?></strong></td>
                        <td><p>
                   <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
                    <cite><?php echo $case_law[$i]['citation']; ?></cite><br>
@@ -353,7 +213,45 @@ window.onload = function() {
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
-            <div class="tab-pane" id="4">
+            <?php foreach ($doc as $key => $value) { ?>
+            <div class="tab-pane" id="2_<?php echo $key; ?>">
+				<?php if (count($doc[$key]) > 0) {
+          $jsLisst .= "#table_".$key.","; ?>
+                    <table width="100%" border="0" id="table_<?php echo $key; ?>">
+                    <thead>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+					  <?php 
+					  $count = 0;
+					  for ($i = 0; $i < count($doc[$key]); $i++) {
+						  $count++ ?>
+                       <tr>
+                       <td valign="top"><strong><?php echo $count; ?></strong></td>
+                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>document.read?id=<?php echo $doc[$key][$i]['ref']; ?>&read=<?php echo $doc[$key][$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $doc[$key][$i]['title']; ?></a></strong><br>
+                  <strong style="color:#00F"><?php echo nl2br($common->getLine($doc[$key][$i]['section_no'])); ?></strong><br>
+                   <?php 
+                       echo nl2br($common->truncate($doc[$key][$i]['section_content'], 150));
+                    ?></p></td>
+                          </tr>
+                      <?php } ?>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                      </tr>
+                    </tfoot>
+                    </table>
+                <?php } else { ?>
+                    <p>No result for this item now</p>
+                <?php } ?>
+            </div>
+            <?php } ?>
+            <div class="tab-pane" id="3">
 				<?php if (count($reg) > 0) { ?>
                     <table width="100%" border="0" id="example4">
                     <thead>
@@ -368,7 +266,7 @@ window.onload = function() {
 					  for ($i = 0; $i < count($reg); $i++) {
 						  $count++ ?>
                           <tr>
-                       <td><?php echo $count; ?></td>
+                       <td valign="top"><strong><?php echo $count; ?></strong></td>
                        <td><p><strong style="color:#006"><a href="<?php echo URL; ?>regulations.view?id=<?php echo $reg[$i]['ref']; ?>&read=<?php echo $reg[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $reg[$i]['title']; ?></a></strong><br>
                        
                    <?php 
@@ -394,7 +292,7 @@ window.onload = function() {
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
-            <div class="tab-pane" id="5">
+            <div class="tab-pane" id="4">
 				<?php if (count($dic) > 0) { ?>
                     <table width="100%" border="0" id="example5">
                     <thead>
@@ -409,58 +307,9 @@ window.onload = function() {
 					  for ($i = 0; $i < count($dic); $i++) {
 						  $count++ ?>
                           <tr>
-                       <td><?php echo $count; ?></td>
+                       <td valign="top"><strong><?php echo $count; ?></strong></td>
                        <td><p><strong><?php echo $dic[$i]['title']; ?></strong><br> <?php echo $dic[$i]['details']; ?></p>
                        </td>
-                          </tr>
-                      <?php } ?>
-                    </tbody>
-                    <tfoot>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                    </tfoot>
-                    </table>
-                <?php } else { ?>
-                    <p>No result for this item now</p>
-                <?php } ?>
-            </div>
-            <div class="tab-pane" id="6">
-				<?php if ((count($forum_cat)+count($forum_title)+count($forum_post)) > 0) { ?>
-                    <table width="100%" border="0" id="example5">
-                    <thead>
-                      <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                    </thead>
-                    <tbody>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($forum_cat); $i++) {
-						  $count++ ?>
-                          <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><a href="<?php echo $common->seo($forum_cat[$i]['cat_id'], "category"); ?>"><?php echo $forum_cat[$i]['cat_name']; ?></a> in Categories</td>
-                          </tr>
-                      <?php } ?>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($forum_title); $i++) {
-						  $count++ ?>
-                          <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><a href="<?php echo $common->seo($forum_title[$i]['topic_id'], "topic"); ?>"><?php echo $forum_title[$i]['topic_subject']; ?></a></td>
-                          </tr>
-                      <?php } ?>
-					  <?php 
-					  $count = 0;
-					  for ($i = 0; $i < count($forum_post); $i++) {
-						  $count++ ?>
-                          <tr>
-                       <td><?php echo $count; ?></td>
-                       <td><a href="<?php echo URL."Forum.post#".$forum_post[$i]['ref']; ?>"><?php echo $forum_post[$i]['post_content']; ?></a></td>
                           </tr>
                       <?php } ?>
                     </tbody>
@@ -520,7 +369,7 @@ window.onload = function() {
 						//something
 					});
                     $(function() {
-        				$("#example1,#example3,#example4,#example5").dataTable( {
+        				$("#example1,<?php echo $jsLisst; ?>#example4,#example5").dataTable( {
 						  "pageLength": 50,
 						  "bLengthChange": false,
 						  "bFilter":false
