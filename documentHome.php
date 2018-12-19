@@ -17,18 +17,10 @@
 		$filter = $common->get_prep($_REQUEST['filter']);
 	} else {
 		$filter = "title";
-	}
-		
-	if (isset($_REQUEST['s'])) {
-		$s = $common->get_prep($_REQUEST['s']);
-		$list = $documents->fullSearch($s, "Law", $id, "cat");
-		$tag = "Search Result for <strong>'".$s."'</strong>";
-	} else if (isset($_REQUEST['q'])) {
-		$q = $common->get_prep($_REQUEST['q']);
-		$list = $documents->indexSearch($q, "Law", $id, "cat", $filter);
-	} else {
-		$list = $documents->listAllHome("Law", $id, "cat", $filter);
-	}
+    }
+    
+	$listHidden = $categories->sortAll(0, "parent_id", "status", "active");
+    $list = $categories->sortAll($id, "parent_id");
 ?>
 <!doctype html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -96,36 +88,32 @@
 <div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
-       <h4 style="" align="center"><?php echo $categories->showLink($id); ?> </h4>
-		<form id="search-form2" class="search-form2 clearfix" method="post" action="" autocomplete="off">
-		        <input class="search-term2 required" type="text" id="s" name="s" placeholder="Type your search terms here" title="* Please enter a search term!" />
-		        <input class="search-btn" type="submit" value="Search" />
+       <h4 style="" align="center">Quick Find </h4>
+		<form id="search-form2" class="search-form2 clearfix" method="post" action="home" autocomplete="off">
+		        <input class="search-term2 required" type="text" id="s" name="s" placeholder="Enter matter of interest" title="* Enter matter of interest" onBlur="saveSearch(this.value)" value="<?php echo $search_data; ?>" required autofocus />
+		        <input class="search-btn" type="submit" value="Go" /><br>
 		        <span style="margin-left:-30px;margin-top:10px;">
 		        </span>
-		        <div id="search-error-container2"></div>
+                
+            <?php for ($i = 0; $i < count($listHidden); $i++) { ?>
+            <input type="hidden" name="parameter[]" value="<?php echo $listHidden[$i]['ref']; ?>" />
+            <?php } ?><br>
+            <input type="hidden" name="case_law" id="case_law" value="1" />
+            <input type="hidden" name="reg_circular" id="reg_circular" value="1" />
+            <input type="hidden" name="dic" id="dic" value="1" />
 		</form>
         <hr>
         <h4><?php echo $tag; ?></h4>
 		<?php if (isset($_REQUEST['s'])) { ?>
         <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
         <?php } ?>
-        <p><a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=a">A</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=b">B</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=c">C</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=d">D</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=e">E</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=f">F</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=g">G</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=h">H</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=i">I</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=j">J</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=k">K</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=l">L</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=m">M</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=n">N</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=o">O</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=p">P</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=q">Q</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=r">R</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=s">S</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=t">T</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=u">U</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=v">V</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=w">W</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=x">X</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=y">Y</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=z">Z</a></p>
-        <div id="easyPaginate">
-			<?php foreach ($list as $key => $value) { ?>
-                    <h4><?php echo $key; ?></h4>
-                    <?php for ($i = 0; $i < count($list[$key]); $i++) {
-                        $section_list = $sections->sortAll($list[$key][$i]['ref'], "document", "status", "active"); ?>
+            <?php for ($i = 0; $i < count($list); $i++) {?>
                 <span>
-                    <p><strong>
-                    <a href="<?php echo URL; ?>document.view?view=Document&id=<?php echo $list[$key][$i]['ref']; ?>&jump=<?php echo intval($list[$key][$i]['section_ref']); ?>"><?php echo $list[$key][$i]['title']; ?></a></strong><br>
-                    <?php for ($j= 0; $j < count($section_list); $j++) { ?>
-                    <a href="<?php echo URL; ?>document.read?id=<?php echo $list[$key][$i]['ref']; ?>&read=<?php echo $section_list[$j]['ref']; ?>"><?php echo nl2br(($section_list[$j]['section_no'])); ?></a>  
-                    <br>
-                    <?php } ?></p>
-				</span>
-                    <?php } ?>
+                    <strong>
+                    <a href="<?php echo URL; ?>document?sort=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a>
+                    </strong><br>
+                </span>
             <?php } ?>
-        </div>
 	 </div>
 
    </div>
@@ -169,11 +157,6 @@
                 
 	<script>
         $(function() {
-			$('#easyPaginate').easyPaginate({
-				paginateElement: 'span',
-				elementsPerPage: 3,
-				effect: 'climb'
-			});
             $( "#s" ).catcomplete({
       		  delay: 0,
               source: "includes/scripts/auto_complete_doc.php?sort=<?php echo $id; ?>&type=Law",

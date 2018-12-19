@@ -116,7 +116,7 @@
                     <?php for ($i = 0; $i < count($list[$key]); $i++) {
                         $section_list = $sections->sortAll($list[$key][$i]['ref'], "document", "status", "active"); ?>
                 <span>
-                    <p><strong>
+                    <strong>
                     <a href="<?php echo URL; ?>document.view?view=Document&id=<?php echo $list[$key][$i]['ref']; ?>&jump=<?php echo intval($list[$key][$i]['section_ref']); ?>"><?php echo $list[$key][$i]['title']; ?></a></strong><br>
                     <?php for ($j= 0; $j < count($section_list); $j++) { ?>
                     <a href="<?php echo URL; ?>document.read?id=<?php echo $list[$key][$i]['ref']; ?>&read=<?php echo $section_list[$j]['ref']; ?>"><?php echo nl2br(($section_list[$j]['section_no'])); ?></a>  
