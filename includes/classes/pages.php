@@ -217,7 +217,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		echo $categories->gettreeHome($list[$i]['ref']);
 		echo "</li>";
 	} ?>
-<li><a href="<?php echo URL; ?>caseLaw">Case law</a>
+<li><a href="<?php echo URL; ?>caseLawHome">Case law</a>
   <ul>
   <?php for ($i = 0; $i < count($caseCOurt); $i++) { ?>
   <li><a href="<?php echo URL; ?>caseLaw?sort=<?php echo urlencode($caseCOurt[$i]['title']); ?>"><?php echo $caseCOurt[$i]['title']; ?></a></li>
