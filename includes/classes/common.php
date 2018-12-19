@@ -294,13 +294,17 @@
 		}
 		
 		function stateList() {
-			$sql = mysql_query("SELECT * FROM `areas` ORDER BY `state` ASC") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `areas` ORDER BY `state` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['state'] = ucfirst(strtolower($row['state']));
 					$count++;
 				}
@@ -309,13 +313,17 @@
 		}
 		
 		function searchStte($val) {
-			$sql = mysql_query("SELECT * FROM `areas` WHERE `state` LIKE '%".$val."%' ORDER BY `state` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `areas` WHERE `state` LIKE '%".$val."%' ORDER BY `state` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
 				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['state'] = ucfirst(strtolower($row['state']));
 					$count++;
 				}
@@ -333,7 +341,20 @@
 			$id = $this->mysql_prep($id);
 			$type = $this->mysql_prep($type);
 			$section = $this->mysql_prep($section);
-			mysql_query("INSERT INTO `counter_log` (`id`, `type`,`section`,`user_id`, `date_time`) VALUES ('".$id."','".$type."','".$section."','".$_SESSION['users']['ref']."','".time()."')");
+			global $db;
+			try {
+				$sql = $db->prepare("INSERT INTO `counter_log` (`id`, `type`,`section`,`user_id`, `date_time`) VALUES (:id, :type, :section, :user_id, :date_time)");
+				$sql->execute(
+					array(
+					':id' => $id,
+					':type' => $type,
+					':section' => $section,
+					':user_id' => $_SESSION['users']['ref'],
+					':date_time' => time())
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 		}
 		
 		function addS($val) {
