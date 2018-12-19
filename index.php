@@ -20,7 +20,9 @@
 		header("location: ./");
 	}
 	
-	if (isset($_COOKIE['hash'])) {
+	if (isset($_GET['confirm'])) {
+		$c_login = $users->loginCookie();
+	} else if (isset($_COOKIE['hash'])) {
 		$c_login = $users->loginCookie();
 		if ($c_login) {
 			header("location: ".$tagLink);
@@ -29,7 +31,6 @@
 		}
 	} else if ((!isset($_GET['confirm'])) && (isset($_SESSION['users']['ref'])) && (trim($_SESSION['users']['subscription']) < time())) {
 		header("location: managesubscription?renew");
-	} else if (isset($_GET['confirm'])) {
 	} else if (isset($_SESSION['users']['ref']) ) {
 		header("location: home");
 	}
@@ -64,9 +65,7 @@
 			
 			header("location: ./?error=".urlencode($er));
 		}
-    }
-	
-	if (isset($_POST['registerButton'])) {
+    } else if (isset($_POST['registerButton'])) {
 		$add = $users->create($_POST);
 		
 		if ($add) {
