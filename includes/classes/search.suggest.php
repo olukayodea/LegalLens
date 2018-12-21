@@ -154,7 +154,6 @@
 				$result = array();
 				if ($sql->rowCount() == 1) {
 					$row = $sql->fetch(PDO::FETCH_ASSOC);
-					$row = mysql_fetch_array($sql);
 					$result['ref'] = $row['ref'];
 					$result['title'] = ucwords(strtolower($row['title']));
 					$result['users'] = $row['users'];
