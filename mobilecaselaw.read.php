@@ -39,6 +39,7 @@
 </style>
 
 <head>
+    <meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({

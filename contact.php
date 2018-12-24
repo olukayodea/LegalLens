@@ -5,7 +5,7 @@
 		header("location: ?done");
 	}
 ?>
-<!doctype html>
+<!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
@@ -13,6 +13,7 @@
         
 
 <head>
+    <meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
 <script src="SpryAssets/SpryValidationTextarea.js" type="text/javascript"></script>

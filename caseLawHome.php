@@ -20,7 +20,7 @@
 	
     $list = $caselaw->listCourt()
 ?>
-<!doctype html>
+<!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
@@ -28,6 +28,7 @@
 <base href="<?php echo URL; ?>" />
 
 <head>
+    <meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({

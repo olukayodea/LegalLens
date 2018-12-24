@@ -77,7 +77,7 @@
 	
 	$content = nl2br($page_content->getOneField("home", "title", "content"));
 ?>
-<!doctype html>
+<!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
@@ -85,6 +85,7 @@
         
 <!-- Mirrored from inspirythemes.biz/html-templates/knowledgebase-html/index.html by HTTrack Website Copier/3.x [XR&CO'2013], Sun, 27 Mar 2016 11:14:22 GMT -->
 <head>
+    <meta charset="utf-8">
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

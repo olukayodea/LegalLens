@@ -76,6 +76,7 @@
         
 <!-- Mirrored from inspirythemes.biz/html-templates/knowledgebase-html/index.html by HTTrack Website Copier/3.x [XR&CO'2013], Sun, 27 Mar 2016 11:14:22 GMT -->
 <head>
+    <meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({

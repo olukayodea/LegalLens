@@ -49,6 +49,7 @@
 <link href="SpryAssets/SpryValidationSelect.css" rel="stylesheet" type="text/css">
 <link href="SpryAssets/SpryValidationTextarea.css" rel="stylesheet" type="text/css">
 <head>
+    <meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({

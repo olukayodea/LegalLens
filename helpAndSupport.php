@@ -36,19 +36,20 @@
 	}
 	$listCat = $knowledge_base_category->listAll();
 ?>
-<!doctype html>
+<!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
         <!--[if gt IE 8]><!--> <html lang="en-US"> <!--<![endif]-->
         
 
+<head>
+    <meta charset="utf-8">
 <base href="<?php echo URL; ?>" />
 <script src="SpryAssets/SpryValidationSelect.js" type="text/javascript"></script>
 <script src="SpryAssets/SpryValidationTextarea.js" type="text/javascript"></script>
 <link href="SpryAssets/SpryValidationSelect.css" rel="stylesheet" type="text/css">
 <link href="SpryAssets/SpryValidationTextarea.css" rel="stylesheet" type="text/css">
-<head>
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({
