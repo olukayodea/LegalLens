@@ -1,18 +1,16 @@
 <?php
 	class pages extends common {
-		function head($home = false) { ?>
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-5XKJCSJ');</script>
+        function head($home = false) { ?>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-5XKJCSJ');</script>
 
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5XKJCSJ"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5XKJCSJ"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
          
-            
-            
-            
 			<link rel="shortcut icon" href="images/favicon.png" />
 			
 			<!-- Google Web Fonts-->
@@ -21,8 +19,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			<link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css' />
 			
 			<!-- Style Sheet-->
-			<link rel="stylesheet" href="style.css"/>
-			<link rel='stylesheet' id='bootstrap-css-css'  href='<?php echo URL; ?>css/bootstrap5152.css?ver=1.0' type='text/css' media='all' />
+            <link rel="stylesheet" href="style.css"/>
+            <link rel='stylesheet' id='bootstrap-css-css'  href='<?php echo URL; ?>css/bootstrap5152.css?ver=1.0' type='text/css' media='all' />
 			<link rel='stylesheet' id='responsive-css-css'  href='<?php echo URL; ?>css/responsive5152.css?ver=1.0' type='text/css' media='all' />
 			<link rel='stylesheet' id='pretty-photo-css-css'  href='<?php echo URL; ?>js/prettyphoto/prettyPhotoaeb9.css?ver=3.1.4' type='text/css' media='all' />
 			<link rel='stylesheet' id='main-css-css'  href='<?php echo URL; ?>css/main5152.css?ver=1.0' type='text/css' media='all' />
@@ -205,143 +203,97 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			$caseCOurt = $caselaw->listCourt();
 			 ?>
 
-<!--my new link -->
-<div id="outers-wrap">
-  	
-	<!-- Navigation -->
-	<nav class="mainNavSide">
-<ul>
-<li><a href="<?php echo URL; ?>home">Quick Find</a></li>
- <?php for ($i = 0; $i < count($list); $i++) {
-		echo "<li><a href='".URL."documentHome?sort=".$list[$i]['ref']."'>".$list[$i]['title']."</a>";
-		echo $categories->gettreeHome($list[$i]['ref']);
-		echo "</li>";
-	} ?>
-<li><a href="<?php echo URL; ?>caseLawHome">Case law</a>
-  <ul>
-  <?php for ($i = 0; $i < count($caseCOurt); $i++) { ?>
-  <li><a href="<?php echo URL; ?>caseLaw?sort=<?php echo urlencode($caseCOurt[$i]['title']); ?>"><?php echo $caseCOurt[$i]['title']; ?></a></li>
-  <?php } ?>
-  </ul>
-</li>
-<li><a href="<?php echo URL; ?>regulations">Regulations /Circular</a>
-  <ul>
-  <?php for ($i = 0; $i < count($listReg); $i++) { ?>
-  <li><a href="<?php echo URL; ?>regulations/<?php echo urlencode($listReg[$i]['title']); ?>"><?php echo $listReg[$i]['title']; ?></a></li>
-  <?php } ?>
-  </ul>
-</li>
-<!--<li><a href="<?php echo URL; ?>books">Books</a></li>-->
-<!--<li><a href="<?php echo URL; ?>articles">Articles and Journals</a>
-  <ul>
-  <li><a href="<?php echo URL; ?>articles/Article">Article</a></li>
-  <li><a href="<?php echo URL; ?>articles/Journals">Journals</a></li>
-  </ul>
-</li>-->
-<li><a href="Javascript:void(0);">Legal Drafting</a>
-      <ul>
-      <li><a href="<?php echo URL; ?>clause">Draft Clauses</a></li>
-      <li><a href="<?php echo URL; ?>agreements">Draft Agreement</a></li>
-      <li><a href="<?php echo URL; ?>forms">Forms</a></li>
-      </ul>
-</li>
- <li><a href="<?php echo URL; ?>dictionary">Law Dictionary</a></li>
-<!--<li><a href="<?php echo URL; ?>courts">List of Courts</a>
-<?php if (count($courtList) > 0) { ?>
-  <ul>
-  <?php for ($i = 1; $i < count($courtList); $i++) { ?>
-  <li><a href="<?php echo URL; ?>courts?sort=<?php echo urlencode($courtList[$i]['title']); ?>"><?php echo $courtList[$i]['title']; ?></a></li>
-  <?php } ?>
-  </ul>
-<?php } ?>
-</li>
-<li><a href="<?php echo URL; ?>judges">List of Judges in Nigeria</a>
-<?php if (count($courtList) > 0) { ?>
-  <ul>
-  <?php for ($i = 1; $i < count($courtList); $i++) { ?>
-  <li><a href="<?php echo URL; ?>judges?sort=<?php echo urlencode($courtList[$i]['title']); ?>"><?php echo $courtList[$i]['title']; ?></a></li>
-  <?php } ?>
-  </ul>
-<?php } ?>
-</li>
-<li><a href="<?php echo URL; ?>SANS">List of SANS</a></li>-->
-</ul>
-	</nav>
-</div>
+            <!--my new link -->
+            <div id="outers-wrap">
+
+                <!-- Navigation -->
+                <nav class="mainNavSide">
+                    <ul>
+                        <li><a href="<?php echo URL; ?>home">Quick Find</a></li>
+                        <?php for ($i = 0; $i < count($list); $i++) {
+                        echo "<li><a href='".URL."documentHome?sort=".$list[$i]['ref']."'>".$list[$i]['title']."</a>";
+                        echo $categories->gettreeHome($list[$i]['ref']);
+                        echo "</li>";
+                        } ?>
+                        <li><a href="<?php echo URL; ?>caseLawHome">Case law</a>
+                    <ul>
+                    <?php for ($i = 0; $i < count($caseCOurt); $i++) { ?>
+                    <li><a href="<?php echo URL; ?>caseLaw?sort=<?php echo urlencode($caseCOurt[$i]['title']); ?>"><?php echo $caseCOurt[$i]['title']; ?></a></li>
+                    <?php } ?>
+                    </ul>
+                    </li>
+                    <li><a href="<?php echo URL; ?>regulations">Regulations /Circular</a>
+                    <ul>
+                        <?php for ($i = 0; $i < count($listReg); $i++) { ?>
+                        <li><a href="<?php echo URL; ?>regulations/<?php echo urlencode($listReg[$i]['title']); ?>"><?php echo $listReg[$i]['title']; ?></a></li>
+                        <?php } ?>
+                    </ul>
+                    </li>
+                    <li><a href="Javascript:void(0);">Legal Drafting</a>
+                    <ul>
+                    <li><a href="<?php echo URL; ?>clause">Draft Clauses</a></li>
+                    <li><a href="<?php echo URL; ?>agreements">Draft Agreement</a></li>
+                    <li><a href="<?php echo URL; ?>forms">Forms</a></li>
+                    </ul>
+                    </li>
+                    <li><a href="<?php echo URL; ?>dictionary">Law Dictionary</a></li>
+                    </ul>
+                </nav>
+            </div>
 		<?php }
 		
 		function footer() {
 			$page_content = new page_content;
 			$content = $this->truncate($page_content->getOneField("guide", "title", "content"), 200); ?>
-        <div id="footer" class="container">
-<div class="row">
+            <div id="footer" class="container">
+                <div class="row">
 
-        <div class="span3">
-                <section class="widget">
-                        <h3 class="title">How it works</h3>
-                        <div class="textwidget">
+                    <div class="span3">
+                        <section class="widget">
+                            <h3 class="title">How it works</h3>
+                            <div class="textwidget">
                                 <p><?php echo $content; ?></p>
-                        </div>
-                </section>
-        </div>
+                            </div>
+                        </section>
+                    </div>
 
-        <div class="span3">
-                <section class="widget"><h3 class="title">Quick Links</h3>
-                        <ul>
+                    <div class="span3">
+                        <section class="widget"><h3 class="title">Quick Links</h3>
+                            <ul>
                                 <li><a href="<?php echo URL; ?>home">Members' Home</a> </li>
                                 <li><a href="<?php echo URL; ?>userprofile">User's Profile</a></li>
                                 <li><a href="<?php echo URL; ?>managesavedpages">My Saved Pages</a></li>
                                 <li><a href="<?php echo URL; ?>managesubscription">My Subscription</a></li>
-                              
-                             
-                        </ul>
-                </section>
-        </div>
+                            </ul>
+                        </section>
+                    </div>
 
-        <div class="span3">
-                <section class="widget">
-                        <h3 class="title">Need Help?</h3>
-                       <!-- <div id="twitter_update_list"> -->
-                                <ul>
-                                       <!-- <li>No Tweets loaded !</li>-->
-					<li><a href="<?php echo URL; ?>helpAndSupport">Customer Care Center</a> </li>
+                    <div class="span3">
+                        <section class="widget">
+                            <h3 class="title">Need Help?</h3>
+                            <ul>
+                                <li><a href="<?php echo URL; ?>helpAndSupport">Customer Care Center</a> </li>
                                 <li><a href="<?php echo URL; ?>Forum">Forum</a></li>
                                 <li><a href="<?php echo URL; ?>contact">Connect with us</a></li>
-                                </ul>
-                       <!-- </div>
-                        <script src="http://twitterjs.googlecode.com/svn/trunk/src/twitter.min.js" type="text/javascript"></script>
-                        <script type="text/javascript" >
-                                getTwitters("twitter_update_list", {
-                                        id: "960development",
-                                        count: 3,
-                                        enableLinks: true,
-                                        ignoreReplies: true,
-                                        clearContents: true,
-                                        template: "%text% <span>%time%</span>"
-                                });
-                        </script>-->
-                </section>
-        </div>
+                            </ul>
+                        </section>
+                    </div>
 
-        <div class="span3">
-                <section class="widget">
-                        <h3 class="title">Company</h3>
-                        <!--<div class="flickr-photos" id="basicuse">
-                        </div>-->
-    			<ul>
-                                       <!-- <li>No Tweets loaded !</li>-->
-					<li><a href="<?php echo URL; ?>about">About Us</a> </li>
+                    <div class="span3">
+                        <section class="widget">
+                            <h3 class="title">Company</h3>
+                            <ul>
+                                <li><a href="<?php echo URL; ?>about">About Us</a> </li>
                                 <li><a href="<?php echo URL; ?>faq">FAQ</a></li>
                                 <li><a href="<?php echo URL; ?>career">Career</a></li>
-				<li><a href="#">Contact Us</a></li>
-                <li>
-                                <img src="<?php echo URL; ?>img/isw_logo_new_combined.png" /></li>
-                                </ul>
-                </section>
-        </div>
+                                <li><a href="#">Contact Us</a></li>
+                                <li><img src="<?php echo URL; ?>img/isw_logo_new_combined.png" /></li>
+                            </ul>
+                        </section>
+                    </div>
 
-</div>
-</div>
+                </div>
+            </div>
 		<?php }
 		
 		function footerButtom() { ?>

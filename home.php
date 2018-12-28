@@ -4,11 +4,20 @@
 	include_once("includes/session.php");
 	
 	$list = $categories->sortAll(0, "parent_id", "status", "active");
-	$result = false;
+  $result = false;
+  
+	if (isset($_GET['page'])) {
+    $page_count = $_GET['page'];
+  } else {
+    $page_count = 0;
+  }
+  $previous     = $page_count-1;
+  $next         = $page_count+1;
+
 	if (isset($_POST['s'])) {
 		$search_data = $_POST['s'];
 		$curTime = microtime(true);
-		$add = $search->create($_POST);
+		$add = $search->create($_POST, $page_count);
 		$doc = $add['doc'];
 		$reg = $add['reg'];
 		$case_law = $add['case_law'];
@@ -29,7 +38,7 @@
     }
 		
 		$curTime = microtime(true);
-		$add = $search->create($_GET);
+		$add = $search->create($_GET, $page_count);
 		$doc = $add['doc'];
 		$reg = $add['reg'];
 		$case_law = $add['case_law'];
@@ -44,7 +53,7 @@
 		$raw = json_decode(base64_decode($data['data']), true);
 		$search_data = $raw['s'];
 		$curTime = microtime(true);
-		$add = $search->create($raw);
+		$add = $search->create($raw, $page_count);
 		$doc = $add['doc'];
 		$reg = $add['reg'];
 		$dic = $add['dic'];
@@ -61,10 +70,8 @@
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
         <!--[if gt IE 8]><!--> <html lang="en-US"> <!--<![endif]-->
-        
-
 <head>
-    <meta charset="utf-8">
+<meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({
@@ -96,45 +103,44 @@
 <link href="SpryAssets/SpryValidationCheckbox.css" rel="stylesheet" type="text/css">
 <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
 <script>
-window.onload = function() {
-  var input = document.getElementById("s").focus();
-}
+  window.onload = function() {
+    var input = document.getElementById("s").focus();
+  }
 </script>
 <style>
-	/* Cosmetic only */
-	.easyPaginateNav a {padding:5px;}
-	.easyPaginateNav a.current {font-weight:bold;text-decoration:underline;}
+  tr:nth-child(even) {background: #EEE}
+  tr:nth-child(odd) {background: #FFF}
 </style>
         <?php $pages->chatHeader(); ?>
 </head>
 
-        <body>
-        
-                <!-- Start of Header -->
-                <div class="header-wrapper">
-                        <?php $pages->headerFiles(); ?>
-                </div>
-                <!-- End of Header -->
+  <body>
 
-                <!-- Start of Search Wrapper -->
-                <div class="search-area-wrapper_two">
-                </div>
-                <!-- End of Search Wrapper -->
+  <!-- Start of Header -->
+  <div class="header-wrapper">
+    <?php $pages->headerFiles(); ?>
+  </div>
+  <!-- End of Header -->
 
-                <!-- Start of Page Container -->
-                <div class="page-container">
-                <div class="container">
-                <div class="row">
-                    <div class="span3">
-				   <section class="widget">
-                        <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-                        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-                        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-                        <?php $pages->sideMenu(); ?></div>
-                        </section>
-                    	<?php $pages->sidelinks(); ?>
-            </section>
-                	</div>
+  <!-- Start of Search Wrapper -->
+  <div class="search-area-wrapper_two">
+  </div>
+  <!-- End of Search Wrapper -->
+
+  <!-- Start of Page Container -->
+  <div class="page-container">
+  <div class="container">
+  <div class="row">
+  <div class="span3">
+    <section class="widget">
+      <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
+      Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
+      Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
+      <?php $pages->sideMenu(); ?></div>
+    </section>
+    <?php $pages->sidelinks(); ?>
+  </section>
+  </div>
 
 <div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
@@ -207,6 +213,13 @@ window.onload = function() {
                       </tr>
                     </tfoot>
                     </table>
+                    <ul class="pagination">
+                      <li><a href="#">1</a></li>
+                      <li class="active"><a href="#">2</a></li>
+                      <li><a href="#">3</a></li>
+                      <li><a href="#">4</a></li>
+                      <li><a href="#">5</a></li>
+                    </ul>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
@@ -329,71 +342,63 @@ window.onload = function() {
 <?php $pages->rightColumnAdvert(); ?>   
 </div>
 </div>
-                <!-- End of Page Container -->
+  <!-- End of Page Container -->
 
-                <!-- Start of Footer -->
-                <footer id="footer-wrapper">
-                        <?php $pages->footer(); ?>
-                        <!-- end of #footer -->
+  <!-- Start of Footer -->
+  <footer id="footer-wrapper">
+  <?php $pages->footer(); ?>
+  <!-- end of #footer -->
 
-                        <!-- Footer Bottom -->
-                       <?php $pages->footerButtom(); ?>
-                        <!-- End of Footer Bottom -->
-                </footer>
-                <!-- End of Footer -->
+  <!-- Footer Bottom -->
+  <?php $pages->footerButtom(); ?>
+  <!-- End of Footer Bottom -->
+  </footer>
+  <!-- End of Footer -->
 
-                <a href="#top" id="scroll-top"></a>
+  <a href="#top" id="scroll-top"></a>
 
-                <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->
-                <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>
-                <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
-                <script type='text/javascript' src='js/jquery.liveSearchd5f7.js?ver=2.0'></script>
-				<script type='text/javascript' src='js/jflickrfeed.js'></script>
-                <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
-                <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
-                <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
-                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
-                <script type='text/javascript' src='js/frontEnd.js'></script>
-				<script type='text/javascript' src="js/navAccordion.min.js"></script>
-                
-                <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-                <script language="javascript" src="js/bootstrap.min.js"></script>
-                <script src="js/pagination.js"></script>
-				<link rel="stylesheet" href="css/jquery.ui.datatables.css">
-                <script src="management/plugins/datatables/jquery.dataTables.min.js"></script>
-				<script type="text/javascript">
-                    var sprycheckbox1 = new Spry.Widget.ValidationCheckbox("sprycheckbox1");
-					$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-						//something
-					});
-                    $(function() {
-        				$("#example1,<?php echo $jsLisst; ?>#example4,#example5").dataTable( {
-						  "pageLength": 50,
-						  "bLengthChange": false,
-						  "bFilter":false
-						  
-						} );
-                        $( "#s" ).autocomplete({
-                          source: "includes/scripts/auto_home.php?type=SAN"
-                        });
-                    });
-					
-					function saveResult() {
-						var data = '<?php echo $postData; ?>';
-						if (data != "") {
-							var person = prompt("Please enter a name for the search result", "");
-							if ((person != null) && (person.length > 0)) {
-								$.post( "includes/scripts/search_result.php", { data: data, title: person } );
-								alert("Search result saved as "+person);
-							} else {
-								saveResult();
-							}
-						}else {
-							alert("You cannot save this page");
-						}
-					}
-				</script>
-        </body>
+  <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->
+  <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>
+  <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
+  <script type='text/javascript' src='js/jquery.liveSearchd5f7.js?ver=2.0'></script>
+  <script type='text/javascript' src='js/jflickrfeed.js'></script>
+  <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
+  <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
+  <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+  <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
+  <script type='text/javascript' src='js/frontEnd.js'></script>
+  <script type='text/javascript' src="js/navAccordion.min.js"></script>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    var sprycheckbox1 = new Spry.Widget.ValidationCheckbox("sprycheckbox1");
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    //something
+    });
+    $(function() {
+      $( "#s" ).autocomplete({
+        source: "includes/scripts/auto_home.php?type=SAN"
+      });
+    });
+
+    function saveResult() {
+      var data = '<?php echo $postData; ?>';
+      if (data != "") {
+        var person = prompt("Please enter a name for the search result", "");
+        if ((person != null) && (person.length > 0)) {
+          $.post( "includes/scripts/search_result.php", { data: data, title: person } );
+          alert("Search result saved as "+person);
+        } else {
+          saveResult();
+        }
+      }else {
+        alert("You cannot save this page");
+      }
+    }
+  </script>
+  </body>
 
 
 </html>
