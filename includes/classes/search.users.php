@@ -131,7 +131,7 @@
 			
 			global $db;
 			try {
-				$sql = $db->prepare("SELECT * FROM `search_history` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+				$sql = $db->prepare("SELECT * FROM `search_history` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` DESC");
 								
 				$sql->execute($token);
 			} catch(PDOException $ex) {

@@ -25,7 +25,8 @@
 			<link rel='stylesheet' id='pretty-photo-css-css'  href='<?php echo URL; ?>js/prettyphoto/prettyPhotoaeb9.css?ver=3.1.4' type='text/css' media='all' />
 			<link rel='stylesheet' id='main-css-css'  href='<?php echo URL; ?>css/main5152.css?ver=1.0' type='text/css' media='all' />
 			<link rel='stylesheet' id='blue-skin-css'  href='<?php echo URL; ?>css/blue-skin5152.css?ver=1.0' type='text/css' media='all' />
-			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+            <link rel="stylesheet" href="<?php echo URL; ?>css/pagination.css" />
 			
 			<!--<script type='text/javascript' src='js/jquery-1.8.3.min.js'></script>
 			

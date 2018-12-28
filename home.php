@@ -6,44 +6,76 @@
 	$list = $categories->sortAll(0, "parent_id", "status", "active");
   $result = false;
   
-	if (isset($_GET['page'])) {
+	if ((isset($_GET['page'])) && (isset($_GET['tab'])) && ($_GET['tab'] == "case_law")) {
+    $page_count = 0;
+    $case_law_page_count = $_GET['page'];
+    $dic_page_count = 0;
+    $reg_page_count = 0;
+  } else if ((isset($_GET['page'])) && (isset($_GET['tab'])) && ($_GET['tab'] == "reg")) {
+    $page_count = 0;
+    $case_law_page_count = 0;
+    $dic_page_count = 0;
+    $reg_page_count = $_GET['page'];
+  } else if ((isset($_GET['page'])) && (isset($_GET['tab'])) && ($_GET['tab'] == "dic")) {
+    $page_count = 0;
+    $case_law_page_count = 0;
+    $dic_page_count = $_GET['page'];
+    $reg_page_count = 0;
+  } else if ((isset($_GET['page'])) && (isset($_GET['tab'])) && (intval($_GET['tab']) > 0)) {
     $page_count = $_GET['page'];
+    $case_law_page_count = 0;
+    $dic_page_count = 0;
+    $reg_page_count = 0;
   } else {
     $page_count = 0;
+    $case_law_page_count = 0;
+    $dic_page_count = 0;
+    $reg_page_count = 0;
   }
-  $previous     = $page_count-1;
-  $next         = $page_count+1;
+
+  $page_array['law'] = $page_count;
+  $page_array['case_law'] = $case_law_page_count;
+  $page_array['dic'] = $dic_page_count;
+  $page_array['reg'] = $reg_page_count;
 
 	if (isset($_POST['s'])) {
 		$search_data = $_POST['s'];
 		$curTime = microtime(true);
-		$add = $search->create($_POST, $page_count);
+		$add = $search->create($_POST, $page_array);
 		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
 		$reg = $add['reg'];
+		$reg_count = $add['reg_count'];
 		$case_law = $add['case_law'];
+		$case_law_count = $add['case_law_count'];
 		$dic = $add['dic'];
-		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
+    $dic_count = $add['dic_count'];
+    $total = $add['count'];
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
 		$postData = base64_encode(json_encode($_POST));
 		$result = true;
 	} else if (isset($_GET['q'])) {
-		$search_data = $_GET['q'];
+    $search_data = $_GET['q'];
+    $_GET['s'] = $_GET['q'];
 		$_GET['case_law'] = 1;
 		$_GET['reg_circular'] = 1;
 		$_GET['dic'] = 1;
-		$_GET['case_law'] = 1;
 		
 		for ($i = 0; $i < count($list); $i++) {
       $_GET['parameter'][] =  $list[$i]['ref']; 
     }
 		
 		$curTime = microtime(true);
-		$add = $search->create($_GET, $page_count);
+		$add = $search->create($_GET, $page_array);
 		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
 		$reg = $add['reg'];
+		$reg_count = $add['reg_count'];
 		$case_law = $add['case_law'];
+		$case_law_count = $add['case_law_count'];
 		$dic = $add['dic'];
-		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
+		$dic_count = $add['dic_count'];
+    $total = $add['count'];
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
 		$postData = base64_encode(json_encode($_GET));
 		$result = true;
@@ -53,14 +85,36 @@
 		$raw = json_decode(base64_decode($data['data']), true);
 		$search_data = $raw['s'];
 		$curTime = microtime(true);
-		$add = $search->create($raw, $page_count);
+    $add = $search->create($raw, $page_array);
 		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
 		$reg = $add['reg'];
-		$dic = $add['dic'];
+		$reg_count = $add['reg_count'];
 		$case_law = $add['case_law'];
-		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
+		$case_law_count = $add['case_law_count'];
+		$dic = $add['dic'];
+    $dic_count = $add['dic_count'];
+    $total = $add['count'];
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
-		$postData = "";
+    $postData = $data['data'];
+    $result = true;
+  } else if (isset($_GET['query'])) {
+		$s = $common->get_prep($_GET['query']);
+		$raw = json_decode(base64_decode(urldecode(($_GET['query']))), true);
+		$search_data = $raw['s'];
+		$curTime = microtime(true);
+    $add = $search->create($raw, $page_array);
+		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
+		$reg = $add['reg'];
+		$reg_count = $add['reg_count'];
+		$case_law = $add['case_law'];
+		$case_law_count = $add['case_law_count'];
+		$dic = $add['dic'];
+    $dic_count = $add['dic_count'];
+    $total = $add['count'];
+		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
+    $postData = $_GET['query'];
     $result = true;
   }
   $jsLisst = "";
@@ -169,18 +223,20 @@
 	 </div>
      <?php if ($result == true) { ?>
        <h4 style="" align="center">Search Result</h4>
-       <p>Your search for "<?php echo $search_data; ?>" brought <?php echo number_format($total); ?> results in <?php echo number_format($timeConsumed, 3)." seconds"; ?>, <a href="Javascript:void(0)" onClick="saveResult()">click here to save search result</a>
+       <p>Your search for "<?php echo $search_data; ?>" brought <?php echo number_format($total); ?> results in <?php echo number_format($timeConsumed, 3)." seconds"; ?>,<br>
+       <a href="Javascript:void(0)" onClick="saveResult()"><i class="fa fa-floppy-o" aria-hidden="true"></i>
+ click here to save search result</a>
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#1" data-toggle="tab">Case Law (<?php echo number_format(count($case_law)); ?>)</a></li>
+            <li <?php if ((!isset($_GET['tab'])) || ($_GET['tab'] == 'case_law')) { ?>class="active"<?php } ?>><a href="#1" data-toggle="tab">Case Law (<?php echo number_format($case_law_count); ?>)</a></li>
             <?php foreach ($doc as $key => $value) { ?>
-            <li><a href="#2_<?php echo $key; ?>" data-toggle="tab"><?php echo $categories->getOneField($key); ?> (<?php echo number_format(count($doc[$key])); ?>)</a></li>
+            <li <?php if ((isset($_GET['tab'])) && ($_GET['tab'] == $key)) { ?>class="active"<?php } ?>><a href="#2_<?php echo $key; ?>" data-toggle="tab"><?php echo $categories->getOneField($key); ?> (<?php echo number_format($doc_count[$key]); ?>)</a></li>
             <?php } ?>
-            <li><a href="#3" data-toggle="tab">Regulations (<?php echo number_format(count($reg)); ?>)</a></li>
-            <li><a href="#4" data-toggle="tab">Dictionary (<?php echo number_format(count($dic)); ?>)</a></li>
+            <li <?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'reg')) { ?>class="active"<?php } ?>><a href="#3" data-toggle="tab">Regulations (<?php echo number_format($reg_count); ?>)</a></li>
+            <li <?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'dic')) { ?>class="active"<?php } ?>><a href="#4" data-toggle="tab">Dictionary (<?php echo number_format($dic_count); ?>)</a></li>
         </ul>
     
         <div class="tab-content">
-            <div class="tab-pane active" id="1">
+            <div class="tab-pane<?php if ((!isset($_GET['tab'])) || ($_GET['tab'] == 'case_law')) { ?> active<?php } ?>" id="1">
 				<?php if (count($case_law) > 0) { ?>
                     <table width="100%" border="0" id="example4">
                     <thead>
@@ -191,14 +247,14 @@
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $case_law_page_count*page_list;
 					  for ($i = 0; $i < count($case_law); $i++) {
 						  $count++ ?>
                        <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
                        <td><p>
                   <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
-                   <cite><?php echo $case_law[$i]['citation']; ?></cite><br>
+                   <cite><strong><?php echo $case_law[$i]['citation']; ?></strong></cite><br>
                    <strong style="color:#00F"><?php echo $common->getLine($case_law[$i]['section_content']); ?></strong><br></a>
                    <?php echo nl2br($common->truncate($case_law[$i]['section_content'], 250)); ?><br>
                    <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">read more</a></p>
@@ -213,19 +269,13 @@
                       </tr>
                     </tfoot>
                     </table>
-                    <ul class="pagination">
-                      <li><a href="#">1</a></li>
-                      <li class="active"><a href="#">2</a></li>
-                      <li><a href="#">3</a></li>
-                      <li><a href="#">4</a></li>
-                      <li><a href="#">5</a></li>
-                    </ul>
+                    <?php $pagination->draw($case_law_page_count, $postData, $case_law_count, $redirect, 'case_law'); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
             <?php foreach ($doc as $key => $value) { ?>
-            <div class="tab-pane" id="2_<?php echo $key; ?>">
+            <div class="tab-pane<?php if ((isset($_GET['tab'])) && ($_GET['tab'] == $key)) { ?> active<?php } ?>" id="2_<?php echo $key; ?>">
 				<?php if (count($doc[$key]) > 0) {
           $jsLisst .= "#table_".$key.","; ?>
                     <table width="100%" border="0" id="table_<?php echo $key; ?>">
@@ -237,7 +287,7 @@
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $page_count*page_list;
 					  for ($i = 0; $i < count($doc[$key]); $i++) {
 						  $count++ ?>
                        <tr>
@@ -257,12 +307,13 @@
                       </tr>
                     </tfoot>
                     </table>
+                    <?php $pagination->draw($page_count, $postData, $doc_count[$key], $redirect, $key); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
             <?php } ?>
-            <div class="tab-pane" id="3">
+            <div class="tab-pane<?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'reg')) { ?> active<?php } ?>" id="3">
 				<?php if (count($reg) > 0) { ?>
                     <table width="100%" border="0" id="example4">
                     <thead>
@@ -273,7 +324,7 @@
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $reg_page_count*page_list;
 					  for ($i = 0; $i < count($reg); $i++) {
 						  $count++ ?>
                           <tr>
@@ -299,11 +350,12 @@
                       </tr>
                     </tfoot>
                     </table>
+                    <?php $pagination->draw($reg_page_count, $postData, $reg_count, $redirect, 'reg'); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
-            <div class="tab-pane" id="4">
+            <div class="tab-pane<?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'dic')) { ?> active<?php } ?>" id="4">
 				<?php if (count($dic) > 0) { ?>
                     <table width="100%" border="0" id="example5">
                     <thead>
@@ -314,7 +366,7 @@
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $dic_page_count*page_list;
 					  for ($i = 0; $i < count($dic); $i++) {
 						  $count++ ?>
                           <tr>
@@ -331,6 +383,7 @@
                       </tr>
                     </tfoot>
                     </table>
+                    <?php $pagination->draw($dic_page_count, $postData, $dic_count, $redirect, 'dic'); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
@@ -368,10 +421,9 @@
   <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
   <script type='text/javascript' src='js/frontEnd.js'></script>
   <script type='text/javascript' src="js/navAccordion.min.js"></script>
-
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script language="javascript" src="js/bootstrap.min.js"></script>
   <script type="text/javascript">
     var sprycheckbox1 = new Spry.Widget.ValidationCheckbox("sprycheckbox1");
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {

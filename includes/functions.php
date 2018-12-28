@@ -130,6 +130,7 @@
 	include_once("classes/pages.php");
 	include_once("classes/adminPages.php");
 	include_once("classes/api.php");
+	include_once("classes/pagination.php");
 	$news = new news;
 	$advert = new advert;
 	$slider = new slider;
@@ -158,4 +159,5 @@
 	$page_content = new page_content;
 	$pages = new pages;
 	$adminPages = new adminPages;
+	$pagination = new pagination;
 ?>
