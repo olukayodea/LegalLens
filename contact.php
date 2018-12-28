@@ -27,7 +27,7 @@
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title>Contact legallens, contact legal lens, legallens contact details</title>
+                <title>Contact legallens</title>
                 <meta name="description" content="Get in touch with the Legal Lens team and we'd respond within 24hrs">
 
         <?php $pages->head(); ?>
