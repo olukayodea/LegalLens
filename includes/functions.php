@@ -143,6 +143,7 @@
 	$friendzone = new friendzone;
 	$api = new api;
 	
+	define("page_list", $settings->getOne("page_list"));
 	define("facebook", $settings->getOne("facebook"));
 	define("instagram", $settings->getOne("instagram"));
 	define("flickr", $settings->getOne("flickr"));
