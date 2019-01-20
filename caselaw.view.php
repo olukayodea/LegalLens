@@ -70,15 +70,13 @@
                 <div class="container">
                 <div class="row">
                     <div class="span3">
-				   <section class="widget">
-                        <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-                       Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-                        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-                        <?php $pages->sideMenu(); ?></div>
-                    	</section>
-<section>
                     	<?php $pages->sidelinks(); ?>
-            </section>
+    <section class="widget">
+      <div class="login-widget">
+        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
+        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
+      </div>
+    </section>
                 	</div>
 
 <div class="span7">
@@ -86,9 +84,9 @@
      <div style="margin-top:30px">
        <h3 style="" align="center"><?php echo $data['title']; ?></h3>
        <?php for ($i = 0; $i < count($list); $i++) { ?>
-       <p><?php echo nl2br($common->truncate($list[$i]['section_content'], 500)); ?><br>
+        <p><?php echo nl2br($common->truncate($list[$i]['section_content'], 500)); ?><br>
        <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $id; ?>&read=<?php echo $list[$i]['ref']; ?>">Read More</a><br>
-       <cite><?php echo $list[$i]['citation']; ?></cite></p>
+       <cite><strong><?php echo $list[$i]['citation']; ?></strong></cite></p>
        <?php } ?>
        
 	 </div>

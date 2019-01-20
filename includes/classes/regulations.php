@@ -1,7 +1,7 @@
 <?php
 	class regulations extends common {
 		function add($array) {
-			$title = $this->mysql_prep($array['title']);
+			$title = htmlentities($this->mysql_prep($array['title']));
 			$status = $this->mysql_prep($array['status']);
 			$regulator = $this->mysql_prep($array['regulator']);
 			$type = $this->mysql_prep($array['type']);

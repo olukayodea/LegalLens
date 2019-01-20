@@ -86,12 +86,12 @@
                 <nav class="main-nav">
                     <div class="menu-top-menu-container navbar">
                         <ul id="menu-top-menu nav navbar-nav" class="clearfix">
-                            <li<?php if ($tag == "home") { ?> class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>">Home</a></li>
-                            <li<?php if ($tag == "about") { ?> class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>about">About us</a></li>
-                            <li<?php if ($tag == "userguide") { ?> class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>userguide">User guide</a></li>
-                            <li<?php if ($tag == "career") { ?> class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>career">Career</a></li>
-                            <li<?php if ($tag == "faq") { ?> class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>faq">FAQs</a></li>
-                            <li<?php if ($tag == "Forum") { ?> class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>Forum">Forum</a></li>
+                            <li <?php if ($tag == "home") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>">Home</a></li>
+                            <li <?php if ($tag == "about") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>about">About us</a></li>
+                            <li <?php if ($tag == "userguide") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>userguide">User guide</a></li>
+                            <li <?php if ($tag == "career") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>career">Career</a></li>
+                            <li <?php if ($tag == "faq") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>faq">FAQs</a></li>
+                            <li <?php if ($tag == "Forum") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>Forum">Forum</a></li>
                             <li class="dropdown<?php if ($tag == "friendzone") { ?> current-menu-item<?php } ?>"><a href="<?php echo URL; ?>friendzone" class="dropdown-toggle"s>Friendzone (<?php echo count($list); ?>)</a>
                             
                                 <ul class="dropdown-menu">
@@ -107,7 +107,13 @@
                                 </ul>
                             
                             </li>
-                            <li<?php if ($tag == "contact") { ?> class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>contact">Contact</a></li>
+                            <li <?php if ($tag == "contact") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>contact">Contact</a></li>
+                            <?php if (isset($_SESSION['users']['ref'])) { ?>
+                            <li class="dropdown"><a href="Javascript:void((0);" class="dropdown-toggle"s><?php echo trim($_SESSION['users']['last_name'])." ".$this->initials(trim($_SESSION['users']['other_names'])); ?></a>
+                                <?php $this->sideMenu(); ?>                                      
+                            </li>
+                            <?php } ?>
+
                 <!--<li><a class="show-popup" href="#" data-showpopup="1" >Login</a></li>-->
                         </ul>
                     </div>
@@ -217,27 +223,27 @@
                         echo "</li>";
                         } ?>
                         <li><a href="<?php echo URL; ?>caseLawHome">Case law</a>
-                    <ul>
-                    <?php for ($i = 0; $i < count($caseCOurt); $i++) { ?>
-                    <li><a href="<?php echo URL; ?>caseLaw?sort=<?php echo urlencode($caseCOurt[$i]['title']); ?>"><?php echo $caseCOurt[$i]['title']; ?></a></li>
-                    <?php } ?>
-                    </ul>
-                    </li>
-                    <li><a href="<?php echo URL; ?>regulations">Regulations /Circular</a>
-                    <ul>
-                        <?php for ($i = 0; $i < count($listReg); $i++) { ?>
-                        <li><a href="<?php echo URL; ?>regulations/<?php echo urlencode($listReg[$i]['title']); ?>"><?php echo $listReg[$i]['title']; ?></a></li>
+                        <ul>
+                        <?php for ($i = 0; $i < count($caseCOurt); $i++) { ?>
+                        <li><a href="<?php echo URL; ?>caseLaw?sort=<?php echo urlencode($caseCOurt[$i]['title']); ?>"><?php echo $caseCOurt[$i]['title']; ?></a></li>
                         <?php } ?>
-                    </ul>
-                    </li>
-                    <li><a href="Javascript:void(0);">Legal Drafting</a>
-                    <ul>
-                    <li><a href="<?php echo URL; ?>clause">Draft Clauses</a></li>
-                    <li><a href="<?php echo URL; ?>agreements">Draft Agreement</a></li>
-                    <li><a href="<?php echo URL; ?>forms">Forms</a></li>
-                    </ul>
-                    </li>
-                    <li><a href="<?php echo URL; ?>dictionary">Law Dictionary</a></li>
+                        </ul>
+                        </li>
+                        <li><a href="<?php echo URL; ?>regulations">Regulations /Circular</a>
+                        <ul>
+                            <?php for ($i = 0; $i < count($listReg); $i++) { ?>
+                            <li><a href="<?php echo URL; ?>regulations/<?php echo urlencode($listReg[$i]['title']); ?>"><?php echo $listReg[$i]['title']; ?></a></li>
+                            <?php } ?>
+                        </ul>
+                        </li>
+                        <li><a href="Javascript:void(0);">Legal Drafting</a>
+                        <ul>
+                            <li><a href="<?php echo URL; ?>clause">Draft Clauses</a></li>
+                            <li><a href="<?php echo URL; ?>agreements">Draft Agreement</a></li>
+                            <li><a href="<?php echo URL; ?>forms">Forms</a></li>
+                        </ul>
+                        </li>
+                        <li><a href="<?php echo URL; ?>dictionary">Law Dictionary</a></li>
                     </ul>
                 </nav>
             </div>
@@ -335,14 +341,16 @@
 <script type="text/javascript" src="<?php echo URL; ?>js/chat.js"></script>
 		<?php }
 		
-		function sideMenu() { ?>
-			<a href="<?php echo URL; ?>managesubscription">Manage Subscription</a><br />
-			<a href="<?php echo URL; ?>support">Help and Support</a><br />
-			<a href="<?php echo URL; ?>userprofile">View profile</a><br />
-			<a href="<?php echo URL; ?>managesavedpages">Manage Saved Pages</a><br />
-			<a href="<?php echo URL; ?>managesearch">Manage Recent Search</a><br />
-			<!--<a href="<?php echo URL; ?>managesession">Manage Sessions</a><br />-->
-			<a href="<?php echo URL; ?>?logout">Logout</a>
+        function sideMenu() { ?>
+            <ul class="dropdown-menu">
+                <li><a href="<?php echo URL; ?>managesubscription">Manage Subscription</a></li>
+                <li><a href="<?php echo URL; ?>support">Help and Support</a></li>
+                <li><a href="<?php echo URL; ?>userprofile">View profile</a></li>
+                <li><a href="<?php echo URL; ?>managesavedpages">Manage Saved Pages</a></li>
+                <li><a href="<?php echo URL; ?>managesearch">Manage Recent Search</a></li>
+                <!--<a href="<?php echo URL; ?>managesession">Manage Sessions</a><br />-->
+                <li><a href="<?php echo URL; ?>?logout">Logout</a></li>
+            </ul>
 		<?php }
 	}
 ?>

@@ -3,7 +3,7 @@
 		function add($array) {
 			$caselaw = $this->mysql_prep($array['caselaw']);
 			$parent_issue = $this->mysql_prep($array['parent_issue']);
-			$section_content = $this->mysql_prep($array['section_content']);
+			$section_content = htmlentities($this->mysql_prep($array['section_content']));
 			$areas = implode(",",$array['areas']);
 			$tags = $this->mysql_prep($array['tags']);
 			$status = $this->mysql_prep($array['status']);

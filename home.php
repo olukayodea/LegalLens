@@ -118,6 +118,7 @@
     $result = true;
   }
   $jsLisst = "";
+  $listCat = $categories->sortAll("0", "parent_id", "status", "active");
 ?>
 <!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -187,13 +188,42 @@
   <div class="row">
   <div class="span3">
     <section class="widget">
-      <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-      Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-      Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-      <?php $pages->sideMenu(); ?></div>
+      <h3>Document Filter</h3>
+      <?php for ($i = 0; $i < count($listCat); $i++) { ?>
+        <label><input type="checkbox" name="filter[]" id="filter_<?php echo $i; ?>" class="filter_<?php echo $listCat[$i]['ref'] ; ?>" data-main="yes" value="<?php echo $listCat[$i]['ref']; ?>">&nbsp;<?php echo $listCat[$i]['title']; ?></label>
+        <?php echo $categories->gettreeCheckBox($listCat[$i]['ref']); ?>
+      <?php } ?>
+      <script language="javascript">
+        $("input[type='checkbox']").each(function(){
+          $(this).click(function(){
+            var c = $(this).attr("class");
+            var m =  $(this).attr("data-main");
+            if (m == "yes") {
+              if($(this).is(":checked")){
+                $("."+c).attr("checked",true);
+              }else{
+                $("."+c).attr("checked",false);
+              }
+            }
+
+            var checked = []
+            $("input[name='filter[]']:checked").each(function ()
+            {
+                checked.push(parseInt($(this).val()));
+            });
+
+            console.log(checked);
+          })
+        })
+      </script>
     </section>
     <?php $pages->sidelinks(); ?>
-  </section>
+    <section class="widget">
+      <div class="login-widget">
+        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
+        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
+      </div>
+    </section>
   </div>
 
 <div class="span7">

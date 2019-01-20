@@ -1,29 +1,25 @@
 <?php
-	$redirect = "courts";
+	$redirect = "caseLaw.ratio";
 	include_once("includes/functions.php");
 	include_once("includes/session.php");
 	
-	 if ((isset($_REQUEST['sort'])) && ($_REQUEST['sort'] == true)) {
-		 $sort = urldecode($_REQUEST['sort']);
-		 $sortType = "court";
-		 $urlPara = "&sort=".urldecode($sort);
-		 $title = $sort;
-	 } else {
-		 $sort = false;
-		 $sortType = false;
-		 $urlPara = "";
-		 $title = "Courts";
-	 }
-	 
-	 if (isset($_REQUEST['s'])) {
-		$s = $common->get_prep($_REQUEST['s']);
-		$list = $listItem->fullSearch($s, "Court", $court, $sortType);
-		$tag = "Search Result for <strong>'".$s."'</strong>";
-	 } else if (isset($_REQUEST['q'])) {
-		$q = $common->get_prep($_REQUEST['q']);
-		$list = $listItem->indexSearch($q, "Court", $sort, $sortType);
+	if (isset($_REQUEST['id'])) {
+		$id = $common->get_prep($_REQUEST['id']);
+		$tag = "Documents issued by ".$id;
 	} else {
-		$list = $listItem->listAllHome("Court", $sort, $sortType);
+		header("location: caseLaw");
+	}
+	if (isset($_REQUEST['jump'])) {
+		$jump = intval($common->get_prep($_REQUEST['jump']));
+	} else {
+		$jump = 0;
+	}
+	
+	$data = $caselaw->getOne($id);
+	if ($jump == 0) {
+		$list = $caselaw->sortAll($id, "areas", "status", "active", false, false, 'title');
+	} else {
+		$list = $caselaw->sortAll($id, "areas", "status", "active", "ref", $jump);
 	}
 ?>
 <!DOCTYPE html>
@@ -31,7 +27,7 @@
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
         <!--[if gt IE 8]><!--> <html lang="en-US"> <!--<![endif]-->
-        
+<base href="<?php echo URL; ?>" />
 
 <head>
     <meta charset="utf-8">
@@ -46,9 +42,8 @@
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title>List of <?php echo $title; ?> </title>
+                <title><?php echo $data['title']; ?></title>
     <?php $pages->head(); ?>
-
                 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
                 <!--[if lt IE 9]>
                 <script src="js/html5.js"></script>
@@ -87,48 +82,17 @@
 <div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
-       <h4 style="" align="center">List of <?php echo $title; ?> </h4>
-       	<i>Click on the table headers to sort in acceding and defending order</i>
-            <table width="100%" border="0" id="example1">
-            <thead>
-              <tr>
-                <td>&nbsp;</td>
-                <td>Court</td>
-                <td>Court Type</td>
-                <td>State</td>
-              </tr>
-            </thead>
-            <tbody>
-            <?php for ($i = 0; $i < count($list); $i++) { ?>
-              <?php if ($i % 2) { ?>
-              <tr bgcolor="#CCCCCC">
-              <?php } else { ?>
-              <tr>
-              <?php } ?>
-                <td>&nbsp;</td>
-                <td><?php echo $list[$i]['title'];?></td>
-                <td><?php echo $list[$i]['court']; ?></td>
-                <td><?php echo $list[$i]['state']; ?></td>
-              </tr>
-            <?php } ?>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td>&nbsp;</td>
-                <td>Court</td>
-                <td>Court Type</td>
-                <td>State</td>
-              </tr>
-            </tfoot>
-            </table>
-            <p>&nbsp;</p>
+       <h3 style="" align="center"><?php echo ucfirst(strtolower($id)); ?></h3>
+       <?php for ($i = 0; $i < count($list); $i++) { ?>
+        <?php echo $i+1; ?>&nbsp;&nbsp;&nbsp;<strong><a href="<?php echo URL; ?>caselaw.view?id=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a></strong><br>
+       <?php } ?>
+       
 	 </div>
 
    </div>
 </div>
-
-<?php $pages->rightColumnAdvert(); ?>   
-                                 </div> <!--end row -->      
+<?php $pages->rightColumnAdvert(); ?>
+                </div> <!--end row -->      
 			</div><!-- end container-->
                 </div>
                 <!-- End of Page Container -->
@@ -157,19 +121,6 @@
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
                 <script type='text/javascript' src='js/frontEnd.js'></script>
 				<script type='text/javascript' src="js/navAccordion.min.js"></script>
-                
-                <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-                <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-				<link rel="stylesheet" href="css/jquery.ui.datatables.css">
-                <script src="management/plugins/datatables/jquery.dataTables.min.js"></script>
-                <script>
-					$(function() {
-        				$("#example1").DataTable();
-						$( "#s" ).autocomplete({
-						  source: "includes/scripts/auto_complete_list.php?type=Court"
-						});
-					});
-				</script>
 
         </body>
 

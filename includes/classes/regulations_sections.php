@@ -3,7 +3,7 @@
 		function add($array) {
 			$regulations = $this->mysql_prep($array['regulations']);
 			$section_no = $this->mysql_prep($array['section_no']);
-			$section_content = $this->mysql_prep($array['section_content']);
+			$section_content = htmlentities($this->mysql_prep($array['section_content']));
 			$tags = $this->mysql_prep($array['tags']);
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();

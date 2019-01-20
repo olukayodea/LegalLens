@@ -73,15 +73,13 @@
                 <div class="container">
                 <div class="row">
                     <div class="span3">
-				   <section class="widget">
-                        <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-                       Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-                        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-                        <?php $pages->sideMenu(); ?></div>
-                    	</section>
-<section>
                     	<?php $pages->sidelinks(); ?>
-            </section>
+    <section class="widget">
+      <div class="login-widget">
+        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
+        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
+      </div>
+    </section>
                 	</div>
 
 <div class="span7">
@@ -97,8 +95,8 @@
          </tr>
        </table>
 <h3 style="" align="center"><?php echo $data['title']; ?></h3>
-       <p align="center"><?php echo $list['section_no']; ?></p>
-       <p><?php echo nl2br($list['section_content']); ?></p>
+       <p align="center"><strong><?php echo $list['section_no']; ?></strong></p>
+       <p><?php echo nl2br(html_entity_decode($list['section_content'])); ?></p>
        <?php if (count($subList) > 0) { ?>
            <h3 style="" align="center">Other Sections in This Document</h3>
            <?php for ($i = 0; $i < count($subList); $i++) { ?>

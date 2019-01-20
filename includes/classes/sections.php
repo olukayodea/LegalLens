@@ -2,9 +2,9 @@
 	class sections extends common {
 		function add($array) {
 			$document = $this->mysql_prep($array['document']);
-			$section_no = $this->mysql_prep($array['section_no']);
+			$section_no = htmlentities($this->mysql_prep($array['section_no']));
 			$sub_section = $this->mysql_prep($array['sub_section']);
-			$section_content = $this->mysql_prep($array['section_content']);
+			$section_content = htmlentities($this->mysql_prep($array['section_content']));
 			$tags = $this->mysql_prep($array['tags']);
 			$court = $this->mysql_prep($array['court']);
 			$status = $this->mysql_prep($array['status']);

@@ -1,8 +1,8 @@
 <?php
 class help extends common {
 		function add($array, $fles, $adm=false) {
-			$category = $this->mysql_prep($array['category']);
-			$content = $this->mysql_prep($array['content']);
+			$category = htmlentities($this->mysql_prep($array['category']));
+			$content = htmlentities($this->mysql_prep($array['content']));
 			$parent_id = $this->mysql_prep($array['parent_id']);
 			$user_id = $this->mysql_prep($array['user_id']);
 			$admin_id = $this->mysql_prep($array['admin_id']);

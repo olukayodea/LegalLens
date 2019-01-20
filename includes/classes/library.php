@@ -1,9 +1,9 @@
 <?php
 	class library extends common {
 		function add($array) {
-			$title = ucwords(strtolower($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucwords(strtolower($this->mysql_prep($array['title']))));
 			$status = $this->mysql_prep($array['status']);
-			$details = $this->mysql_prep($array['details']);
+			$details = htmlentities($this->mysql_prep($array['details']));
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);
 			

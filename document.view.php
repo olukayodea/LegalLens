@@ -73,15 +73,13 @@
                 <div class="container">
                 <div class="row">
                     <div class="span3">
-				   <section class="widget">
-                        <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-                       Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-                        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-                        <?php $pages->sideMenu(); ?></div>
-                    	</section>
-<section>
                     	<?php $pages->sidelinks(); ?>
-            </section>
+    <section class="widget">
+      <div class="login-widget">
+        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
+        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
+      </div>
+    </section>
                 	</div>
 
 <div class="span7">
@@ -89,7 +87,8 @@
      <div style="margin-top:30px">
        <h3 style="" align="center"><?php echo $data['title']; ?></h3>
        <?php for ($i = 0; $i < count($list); $i++) { ?>
-       <p><?php echo nl2br($common->truncate($list[$i]['section_content'], 500)); ?><br>
+        <h4><a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $list[$i]['ref']; ?>"><?php echo nl2br(($list[$i]['section_no'])); ?></a></h4>
+       <p><?php echo nl2br(($common->truncate($list[$i]['section_content'], 500))); ?><br>
        <a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $list[$i]['ref']; ?>">Read More</a></p>
        <?php } ?>
        
@@ -128,7 +127,6 @@
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
                 <script type='text/javascript' src='js/frontEnd.js'></script>
 				<script type='text/javascript' src="js/navAccordion.min.js"></script>
-
         </body>
 
 

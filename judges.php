@@ -71,15 +71,13 @@
                 <div class="container">
                 <div class="row">
                     <div class="span3">
-				   <section class="widget">
-                        <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-                       Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-                        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-                        <?php $pages->sideMenu(); ?></div>
-                    	</section>
-<section>
                     	<?php $pages->sidelinks(); ?>
-            </section>
+    <section class="widget">
+      <div class="login-widget">
+        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
+        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
+      </div>
+    </section>
                 	</div>
 
 <div class="span7">

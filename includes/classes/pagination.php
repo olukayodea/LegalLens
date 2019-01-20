@@ -29,7 +29,7 @@
             }
 
             echo '<div class="rightHand">';
-            echo '<span>Voewing page '.($page+1).' of '.$lenght.'</span><br>';
+            echo '<span>Viewing page '.($page+1).' of '.$lenght.'</span><br>';
             echo '<div class="pagination">';
             if ($prev > 0) {
                 echo '<a href="'.$url.'?page=0&query='.urlencode($data).$tabLink.'">&laquo;&laquo;</a>';

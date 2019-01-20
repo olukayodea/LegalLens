@@ -1,7 +1,7 @@
 <?php
 	class search_result extends common {
 		function add($array) {
-			$title = ucfirst(strtolower($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucfirst(strtolower($this->mysql_prep($array['title']))));
 			$users = $this->mysql_prep($array['users']);
 			$data = $array['data'];
 			$create_time = time();
