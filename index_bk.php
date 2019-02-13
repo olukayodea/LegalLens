@@ -396,6 +396,7 @@
                 <script type='text/javascript' src='js/jquery.form.js'></script>
                 <script type='text/javascript' src='js/jquery.validate.min.js'></script>
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
                 <script type='text/javascript' src='js/custom.js'></script>
         <script type="text/javascript">
 <?php if (isset($_REQUEST['register'])) { ?>

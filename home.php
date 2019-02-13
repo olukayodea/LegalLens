@@ -39,7 +39,7 @@
   $page_array['reg'] = $reg_page_count;
 
 	if (isset($_POST['s'])) {
-		$search_data = $_POST['s'];
+    $search_data = $_POST['s'];
 		$curTime = microtime(true);
 		$add = $search->create($_POST, $page_array);
 		$doc = $add['doc'];
@@ -134,15 +134,7 @@
     enable_page_level_ads: true
   });
 </script>
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-4142286148495329",
-    enable_page_level_ads: true
-  });
-</script>
 <!-- META TAGS -->
-<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Quick Find </title>
@@ -187,15 +179,18 @@
   <div class="container">
   <div class="row">
   <div class="span3">
+  <?php if ($result == true) { ?>
     <section class="widget">
       <h3>Document Filter</h3>
       <?php for ($i = 0; $i < count($listCat); $i++) { ?>
-        <label><input type="checkbox" name="filter[]" id="filter_<?php echo $i; ?>" class="filter_<?php echo $listCat[$i]['ref'] ; ?>" data-main="yes" value="<?php echo $listCat[$i]['ref']; ?>">&nbsp;<?php echo $listCat[$i]['title']; ?></label>
+        <label><input type="checkbox" name="filter[]" id="filter_<?php echo $i; ?>" class="filter_<?php echo $listCat[$i]['ref'] ; ?>" data-main="yes" value="<?php echo $listCat[$i]['ref']; ?>">&nbsp;<?php echo ucfirst(strtolower($listCat[$i]['title'])); ?></label>
         <?php echo $categories->gettreeCheckBox($listCat[$i]['ref']); ?>
       <?php } ?>
       <script language="javascript">
         $("input[type='checkbox']").each(function(){
+          
           $(this).click(function(){
+            $('#search_result').html("<br><br>Getting result list");
             var c = $(this).attr("class");
             var m =  $(this).attr("data-main");
             if (m == "yes") {
@@ -205,6 +200,24 @@
                 $("."+c).attr("checked",false);
               }
             }
+            var s = $('#s').val();
+            if ($('#dic').is(':checked')) {
+              var dic = 1;
+            } else {
+              var dic = 0;
+            }
+            if ($('#reg_circular').is(':checked')) {
+              var reg_circular = 1;
+            } else {
+              var reg_circular = 0;
+            }
+            if ($('#case_law').is(':checked')) {
+              var case_law = 1;
+            } else {
+              var case_law = 0;
+            }
+            
+            var other_data = "search_"+s+":dic_"+dic+":reg_"+reg_circular+":case_"+case_law
 
             var checked = []
             $("input[name='filter[]']:checked").each(function ()
@@ -212,18 +225,17 @@
                 checked.push(parseInt($(this).val()));
             });
 
-            console.log(checked);
+            $.post( "home_search.php", { parameter: checked, other_data: other_data })
+            .done(function( data ) {
+              $('#search_result').html(data);
+            });
           })
         })
       </script>
     </section>
+      <?php } ?>
     <?php $pages->sidelinks(); ?>
-    <section class="widget">
-      <div class="login-widget">
-        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
-      </div>
-    </section>
+    
   </div>
 
 <div class="span7">
@@ -250,7 +262,8 @@
             </div>
 		        <div id="search-error-container2"></div>
 		</form>
-	 </div>
+   </div>
+   <div id="search_result">
      <?php if ($result == true) { ?>
        <h4 style="" align="center">Search Result</h4>
        <p>Your search for "<?php echo $search_data; ?>" brought <?php echo number_format($total); ?> results in <?php echo number_format($timeConsumed, 3)." seconds"; ?>,<br>
@@ -420,6 +433,7 @@
             </div>
         </div>
     <?php } ?>
+   </div>
    </div>
 </div>
 <?php $pages->rightColumnAdvert(); ?>   

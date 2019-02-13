@@ -87,11 +87,15 @@
                     <div class="menu-top-menu-container navbar">
                         <ul id="menu-top-menu nav navbar-nav" class="clearfix">
                             <li <?php if ($tag == "home") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>">Home</a></li>
+                            <?php if (!isset($_SESSION['users']['ref'])) { ?>
+                            <li <?php if ($tag == "libraryAndDocuments") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>libraryAndDocuments">library</a></li>
+                            <?php } ?>
                             <li <?php if ($tag == "about") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>about">About us</a></li>
                             <li <?php if ($tag == "userguide") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>userguide">User guide</a></li>
                             <li <?php if ($tag == "career") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>career">Career</a></li>
                             <li <?php if ($tag == "faq") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>faq">FAQs</a></li>
                             <li <?php if ($tag == "Forum") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>Forum">Forum</a></li>
+                            <?php if (isset($_SESSION['users']['ref'])) { ?>
                             <li class="dropdown<?php if ($tag == "friendzone") { ?> current-menu-item<?php } ?>"><a href="<?php echo URL; ?>friendzone" class="dropdown-toggle"s>Friendzone (<?php echo count($list); ?>)</a>
                             
                                 <ul class="dropdown-menu">
@@ -107,6 +111,7 @@
                                 </ul>
                             
                             </li>
+                            <?php } ?>
                             <li <?php if ($tag == "contact") { ?>class="current-menu-item"<?php } ?>><a href="<?php echo URL; ?>contact">Contact</a></li>
                             <?php if (isset($_SESSION['users']['ref'])) { ?>
                             <li class="dropdown"><a href="Javascript:void((0);" class="dropdown-toggle"s><?php echo trim($_SESSION['users']['last_name'])." ".$this->initials(trim($_SESSION['users']['other_names'])); ?></a>

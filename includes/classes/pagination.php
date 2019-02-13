@@ -1,6 +1,6 @@
 <?php
     class pagination {
-        function draw($page, $data, $count, $url, $tab=false) {
+        function draw($page, $data, $count, $url, $tab=false, $show=false) {
             $lenght = ceil($count/page_list);
             if ($page <= 3) {
                 if ($lenght < 5) {
@@ -26,6 +26,9 @@
                 $tabLink = "";
             } else {
                 $tabLink = "&tab=".$tab;
+            }
+            if ($show == true) {
+                $tabLink .= "&show=".$show;
             }
 
             echo '<div class="rightHand">';

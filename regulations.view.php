@@ -34,12 +34,37 @@
     google_ad_client: "ca-pub-4142286148495329",
     enable_page_level_ads: true
   });
-</script>
+</script><?php 
+// Program to display URL of current page. 
+  
+if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') 
+    $link = "https"; 
+else
+    $link = "http"; 
+  
+// Here append the common URL characters. 
+$link .= "://"; 
+  
+// Append the host(domain name, ip) to the URL. 
+$link .= $_SERVER['HTTP_HOST']; 
+  
+// Append the requested resource location to the URL 
+$link .= $_SERVER['REQUEST_URI']; 
+?> 
     <!-- META TAGS -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title><?php echo $data['title']; ?></title>
+                <meta name="description" content="<?php echo nl2br($list_one['section_content']); ?>" />
+                <meta property="og:title" content="<?php echo $data['title']; ?>" />
+                <meta property="og:description" content="<?php echo nl2br($list_one['section_content']); ?>" />
+                <meta property="og:url" content="<?php echo $link; ?>" />
+
+                <meta name="twitter:card" content="summary_large_image">
+                <meta name="twitter:site" content="<?php echo $link; ?>">
+                <meta name="twitter:title" content="<?php echo $data['title']; ?>">
+                <meta name="twitter:description" content="<?php echo nl2br($list_one['section_content']); ?>"">
 <?php $pages->head(); ?>
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -73,12 +98,7 @@
                 <div class="row">
                     <div class="span3">
                     	<?php $pages->sidelinks(); ?>
-    <section class="widget">
-      <div class="login-widget">
-        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
-      </div>
-    </section>
+    
                 	</div>
 
 <div class="span7">
@@ -138,6 +158,7 @@
                 <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
                 <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
                 <script type='text/javascript' src='js/frontEnd.js'></script>
 				<script type='text/javascript' src="js/navAccordion.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>

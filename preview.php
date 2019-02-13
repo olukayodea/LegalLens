@@ -147,12 +147,7 @@
                 <?php $pages->advert(); ?>
             </section>
 
-    <section class="widget">
-      <div class="login-widget">
-        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
-      </div>
-    </section>
+    
 </aside>
             <!-- end of sidebar -->
     </div>

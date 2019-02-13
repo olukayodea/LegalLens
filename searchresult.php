@@ -53,12 +53,7 @@
                                 <div class="row">
 					<div class="span3">
 <?php $pages->sidelinks(); ?>
-    <section class="widget">
-      <div class="login-widget">
-        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?>
-      </div>
-    </section>
+    
 </div>
 
 <div class="span7">

@@ -254,11 +254,11 @@
 		}
 		
 		function gettreeCheckBox($id) {
-			$ids = $this->sortAll($id, "parent_id");
+			$ids = $this->sortAll($id, "parent_id", false, false, false, false, "title");
 			$result = "";
 			if (count($ids) > 0) {
 				for ($i = 0; $i < count($ids); $i++) {
-					$result .= "<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type='checkbox' name='filter[]' id='filter_".$id."_".$i."' class='filter_".$id."' data-main='no' value='".$ids[$i]['ref']."'>&nbsp;".strtolower($ids[$i]['title'])."</label>";
+					$result .= "<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type='checkbox' name='filter[]' id='filter_".$id."_".$i."' class='filter_".$id."' data-main='no' value='".$ids[$i]['ref']."'>&nbsp;".ucfirst(strtolower($ids[$i]['title']))."</label>";
 				}
 			}
 			return $result;
