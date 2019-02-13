@@ -18,15 +18,50 @@
 	$type = "text/json";
 
 	$URL = $u."api/".$hash."/users/login";*/
+
+	/*//register
+	//JSON Example
+	$array['product_key'] = $product_key;
+	$array['product_id'] = $product_id;
+	$array['app_id'] = "1234567890";
+	$array['user']['email'] = "olukayode.adebiyi@linnkstec.com";
+	$array['user']['password'] = "lolade";
+	$array['user']['last_name'] = "Adebiyi";
+	$array['user']['other_names'] = "Olukayode";
+	$array['user']['phone'] = "08182441752";
+	$xml_data = json_encode($array);
+	$type = "text/json";
+
+	$URL = $u."api/".$hash."/users/register";*/
 	
-	//logout
+/*	//Change Password
+	//JSON Example
+	$array['product_key'] = $product_key;
+	$array['product_id'] = $product_id;
+	$array['user']['password'] = "lolade";
+	$array['user']['ref'] = "1";
+	$xml_data = json_encode($array);
+	$type = "text/json";
+
+	$URL = $u."api/".$hash."/users/changePassword";  */
+
+/*	//Reset Password
 	//JSON Example
 	$array['product_key'] = $product_key;
 	$array['product_id'] = $product_id;
 	$xml_data = json_encode($array);
 	$type = "text/json";
 
-	$URL = $u."api/".$hash."/category";  
+	$URL = $u."api/".$hash."/users/passwordReset/olukayode.adebiyi@gmail.com";  */
+
+/*	//logout
+	//JSON Example
+	$array['product_key'] = $product_key;
+	$array['product_id'] = $product_id;
+	$xml_data = json_encode($array);
+	$type = "text/json";
+
+	$URL = $u."api/".$hash."/category";  */
 	
 /*	//update
 	//JSON Example
@@ -83,157 +118,6 @@
 	$URL = $u."api/".$hash."/quickfind/search";*/
 	
 	
-	/*//post reward
-	//JSON Example
-	$array['product_key'] = $product_key;
-	$array['product_id'] = $product_id;
-	$array['user_id'] = "2";
-	$array['amount'] = "100";
-	$array['number'] = "08182441752";
-	$array['productCode'] = "ETST";
-	$array['type'] = "payout";
-	$xml_data = json_encode($array);
-	
-	//XML example
-	$xml_data = '<?xml version="1.0" encoding="utf-8"?>
-	<skrinAd>
-	<product_key>'.$product_key.'</product_key>
-	<product_id>'.$product_id.'</product_id>
-	<user_id>2</user_id>
-	<amount>50</amount>
-	<number>08182441752</number>
-	<productCode>ETST</productCode>
-	<type>payout</type>
-	</skrinAd>';
-
-	$URL = $u."api/".$hash."/xml/reward/postrequest";*/
-	
-	
-	/*//update
-	//JSON Example
-	$array['product_key'] = $product_key;
-	$array['product_id'] = $product_id;
-	$array['advert'][0]['id'] = 1;
-	$array['advert'][0]['user_id'] = 1;
-	$array['advert'][0]['impression'] = 1;
-	$array['advert'][0]['click'] = 1;
-	$array['advert'][0]['impression_time'] = time();
-	$array['advert'][0]['click'] = 1;
-	$array['advert'][0]['click_time'] = time();
-	$array['advert'][1]['id'] = 1;
-	$array['advert'][1]['user_id'] = 1;
-	$array['advert'][1]['impression'] = 1;
-	$array['advert'][1]['impression_time'] = time();
-	$array['advert'][1]['click'] = 1;
-	$array['advert'][1]['click_time'] = time();
-	$array['advert'][2]['id'] = 1;
-	$array['advert'][2]['user_id'] = 1;
-	$array['advert'][2]['impression'] = 1;
-	$array['advert'][2]['impression_time'] = time();
-	$array['advert'][2]['click'] = 0;
-	$xml_data = json_encode($array);
-	
-	//XML example
-	$xml_data = '<?xml version="1.0" encoding="utf-8"?>
-	<skrinAd>
-	<product_key>'.$product_key.'</product_key>
-	<product_id>'.$product_id.'</product_id>
-	<advert>
-		<id>3</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>1</click>>
-		<click_time>'.time().'</click_time>>
-	</advert>
-	<advert>
-		<id>3</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>1</click>>
-		<click_time>'.time().'</click_time>>
-	</advert>
-	<advert>
-		<id>4</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>0</click>>
-	</advert>
-	<advert>
-		<id>3</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>1</click>>
-		<click_time>'.time().'</click_time>>
-	</advert>
-	<advert>
-		<id>4</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>0</click>>
-	</advert>
-	<advert>
-		<id>3</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>1</click>>
-		<click_time>'.time().'</click_time>>
-	</advert>
-	<advert>
-		<id>4</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>0</click>>
-	</advert>
-	<advert>
-		<id>4</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>0</click>>
-	</advert>
-	<advert>
-		<id>3</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>0</click>>
-	</advert>
-	<advert>
-		<id>4</id>
-		<user_id>1</user_id>
-		<impression>1</impression>
-		<impression_time>'.time().'</impression_time>>
-		<click>0</click>>
-	</advert>
-	</skrinAd>';
-
-	$URL = $u."api/".$hash."/xml/advert/update";*/
-	
-	//JSON Example
-	/*$array['product_key'] = $product_key;
-	$array['product_id'] = $product_id;
-	$xml_data = json_encode($array);*/
-	
-	/*//XML example
-	$xml_data = '<?xml version="1.0" encoding="utf-8"?>
-	<skrinAd>
-	<product_key>'.$product_key.'</product_key>
-	<product_id>'.$product_id.'</product_id>
-	</skrinAd>';*/
-	
-	//$URL = $u."api/".$hash."/xml/list/category";
-	//$URL = $u."api/".$hash."/xml/list/ageRange";
-	//$URL = $u."api/".$hash."/xml/list/gender";
-	//$URL = $u."api/".$hash."/xml/list/state";
-	//$URL = $u."api/".$hash."/xml/list/banks";
-	//$URL = $u."api/".$hash."/json/list/category";
 	$ch = curl_init($URL);
 	curl_setopt($ch, CURLOPT_VERBOSE, true);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

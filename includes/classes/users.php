@@ -1,7 +1,9 @@
 <?php
 	class users extends common {
-		function activate($password) {
-			$ref = $_SESSION['users']['ref'];
+		function activate($password, $ref=false) {
+			if ($ref == false) {
+				$ref = $_SESSION['users']['ref'];
+			}
 			$password = $this->mysql_prep($password);
 			$array = array();
 			$array['ref'] = $ref;
