@@ -234,8 +234,10 @@
 			
 			$users->modifyOne("subscription",$newTime, $data['order_owner']);
 			$users->modifyOne("subscription_type", $order_subscription, $data['order_owner']);
+			$users->modifyOne("subscription_type_name", $sub_data['title'], $data['order_owner']);
 			$users->modifyOne("subscription_group", $data['order_owner'], $data['order_owner']);
 			$users->modifyOne("subscription_order", $id, $data['order_owner']);
+			$users->modifyOne("last_subscription", time(), $data['order_owner']);
 			$_SESSION['users']['subscription'] = $newTime;
 			$_SESSION['users']['subscription_group_onwer'] = $data['order_owner'];
 			$_SESSION['users']['subscription_type'] = $order_subscription;
