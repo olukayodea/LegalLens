@@ -141,24 +141,22 @@ window.onload = function() {
      <div style="margin-top:30px">
        <h4 style="" align="center">Quick Find </h4>
 		<form id="search-form2" class="search-form2 clearfix" method="post" action="home" autocomplete="off">
-		        <input class="search-term2 required" type="text" id="s" name="s" placeholder="Enter matter of interest" title="* Enter matter of interest" onBlur="saveSearch(this.value)" value="<?php echo $search_data; ?>" required autofocus />
-		        <input class="search-btn" type="submit" value="Go" /><br>
-                
-			<div style="margin-left:-30px;margin-top:10px;"><b>Include in search:</b><br>
-            <span id="sprycheckbox1">
-            <?php for ($i = 0; $i < count($list); $i++) { ?>
-            <input type="checkbox" name="parameter[]" value="<?php echo $list[$i]['ref']; ?>" checked />&nbsp;<?php echo $list[$i]['title']; ?> &nbsp;
-            <?php } ?><br>
-            <input type="checkbox" name="case_law" id="case_law" value="1" checked />&nbsp;Case Law &nbsp;
-            <input type="checkbox" name="reg_circular" id="reg_circular" checked value="1" />&nbsp;Regulations and Circulars &nbsp;
-            <!--<input type="checkbox" name="court_rules" id="court_rules" checked value="1" />
-            &nbsp;Court Rules&nbsp;-->
-            <input type="checkbox" name="dic" id="dic" checked value="1" />
-            &nbsp;Dictionary&nbsp;
-            <br>
-            <span class="checkboxRequiredMsg">Please make a selection.</span></span>
-            </div>
-		        <div id="search-error-container2"></div>
+      <input class="search-term2 required" type="text" id="s" name="s" placeholder="Enter matter of interest" title="* Enter matter of interest" onBlur="saveSearch(this.value)" value="<?php echo $search_data; ?>" required autofocus />
+      <input class="search-btn" type="submit" value="Go" /><br>
+          
+      <div style="margin-left:-30px;margin-top:10px;"><b>Include in search:</b><br>
+        <span id="sprycheckbox1">
+        <?php for ($i = 0; $i < count($list); $i++) { ?>
+        <input type="checkbox" name="parameter[]" value="<?php echo $list[$i]['ref']; ?>" checked />&nbsp;<?php echo $list[$i]['title']; ?> &nbsp;
+        <?php } ?><br>
+        <input type="checkbox" name="case_law" id="case_law" value="1" checked />&nbsp;Case Law &nbsp;
+        <input type="checkbox" name="reg_circular" id="reg_circular" checked value="1" />&nbsp;Regulations and Circulars &nbsp;
+        <input type="checkbox" name="dic" id="dic" checked value="1" />
+        &nbsp;Dictionary&nbsp;
+        <br>
+        <span class="checkboxRequiredMsg">Please make a selection.</span></span>
+      </div>
+      <div id="search-error-container2"></div>
 		</form>
 	 </div>
      <?php if ($result == true) { ?>

@@ -27,7 +27,19 @@
 			global $categories;
 			global $db;
 			try {
-				$sql = $db->query("SELECT `documents`.`title`, `documents`.`ref`, `sections`.`ref` AS section_ref, `documents`.`cat`, `documents`.`type`, `documents`.`year`, `documents`.`category_name`, `documents`.`owner`, `sections`.`section_no`, `sections`.`section_content`, `documents`.`create_time`, `documents`.`modify_time`,`categories`.`priority`,MATCH (`sections`.`section_content`) AGAINST ('".$val."' IN BOOLEAN MODE) AS name_match FROM `documents`, `sections`,`categories` WHERE `documents`.`cat` = `categories`.`ref` AND`documents`.`ref` = `sections`.`document` AND `documents`.`status` = 'active' AND `sections`.`status` = 'active' AND `cat` IN (".$cat.") AND (`documents`.`title` LIKE '%".$val."%' OR `documents`.`year` LIKE '%".$val."%' OR `documents`.`category_name` LIKE '%".$val."%' OR `documents`.`owner` LIKE '%".$val."%' OR `documents`.`tags` LIKE '%".$val."%' OR `sections`.`tags` LIKE '%".$val."%' OR `sections`.`section_content` LIKE '%".$val."%' OR MATCH(`sections`.`section_content`) AGAINST ('".$val."') OR MATCH(`documents`.`title`) AGAINST ('".$val."')) GROUP BY `sections`.`section_content` ORDER BY `name_match` DESC, `documents`.`tags`,`title`,`documents`.`category_name` ASC");
+				$sql = $db->query("SELECT `documents`.`title`, `documents`.`ref`, `sections`.`ref` AS section_ref, 
+				`documents`.`cat`, `documents`.`type`, `documents`.`year`, `documents`.`category_name`, `documents`.
+				`owner`, `sections`.`section_no`, `sections`.`section_content`, `documents`.`create_time`, `documents`.
+				`modify_time`,`categories`.`priority`,MATCH (`sections`.`section_content`) 
+				AGAINST ('".$val."' IN BOOLEAN MODE) AS name_match FROM `documents`, `sections`,`categories` 
+				WHERE `documents`.`cat` = `categories`.`ref` AND`documents`.`ref` = `sections`.`document` 
+				AND `documents`.`status` = 'active' AND `sections`.`status` = 'active' AND `cat` IN (".$cat.") 
+				AND (`documents`.`title` LIKE '%".$val."%' OR `documents`.`year` LIKE '%".$val."%' 
+				OR `documents`.`category_name` LIKE '%".$val."%' OR `documents`.`owner` LIKE '%".$val."%' 
+				OR `documents`.`tags` LIKE '%".$val."%' OR `sections`.`tags` LIKE '%".$val."%' 
+				OR `sections`.`section_content` LIKE '%".$val."%' OR MATCH(`sections`.`section_content`) 
+				AGAINST ('".$val."') OR MATCH(`documents`.`title`) AGAINST ('".$val."')) GROUP BY `sections`.`section_content` 
+				ORDER BY `name_match` DESC, `documents`.`tags`,`title`,`documents`.`category_name` ASC");
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
