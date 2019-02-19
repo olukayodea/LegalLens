@@ -21,7 +21,18 @@
 		if ($create) {
 			$res = explode("_", $create);
 			$data = $orders->getOne($res[0]);
-			if ($data['payment_type'] == "Online") {
+			if ($amount < 1) {
+				$orders->updateOne("order_status", "COMPLETE", $data['ref']);
+				$transactions->updateOne("transaction_status", "PAID", $res[1]);
+				$orders->orderNotification($data['ref']);
+				$orders->updateSubscrption($data['ref']);
+				
+				$array['ResponseCode'] = "00";
+				$array['TransactionDate'] = date('l jS \of F Y h:i:s A', $data['create_time']);
+				$response = json_encode($array);
+				$token = base64_encode($response);
+				header("location: confirmation?id=".$data['ref']."&token=".$token);
+			} elseif ($data['payment_type'] == "Online") {
 				//for online Payment
 				//$transData = $transactions->getOne($add, "order_id");
 				header("location: preview?id=".$res[1]);

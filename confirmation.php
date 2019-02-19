@@ -84,11 +84,16 @@
                          <p><a href="<?php echo URL; ?>preview?others&id=<?php echo $id; ?>" onClick="return confirm('You have opted to pay for this order via other channels, do you wish to continue?')">Cick here to select other payment method</a></p>
                         <p><a href="<?php echo URL; ?>redirect?retry&id=<?php echo $transaction_data['ref']; ?>">Cick here to retry online payment</a></p>
                         <?php } ?>
-                        <?php if ($data['payment_type'] != "Online") { ?>
-                        <p><strong>Payment instruction for other methods here.</strong></p>
+                        <?php if (($data['payment_type'] != "Online") && ($urlData['Amount'] > 0)) { ?>
+                        <p><strong><p>To make payments online through your card, please choose online payments.</p>
+                                      <p>Alternatively, you can complete your subscription by making payment to our account provided below and contacting Legallens officials and send the name of payer and transaction referenced to us through our live chat to activate your subscription.</p>
+                                      <p>Account details:<br>
+                                      Name:&nbsp;&nbsp;<strong>Pearlhouse Legal Lens Limited</strong><br>
+                                      Bank:&nbsp;&nbsp;<strong>United Bank For Africa</strong><br>
+                                    Number:&nbsp;&nbsp;<strong>1019666896</strong></p></strong></p>
                         <?php } ?>
                         
-                        <?php if ($data['order_status'] == "COMPLETE") { ?>
+                        <?php if (($data['order_status'] == "COMPLETE") && ($urlData['Amount'] > 0) ) { ?>
                         <p><strong>Payments has been confirmed for this order</strong></p>
                         <p>Transaction Time: <strong><?php echo $urlData['TransactionDate']; ?></strong><br>
                         Amount Charged: <strong><?php echo NGN.number_format($data['order_amount_net'], 2); ?></strong><br />
@@ -98,6 +103,8 @@
                         Card Number: <strong>**** **** **** <?php echo $urlData['CardNumber']; ?></strong><br />
                         Payment Status: <strong><?php echo $data['payment_status']; ?></strong><br />
                         Transaction Status Description: <strong><?php echo $urlData['ResponseDescription']; ?></strong></p>
+                        <?php } else if ($urlData['Amount'] < 1) { ?>
+                          <p><strong>Pyment is not needed for this order</strong></p>
                         <?php } else { ?>
                         <p><strong>Pyment has not been confirmed for this order</strong></p>
                         <?php } ?>
