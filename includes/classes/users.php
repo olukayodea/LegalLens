@@ -332,7 +332,7 @@
 			$subscription_type = "";
 			$subscription = "";
 			$subscription_group = "";
-			$status = "NEW";
+			$status = "ACTIVE";
 			$date_time = time();
 			$modify_time = time();
 			
