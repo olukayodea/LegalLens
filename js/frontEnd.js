@@ -65,6 +65,13 @@ function getbill(val, users) {
 			document.getElementById('d_disc').innerHTML = formatNumber(myJson[2])+"%";
 			document.getElementById('n_total').innerHTML = "&#8358; "+formatNumber(myJson[3]);
 			document.getElementById('total').value = myJson[3];
+			if (myJson[3] < 1) {
+				document.getElementById('payment_type').setAttribute("readonly", "readonly");
+				alert("hide");
+			} else {
+				document.getElementById('payment_type').removeAttribute("readonly");
+				alert("show");
+			}
 		} else {
 			alert("An error occured, please try again later");
 		}

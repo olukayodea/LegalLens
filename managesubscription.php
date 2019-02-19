@@ -146,7 +146,6 @@
                                   <option value="Online">Online Payment</option>
                                   <option value="Others">Other Channels</option>
                                 </select></td>
-                                
                                   </tr>
                                  <tr>
                                    <td>Subscription Fees</td>
