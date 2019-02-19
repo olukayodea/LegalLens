@@ -19,7 +19,7 @@
         } else if (isset($_GET['show']) && ($_GET['show'] == "caselaw")) {
                 $list = $searchHome->listCase($page_count);
                 $listCount = $searchHome->listCaseCount();
-                $tag = "Caselaw";
+                $tag = "Case law";
                 $show = $_GET['show'];
                 $showCaselaw = true;
         } else if (isset($_GET['show']) && ($_GET['show'] == "reg")) {
