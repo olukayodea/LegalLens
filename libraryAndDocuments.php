@@ -28,10 +28,28 @@
                 $tag = "Regulations";
                 $show = $_GET['show'];
                 $showReg = true;
+        } else if (isset($_GET['show']) && ($_GET['show'] == "clause")) {
+                $list = $searchHome->listClause($page_count);
+                $listCount = $searchHome->listClauseCount();
+                $tag = "Draft Clauses";
+                $show = $_GET['show'];
+                $showClause = true;
+        } else if (isset($_GET['show']) && ($_GET['show'] == "agreement")) {
+                $list = $searchHome->listAgreement($page_count);
+                $listCount = $searchHome->listAgreementCount();
+                $tag = "Draft Agreement";
+                $show = $_GET['show'];
+                $showAgreement = true;
+        } else if (isset($_GET['show']) && ($_GET['show'] == "form")) {
+                $list = $searchHome->listForm($page_count);
+                $listCount = $searchHome->listFormCount();
+                $tag = "Forms";
+                $show = $_GET['show'];
+                $showForm = true;
         } else {
                 $list = $searchHome->listCategory($page_count);
                 $listCount = $searchHome->listCategoryCount();
-                $tag = "Documents";
+                $tag = "Laws";
                 $show = false;
                 $showDoc = true;
         }
@@ -92,11 +110,10 @@
 
                                           <article class="type-page hentry clearfix">
 
-                                          <a href="?show=doc">Document</a> | <a href="?show=caselaw">Case Law</a> | <a href="?show=reg">Regulation</a> | <a href="?show=dic">Dictionary</a>
+                                          <a href="?show=doc">Laws</a> | <a href="?show=caselaw">Case Law</a> | <a href="?show=reg">Regulation</a> | <a href="?show=dic">Dictionary</a> | <a href="?show=clause">Draft Clause</a> | <a href="?show=agreement">Draft Agreements</a> | <a href="?show=form">Forms</a>
                                                         <h1 class="post-title">
                                                                 <a href="#"><?php echo $tag; ?></a></h1>
                                                         <hr>
-                                                        
                                                         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
                                                         <!-- forum -->
                                                         <ins class="adsbygoogle"
@@ -109,36 +126,22 @@
                                                         <br>
                                                         <?php if ($showCaselaw == true) {
                                                                 if (count($list) > 0) { ?>
-                                                                        <table width="100%" border="0" id="example4">
-                                                                        <thead>
-                                                                          <tr>
-                                                                            <td>&nbsp;</td>
-                                                                            <td>&nbsp;</td>
-                                                                          </tr>
-                                                                        </thead>
-                                                                        <tbody>
+                                                                        <table width="100%" border="0" cellspacing="0" id="example4">
                                                                                               <?php 
                                                                                               $count = $page_count*page_list;
                                                                                               for ($i = 0; $i < count($list); $i++) {
                                                                                                       $count++ ?>
                                                                            <tr>
                                                                            <td valign="top"><strong><?php echo $count; ?></strong></td>
-                                                                           <td><p>
+                                                                           <td>
                                                                       <a href="libraryDocumentPreviewCase?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $list[$i]['section_ID']; ?>&data=<?php echo urlencode(URL."caselaw.read?id=".$list[$i]['ref']."&read=".$list[$i]['section_ID']."&return=". $search_data); ?>">
                                                                        <cite><strong><?php echo $list[$i]['citation']; ?></strong></cite><br>
                                                                        <strong style="color:#00F"><?php echo $common->getLine($list[$i]['section_content']); ?></strong><br></a>
                                                                        <?php echo nl2br($common->truncate($list[$i]['section_content'], 250)); ?><br>
-                                                                       <a href="libraryDocumentPreviewCase?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $list[$i]['section_ID']; ?>&data=<?php echo urlencode(URL."caselaw.read?id=".$list[$i]['ref']."&read=".$list[$i]['section_ID']."&return=". $search_data); ?>">read more</a></p>
+                                                                       <a href="libraryDocumentPreviewCase?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $list[$i]['section_ID']; ?>&data=<?php echo urlencode(URL."caselaw.read?id=".$list[$i]['ref']."&read=".$list[$i]['section_ID']."&return=". $search_data); ?>">read more</a>
                                                                            </td>
                                                                               </tr>
                                                                           <?php } ?>
-                                                                        </tbody>
-                                                                        <tfoot>
-                                                                          <tr>
-                                                                            <td>&nbsp;</td>
-                                                                            <td>&nbsp;</td>
-                                                                          </tr>
-                                                                        </tfoot>
                                                                         </table>
                                                                         <?php $pagination->draw($page_count, $postData, $listCount, $redirect, false, $show); ?>
                                                                     <?php } else { ?>
@@ -147,34 +150,20 @@
 
                                                         <?php } elseif ($showDoc == true) {
                                                                 if (count($list) > 0) { ?>
-                                                                <table width="100%" border="0" id="table_<?php echo $key; ?>">
-                                                                <thead>
-                                                                <tr>
-                                                                        <td>&nbsp;</td>
-                                                                        <td>&nbsp;</td>
-                                                                </tr>
-                                                                </thead>
-                                                                <tbody>
+                                                                <table width="100%" border="0" cellspacing="0" id="table_<?php echo $key; ?>">
                                                                         <?php 
                                                                         $count = $page_count*page_list;
                                                                         for ($i = 0; $i < count($list); $i++) {
                                                                                 $count++ ?>
                                                                 <tr>
                                                                 <td valign="top"><strong><?php echo $count; ?></strong></td>
-                                                                <td><p><strong style="color:#006"><a href="libraryDocumentPreviewDoc?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $list[$i]['section_ref']; ?>&id=<?php echo $list[$i]['ref']; ?>&data=<?php echo urlencode(URL."document.read?id=".$list[$i]['ref']."&read=".$list[$i]['section_ref']."&return=".$search_data); ?>"><?php echo $list[$i]['title']; ?></a></strong><br>
+                                                                <td><strong style="color:#006"><a href="libraryDocumentPreviewDoc?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $list[$i]['section_ref']; ?>&id=<?php echo $list[$i]['ref']; ?>&data=<?php echo urlencode(URL."document.read?id=".$list[$i]['ref']."&read=".$list[$i]['section_ref']."&return=".$search_data); ?>"><?php echo $list[$i]['title']; ?></a></strong><br>
                                                                 <strong style="color:#00F"><?php echo nl2br($common->getLine($list[$i]['section_no'])); ?></strong><br>
                                                                 <?php 
                                                                 echo nl2br($common->truncate($list[$i]['section_content'], 150));
-                                                                ?></p></td>
+                                                                ?></td>
                                                                         </tr>
                                                                 <?php } ?>
-                                                                </tbody>
-                                                                <tfoot>
-                                                                <tr>
-                                                                        <td>&nbsp;</td>
-                                                                        <td>&nbsp;</td>
-                                                                </tr>
-                                                                </tfoot>
                                                                 </table>
                                                                 <?php $pagination->draw($page_count, $postData, $listCount, $redirect, false, $show); ?>
                                                                 <?php } else { ?>
@@ -182,21 +171,14 @@
                                                                 <?php } ?>
                                                         <?php } elseif ($showReg == true) {
                                                                 if (count($list) > 0) { ?>
-                                                                        <table width="100%" border="0" id="example4">
-                                                                        <thead>
-                                                                        <tr>
-                                                                        <td>&nbsp;</td>
-                                                                        <td>&nbsp;</td>
-                                                                        </tr>
-                                                                        </thead>
-                                                                        <tbody>
+                                                                        <table width="100%" border="0" cellspacing="0" id="example4">
                                                                                         <?php 
                                                                                         $count = $page_count*page_list;
                                                                                         for ($i = 0; $i < count($list); $i++) {
                                                                                                 $count++ ?>
                                                                         <tr>
                                                                         <td valign="top"><strong><?php echo $count; ?></strong></td>
-                                                                        <td><p><strong style="color:#006"><a href="libraryDocumentPreviewReg?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $list[$i]['section_ref']; ?>&data=<?php echo urlencode(URL."regulations.view?id=".$list[$i]['ref']."&read=".$list[$i]['section_ref']."&return=". $search_data); ?>"><?php echo $list[$i]['title']; ?></a></strong><br>
+                                                                        <td><strong style="color:#006"><a href="libraryDocumentPreviewReg?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $list[$i]['section_ref']; ?>&data=<?php echo urlencode(URL."regulations.view?id=".$list[$i]['ref']."&read=".$list[$i]['section_ref']."&return=". $search_data); ?>"><?php echo $list[$i]['title']; ?></a></strong><br>
                                                                         
                                                                 <?php 
                                                                 if ($list[$i]['section_no'] == "") {
@@ -205,17 +187,10 @@
                                                                         echo nl2br($common->getLine($list[$i]['section_no']));
                                                                                         echo "<br>";
                                                                         echo nl2br($common->truncate($list[$i]['section_content'], 200));
-                                                                } ?></p>
+                                                                } ?>
                                                                         </td>
                                                                         </tr>
                                                                         <?php } ?>
-                                                                        </tbody>
-                                                                        <tfoot>
-                                                                        <tr>
-                                                                        <td>&nbsp;</td>
-                                                                        <td>&nbsp;</td>
-                                                                        </tr>
-                                                                        </tfoot>
                                                                         </table>
                                                                         <?php $pagination->draw($page_count, $postData, $listCount, $redirect, false, $show); ?>
                                                                 <?php } else { ?>
@@ -224,30 +199,67 @@
                                                        <?php } elseif ($showDic == true) {
                                                                if (count($list) > 0) { ?>
                                                                 <table width="100%" border="0" id="example5">
-                                                                <thead>
-                                                                  <tr>
-                                                                    <td>&nbsp;</td>
-                                                                    <td>&nbsp;</td>
-                                                                  </tr>
-                                                                </thead>
-                                                                <tbody>
                                                                                       <?php 
                                                                                       $count = $page_count*page_list;
                                                                                       for ($i = 0; $i < count($list); $i++) {
                                                                                               $count++ ?>
                                                                       <tr>
                                                                    <td valign="top"><strong><?php echo $count; ?></strong></td>
-                                                                   <td><p><strong><?php echo $list[$i]['title']; ?></strong><br> <?php echo $list[$i]['details']; ?></p>
+                                                                   <td><strong><?php echo $list[$i]['title']; ?></strong><br> <?php echo $list[$i]['details']; ?>
                                                                    </td>
                                                                       </tr>
                                                                   <?php } ?>
-                                                                </tbody>
-                                                                <tfoot>
-                                                                  <tr>
-                                                                    <td>&nbsp;</td>
-                                                                    <td>&nbsp;</td>
-                                                                  </tr>
-                                                                </tfoot>
+                                                                </table>
+                                                                <?php $pagination->draw($page_count, $postData, $listCount, $redirect, false, $show); ?>
+                                                            <?php } else { ?>
+                                                                <p>No result for this item now</p>
+                                                            <?php } ?>
+                                                       <?php } elseif ($showClause == true) {
+                                                               if (count($list) > 0) { ?>
+                                                                <table width="100%" border="0" id="example5">
+                                                                                      <?php 
+                                                                                      $count = $page_count*page_list;
+                                                                                      for ($i = 0; $i < count($list); $i++) {
+                                                                                              $count++ ?>
+                                                                      <tr>
+                                                                   <td valign="top"><strong><?php echo $count; ?></strong></td>
+                                                                   <td><strong><a href="libraryDocumentPreviewDrafting?id=<?php echo $list[$i]['ref']; ?>&view=Clauses&data=<?php echo urlencode(URL."clause.data?view=Clauses&id=".$list[$i]['ref']); ?>"><?php echo $list[$i]['title']; ?></a></strong></td>
+                                                                      </tr>
+                                                                  <?php } ?>
+                                                                </table>
+                                                                <?php $pagination->draw($page_count, $postData, $listCount, $redirect, false, $show); ?>
+                                                            <?php } else { ?>
+                                                                <p>No result for this item now</p>
+                                                            <?php } ?>
+                                                       <?php } elseif ($showAgreement == true) {
+                                                               if (count($list) > 0) { ?>
+                                                                <table width="100%" border="0" id="example5">
+                                                                                      <?php 
+                                                                                      $count = $page_count*page_list;
+                                                                                      for ($i = 0; $i < count($list); $i++) {
+                                                                                              $count++ ?>
+                                                                      <tr>
+                                                                   <td valign="top"><strong><?php echo $count; ?></strong></td>
+                                                                   <td><strong><a href="libraryDocumentPreviewDrafting?id=<?php echo $list[$i]['ref']; ?>&view=Agreement&data=<?php echo urlencode(URL."clause.data?view=Agreement&id=".$list[$i]['ref']); ?>"><?php echo $list[$i]['title']; ?></a></strong></td>
+                                                                      </tr>
+                                                                  <?php } ?>
+                                                                </table>
+                                                                <?php $pagination->draw($page_count, $postData, $listCount, $redirect, false, $show); ?>
+                                                            <?php } else { ?>
+                                                                <p>No result for this item now</p>
+                                                            <?php } ?>
+                                                       <?php } elseif ($showForm == true) {
+                                                               if (count($list) > 0) { ?>
+                                                                <table width="100%" border="0" id="example5">
+                                                                                      <?php 
+                                                                                      $count = $page_count*page_list;
+                                                                                      for ($i = 0; $i < count($list); $i++) {
+                                                                                              $count++ ?>
+                                                                      <tr>
+                                                                   <td valign="top"><strong><?php echo $count; ?></strong></td>
+                                                                   <td><strong><a href="libraryDocumentPreviewDrafting?id=<?php echo $list[$i]['ref']; ?>&view=Forms&data=<?php echo urlencode(URL."clause.data?view=Forms&id=".$list[$i]['ref']); ?>"><?php echo $list[$i]['title']; ?></a></strong></td>
+                                                                      </tr>
+                                                                  <?php } ?>
                                                                 </table>
                                                                 <?php $pagination->draw($page_count, $postData, $listCount, $redirect, false, $show); ?>
                                                             <?php } else { ?>
@@ -273,6 +285,7 @@
                                           <section class="widget">
                                             <?php $pages->advert(); ?>
                                         </section>
+                                        
                                         <section class="widget">
                                         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
                                         <!-- Ad_Campaign -->
@@ -286,7 +299,7 @@
                                         </script>
                                         </section>
                                         <section class="widget">
-                                                <h3 class="title" align="center">Latest Documents</h3>
+                                                <h3 class="title" align="center">Latest Posts</h3>
                                                 <ul class="articles">
                                                 <?php $forum_posts->recent(); ?>
                                                 </ul>

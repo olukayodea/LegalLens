@@ -327,5 +327,107 @@
 						
 			return $sql->rowCount();
 		}
+
+		function listClause($page_count) {
+			global $db;
+
+			$limit = intval(page_list*$page_count);
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `type` = 'clause' AND `status` = 'active' ORDER BY `title` ASC LIMIT ".$limit.",".page_list);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql) {
+				$result = array();
+				$count = 0;
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
+					$result[$count]['ref'] = $row['ref'];
+					$result[$count]['title'] = $row['title'];
+					$result[$count]['type'] = "Dictionary";
+					$result[$count]['details'] = $row['details'];
+					$count++;
+				}
+				return $this->out_prep($result);
+			}
+		}
+
+		function listClauseCount() {
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `type` = 'clause' AND `status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+						
+			return $sql->rowCount();
+		}
+
+		function listAgreement($page_count) {
+			global $db;
+
+			$limit = intval(page_list*$page_count);
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `type` = 'Agreement' AND `status` = 'active' ORDER BY `title` ASC LIMIT ".$limit.",".page_list);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql) {
+				$result = array();
+				$count = 0;
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
+					$result[$count]['ref'] = $row['ref'];
+					$result[$count]['title'] = $row['title'];
+					$result[$count]['type'] = "Dictionary";
+					$result[$count]['details'] = $row['details'];
+					$count++;
+				}
+				return $this->out_prep($result);
+			}
+		}
+
+		function listAgreementCount() {
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `type` = 'Agreement' AND `status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+						
+			return $sql->rowCount();
+		}
+
+		function listForm($page_count) {
+			global $db;
+
+			$limit = intval(page_list*$page_count);
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `type` = 'Forms' AND `status` = 'active' ORDER BY `title` ASC LIMIT ".$limit.",".page_list);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql) {
+				$result = array();
+				$count = 0;
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
+					$result[$count]['ref'] = $row['ref'];
+					$result[$count]['title'] = $row['title'];
+					$result[$count]['type'] = "Dictionary";
+					$result[$count]['details'] = $row['details'];
+					$count++;
+				}
+				return $this->out_prep($result);
+			}
+		}
+
+		function listFormCount() {
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `type` = 'Forms' AND `status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+						
+			return $sql->rowCount();
+		}
 	}
 ?>

@@ -176,7 +176,7 @@
 			
 			global $db;
 			try {
-				$sql = $db->prepare("SELECT * FROM `drafting_sections` WHERE `".$tag."` = :id".$sqlTag." ORDER BY ".$order."` ASC");
+				$sql = $db->prepare("SELECT * FROM `drafting_sections` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
 								
 				$sql->execute($token);
 			} catch(PDOException $ex) {
