@@ -10,7 +10,6 @@
 <html>
 <head>
 <style type="text/css">
-<!--
 .title {
 	font-family: Arial, Helvetica, sans-serif;
 	padding: 5px;
@@ -58,7 +57,6 @@ body,td,th {
 	color: #000000;
 	padding: 5px;
 }
--->
 </style>
 <title><?php echo $common->get_prep($_REQUEST['subject']); ?></title>
 </head>
