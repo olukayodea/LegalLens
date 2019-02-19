@@ -1,7 +1,7 @@
 <?php
 	class caselaw_area extends common {
 		function add($array) {
-			$title = $this->mysql_prep($array['title']);
+			$title = htmlentities($this->mysql_prep($array['title']));
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);

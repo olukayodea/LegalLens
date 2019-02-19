@@ -95,8 +95,9 @@
       <tr>
         <td><?php echo $i+1; ?></td>
         <td><strong><?php echo $list[$i]['title']; ?></strong></td>
-      	<td><?php echo date('l jS \of F Y h:i:s A', $list[$i]['create_time']); ?></td>
-	<td><a href="?del=<?php echo $list[$i]['ref']; ?>" onClick="return confirm('this action will remove this record. are you sure you want to continue ?')">delete</a></td>
+        <td><?php echo date('l jS \of F Y h:i:s A', $list[$i]['create_time']); ?></td>
+        <td><a href="<?php echo URL; ?>home?q=<?php echo $list[$i]['title']; ?>">view</a></td>
+        <td><a href="?del=<?php echo $list[$i]['ref']; ?>" onClick="return confirm('this action will remove this record. are you sure you want to continue ?')">delete</a></td>
       </tr>
       <?php } ?>
     </tbody>

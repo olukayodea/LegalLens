@@ -1,7 +1,7 @@
 <?php
 	class searchUsers extends common {
 		function add($array) {
-			$title = ucfirst(strtolower($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucfirst(strtolower($this->mysql_prep($array['title']))));
 			$users = $this->mysql_prep($array['users']);
 			$create_time = time();
 						
@@ -131,7 +131,7 @@
 			
 			global $db;
 			try {
-				$sql = $db->prepare("SELECT * FROM `search_history` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+				$sql = $db->prepare("SELECT * FROM `search_history` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` DESC");
 								
 				$sql->execute($token);
 			} catch(PDOException $ex) {

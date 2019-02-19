@@ -2,7 +2,7 @@
 	class articles_sections extends common {
 		function add($array) {
 			$article = $this->mysql_prep($array['article']);
-			$section_content = $this->mysql_prep($array['section_content']);
+			$section_content = htmlentities($this->mysql_prep($array['section_content']));
 			$tags = $this->mysql_prep($array['tags']);
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();

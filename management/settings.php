@@ -14,6 +14,7 @@
 	}
 	
 	$page_view = $settings->getOne("page_view");
+	$page_list = $settings->getOne("page_list");
 	$facebook = $settings->getOne("facebook");
 	$flickr = $settings->getOne("flickr");
 	$google = $settings->getOne("google");
@@ -95,6 +96,12 @@
                             <td><span id="sprytextfield1">
                             <input type="text" name="page_view" id="page_view" value="<?php echo $page_view; ?>">
                             <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid format.</span></span></td>
+                          </tr>
+                          <tr>
+                            <td width="25%">Result per Page</td>
+                            <td><span id="sprytextfield0">
+                            <input type="text" name="page_list" id="page_list" value="<?php echo $page_list; ?>">
+                            <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid format.</span><span class="textfieldMinValueMsg">The entered value is less than the minimum required.</span></span></td>
                           </tr>
                           <tr>
                             <td width="25%">&nbsp;</td>
@@ -288,6 +295,7 @@ $(function () {
 			setSelectedIndex(document.getElementById("level"),"<?php echo $editLevel; ?>");
 			setMultiSelectedIndex(document.getElementById("pages"),"<?php echo $getData['pages']; ?>");
 		});
+var sprytextfield0 = new Spry.Widget.ValidationTextField("sprytextfield0", "integer", {minValue:20});
 var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1", "real");
 var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "url", {isRequired:false});
 var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3", "url", {isRequired:false});

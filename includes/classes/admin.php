@@ -483,7 +483,7 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 						
-			return $sql->rowCount();
+			return $sql->fetchColumn;
 		}
 		
 		function sortList($tag, $id) {

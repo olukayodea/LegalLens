@@ -1,7 +1,7 @@
 <?php
 	class caselaw extends common {
 		function add($array, $datafiles) {
-			$title = $this->mysql_prep($array['title']);
+			$title = htmlentities($this->mysql_prep($array['title']));
 			$status = $this->mysql_prep($array['status']);
 			$court = $this->mysql_prep($array['court']);
 			$reporter = $this->mysql_prep($array['reporter']);
@@ -259,34 +259,24 @@
 				$addition = "";
 			}
 			
-			$listReg = $caselaw_area->sortAll("active", "status");
 			$result = array();
-			for ($i = 0; $i < count($listReg); $i++) {
-				$tag = $listReg[$i]['title'];				
-				global $db;
-				try {
-					$sql = $db->query("SELECT * FROM `caselaw` WHERE ".$addition."`status` = 'active' AND `areas` LIKE '%".$tag."%' ORDER BY `title` ASC");
-				} catch(PDOException $ex) {
-					echo "An Error occured! ".$ex->getMessage(); 
+			global $db;
+			try {
+				//SELECT COUNT(*) AS `Rows`, `areas` FROM `caselaw` GROUP BY `areas` ORDER BY `areas`
+
+				$sql = $db->query("SELECT `ref`, `areas` FROM `caselaw` WHERE ".$addition."`status` = 'active' GROUP BY `areas` ORDER BY `areas` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			if ($sql) {
+				$result = array();
+				$count = 0;
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
+					$result[$count]['ref'] = $row['ref'];
+					$result[$count]['areas'] = $row['areas'];
+					$count++;
 				}
-				if ($sql) {
-					foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
-						$count = count($result[$tag]);
-						$result[$tag][$count]['ref'] = $row['ref'];
-						$result[$tag][$count]['section_ref'] = 0;
-						$result[$tag][$count]['title'] = $row['title'];
-						$result[$tag][$count]['status'] = $row['status'];
-						$result[$tag][$count]['court'] = $row['court'];
-						$result[$tag][$count]['areas'] = $row['areas'];
-						$result[$tag][$count]['owner'] = $row['owner'];
-						$result[$tag][$count]['year'] = $row['year'];
-						$result[$tag][$count]['reporter'] = $row['reporter'];
-						$result[$tag][$count]['file'] = $row['file'];
-						$result[$tag][$count]['create_time'] = $row['create_time'];
-						$result[$tag][$count]['modify_time'] = $row['modify_time'];
-					}
-					ksort($result);
-				}
+				ksort($result);
 			}
 			return $this->out_prep($result);
 		}

@@ -134,7 +134,8 @@
     <script type='text/javascript' src='js/jflickrfeed.js'></script>
     <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
     <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
-    <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+		<script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+		<script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
     <script type='text/javascript' src='js/frontEnd.js'></script>
     <script type='text/javascript' src="js/navAccordion.min.js"></script>
     

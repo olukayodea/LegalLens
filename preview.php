@@ -138,10 +138,7 @@
 
     <!-- start of sidebar -->
     <aside class="span4 page-sidebar">
-        <section class="widget">
-          <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>Last logged in: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br><a href="<?php echo URL; ?>managesubscription">Manage Subscription</a><br><a href="<?php echo URL; ?>support">Help and Support</a><br><a href="<?php echo URL; ?>userprofile">View profile</a><br><a href="<?php echo URL; ?>managesavedpages">Manage saved pages</a><br><a href="<?php echo URL; ?>?logout">Logout</a></div>
-            
-            <section class="widget">
+        <section class="widget">            
                 <div align="center">
                     <a href="<?php echo URL; ?>helpAndSupport" ><img src="<?php echo URL; ?>/images/help.png" width="100" /></a><br />
                     <h3 class="title">Need Help?</h3>
@@ -149,6 +146,8 @@
                 </div>
                 <?php $pages->advert(); ?>
             </section>
+
+    
 </aside>
             <!-- end of sidebar -->
     </div>

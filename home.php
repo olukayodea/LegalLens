@@ -4,37 +4,78 @@
 	include_once("includes/session.php");
 	
 	$list = $categories->sortAll(0, "parent_id", "status", "active");
-	$result = false;
+  $result = false;
+  
+	if ((isset($_GET['page'])) && (isset($_GET['tab'])) && ($_GET['tab'] == "case_law")) {
+    $page_count = 0;
+    $case_law_page_count = $_GET['page'];
+    $dic_page_count = 0;
+    $reg_page_count = 0;
+  } else if ((isset($_GET['page'])) && (isset($_GET['tab'])) && ($_GET['tab'] == "reg")) {
+    $page_count = 0;
+    $case_law_page_count = 0;
+    $dic_page_count = 0;
+    $reg_page_count = $_GET['page'];
+  } else if ((isset($_GET['page'])) && (isset($_GET['tab'])) && ($_GET['tab'] == "dic")) {
+    $page_count = 0;
+    $case_law_page_count = 0;
+    $dic_page_count = $_GET['page'];
+    $reg_page_count = 0;
+  } else if ((isset($_GET['page'])) && (isset($_GET['tab'])) && (intval($_GET['tab']) > 0)) {
+    $page_count = $_GET['page'];
+    $case_law_page_count = 0;
+    $dic_page_count = 0;
+    $reg_page_count = 0;
+  } else {
+    $page_count = 0;
+    $case_law_page_count = 0;
+    $dic_page_count = 0;
+    $reg_page_count = 0;
+  }
+
+  $page_array['law'] = $page_count;
+  $page_array['case_law'] = $case_law_page_count;
+  $page_array['dic'] = $dic_page_count;
+  $page_array['reg'] = $reg_page_count;
+
 	if (isset($_POST['s'])) {
-		$search_data = $_POST['s'];
+    $search_data = $_POST['s'];
 		$curTime = microtime(true);
-		$add = $search->create($_POST);
+		$add = $search->create($_POST, $page_array);
 		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
 		$reg = $add['reg'];
+		$reg_count = $add['reg_count'];
 		$case_law = $add['case_law'];
+		$case_law_count = $add['case_law_count'];
 		$dic = $add['dic'];
-		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
+    $dic_count = $add['dic_count'];
+    $total = $add['count'];
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
 		$postData = base64_encode(json_encode($_POST));
 		$result = true;
 	} else if (isset($_GET['q'])) {
-		$search_data = $_GET['q'];
+    $search_data = $_GET['q'];
+    $_GET['s'] = $_GET['q'];
 		$_GET['case_law'] = 1;
 		$_GET['reg_circular'] = 1;
 		$_GET['dic'] = 1;
-		$_GET['case_law'] = 1;
 		
 		for ($i = 0; $i < count($list); $i++) {
       $_GET['parameter'][] =  $list[$i]['ref']; 
     }
 		
 		$curTime = microtime(true);
-		$add = $search->create($_GET);
+		$add = $search->create($_GET, $page_array);
 		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
 		$reg = $add['reg'];
+		$reg_count = $add['reg_count'];
 		$case_law = $add['case_law'];
+		$case_law_count = $add['case_law_count'];
 		$dic = $add['dic'];
-		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
+		$dic_count = $add['dic_count'];
+    $total = $add['count'];
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
 		$postData = base64_encode(json_encode($_GET));
 		$result = true;
@@ -44,34 +85,48 @@
 		$raw = json_decode(base64_decode($data['data']), true);
 		$search_data = $raw['s'];
 		$curTime = microtime(true);
-		$add = $search->create($raw);
+    $add = $search->create($raw, $page_array);
 		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
 		$reg = $add['reg'];
-		$dic = $add['dic'];
+		$reg_count = $add['reg_count'];
 		$case_law = $add['case_law'];
-		$total = count($doc)+count($case_law)+count($reg)+count($rules)+count($dic)+count($forum_cat)+count($forum_title)+count($forum_post);
+		$case_law_count = $add['case_law_count'];
+		$dic = $add['dic'];
+    $dic_count = $add['dic_count'];
+    $total = $add['count'];
 		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
-		$postData = "";
+    $postData = $data['data'];
+    $result = true;
+  } else if (isset($_GET['query'])) {
+		$s = $common->get_prep($_GET['query']);
+		$raw = json_decode(base64_decode(urldecode(($_GET['query']))), true);
+		$search_data = $raw['s'];
+		$curTime = microtime(true);
+    $add = $search->create($raw, $page_array);
+		$doc = $add['doc'];
+		$doc_count = $add['doc_count'];
+		$reg = $add['reg'];
+		$reg_count = $add['reg_count'];
+		$case_law = $add['case_law'];
+		$case_law_count = $add['case_law_count'];
+		$dic = $add['dic'];
+    $dic_count = $add['dic_count'];
+    $total = $add['count'];
+		$timeConsumed = round(microtime(true) - $curTime,3)*10; 
+    $postData = $_GET['query'];
     $result = true;
   }
   $jsLisst = "";
+  $listCat = $categories->sortAll("0", "parent_id", "status", "active");
 ?>
 <!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
         <!--[if gt IE 8]><!--> <html lang="en-US"> <!--<![endif]-->
-        
-
 <head>
-    <meta charset="utf-8">
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-4142286148495329",
-    enable_page_level_ads: true
-  });
-</script>
+<meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({
@@ -80,7 +135,6 @@
   });
 </script>
 <!-- META TAGS -->
-<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Quick Find </title>
@@ -96,45 +150,93 @@
 <link href="SpryAssets/SpryValidationCheckbox.css" rel="stylesheet" type="text/css">
 <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
 <script>
-window.onload = function() {
-  var input = document.getElementById("s").focus();
-}
+  window.onload = function() {
+    var input = document.getElementById("s").focus();
+  }
 </script>
 <style>
-	/* Cosmetic only */
-	.easyPaginateNav a {padding:5px;}
-	.easyPaginateNav a.current {font-weight:bold;text-decoration:underline;}
+  tr:nth-child(even) {background: #EEE}
+  tr:nth-child(odd) {background: #FFF}
 </style>
         <?php $pages->chatHeader(); ?>
 </head>
 
-        <body>
-        
-                <!-- Start of Header -->
-                <div class="header-wrapper">
-                        <?php $pages->headerFiles(); ?>
-                </div>
-                <!-- End of Header -->
+  <body>
 
-                <!-- Start of Search Wrapper -->
-                <div class="search-area-wrapper_two">
-                </div>
-                <!-- End of Search Wrapper -->
+  <!-- Start of Header -->
+  <div class="header-wrapper">
+    <?php $pages->headerFiles(); ?>
+  </div>
+  <!-- End of Header -->
 
-                <!-- Start of Page Container -->
-                <div class="page-container">
-                <div class="container">
-                <div class="row">
-                    <div class="span3">
-				   <section class="widget">
-                        <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-                        Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-                        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-                        <?php $pages->sideMenu(); ?></div>
-                        </section>
-                    	<?php $pages->sidelinks(); ?>
-            </section>
-                	</div>
+  <!-- Start of Search Wrapper -->
+  <div class="search-area-wrapper_two">
+  </div>
+  <!-- End of Search Wrapper -->
+
+  <!-- Start of Page Container -->
+  <div class="page-container">
+  <div class="container">
+  <div class="row">
+  <div class="span3">
+  <?php if ($result == true) { ?>
+    <section class="widget">
+      <h3>Document Filter</h3>
+      <?php for ($i = 0; $i < count($listCat); $i++) { ?>
+        <label><input type="checkbox" name="filter[]" id="filter_<?php echo $i; ?>" class="filter_<?php echo $listCat[$i]['ref'] ; ?>" data-main="yes" value="<?php echo $listCat[$i]['ref']; ?>">&nbsp;<?php echo ucfirst(strtolower($listCat[$i]['title'])); ?></label>
+        <?php echo $categories->gettreeCheckBox($listCat[$i]['ref']); ?>
+      <?php } ?>
+      <script language="javascript">
+        $("input[type='checkbox']").each(function(){
+          
+          $(this).click(function(){
+            $('#search_result').html("<br><br>Getting result list");
+            var c = $(this).attr("class");
+            var m =  $(this).attr("data-main");
+            if (m == "yes") {
+              if($(this).is(":checked")){
+                $("."+c).attr("checked",true);
+              }else{
+                $("."+c).attr("checked",false);
+              }
+            }
+            var s = $('#s').val();
+            if ($('#dic').is(':checked')) {
+              var dic = 1;
+            } else {
+              var dic = 0;
+            }
+            if ($('#reg_circular').is(':checked')) {
+              var reg_circular = 1;
+            } else {
+              var reg_circular = 0;
+            }
+            if ($('#case_law').is(':checked')) {
+              var case_law = 1;
+            } else {
+              var case_law = 0;
+            }
+            
+            var other_data = "search_"+s+":dic_"+dic+":reg_"+reg_circular+":case_"+case_law
+
+            var checked = []
+            $("input[name='filter[]']:checked").each(function ()
+            {
+                checked.push(parseInt($(this).val()));
+            });
+
+            $.post( "home_search.php", { parameter: checked, other_data: other_data })
+            .done(function( data ) {
+              $('#search_result').html(data);
+            });
+          })
+        })
+      </script>
+    </section>
+      <?php } ?>
+    <?php $pages->sidelinks(); ?>
+    
+  </div>
 
 <div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
@@ -158,21 +260,24 @@ window.onload = function() {
       </div>
       <div id="search-error-container2"></div>
 		</form>
-	 </div>
+   </div>
+   <div id="search_result">
      <?php if ($result == true) { ?>
        <h4 style="" align="center">Search Result</h4>
-       <p>Your search for "<?php echo $search_data; ?>" brought <?php echo number_format($total); ?> results in <?php echo number_format($timeConsumed, 3)." seconds"; ?>, <a href="Javascript:void(0)" onClick="saveResult()">click here to save search result</a>
+       <p>Your search for "<?php echo $search_data; ?>" brought <?php echo number_format($total); ?> results in <?php echo number_format($timeConsumed, 3)." seconds"; ?>,<br>
+       <a href="Javascript:void(0)" onClick="saveResult()"><i class="fa fa-floppy-o" aria-hidden="true"></i>
+ click here to save search result</a>
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#1" data-toggle="tab">Case Law (<?php echo number_format(count($case_law)); ?>)</a></li>
+            <li <?php if ((!isset($_GET['tab'])) || ($_GET['tab'] == 'case_law')) { ?>class="active"<?php } ?>><a href="#1" data-toggle="tab">Case Law (<?php echo number_format($case_law_count); ?>)</a></li>
             <?php foreach ($doc as $key => $value) { ?>
-            <li><a href="#2_<?php echo $key; ?>" data-toggle="tab"><?php echo $categories->getOneField($key); ?> (<?php echo number_format(count($doc[$key])); ?>)</a></li>
+            <li <?php if ((isset($_GET['tab'])) && ($_GET['tab'] == $key)) { ?>class="active"<?php } ?>><a href="#2_<?php echo $key; ?>" data-toggle="tab"><?php echo $categories->getOneField($key); ?> (<?php echo number_format($doc_count[$key]); ?>)</a></li>
             <?php } ?>
-            <li><a href="#3" data-toggle="tab">Regulations (<?php echo number_format(count($reg)); ?>)</a></li>
-            <li><a href="#4" data-toggle="tab">Dictionary (<?php echo number_format(count($dic)); ?>)</a></li>
+            <li <?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'reg')) { ?>class="active"<?php } ?>><a href="#3" data-toggle="tab">Regulations (<?php echo number_format($reg_count); ?>)</a></li>
+            <li <?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'dic')) { ?>class="active"<?php } ?>><a href="#4" data-toggle="tab">Dictionary (<?php echo number_format($dic_count); ?>)</a></li>
         </ul>
     
         <div class="tab-content">
-            <div class="tab-pane active" id="1">
+            <div class="tab-pane<?php if ((!isset($_GET['tab'])) || ($_GET['tab'] == 'case_law')) { ?> active<?php } ?>" id="1">
 				<?php if (count($case_law) > 0) { ?>
                     <table width="100%" border="0" id="example4">
                     <thead>
@@ -183,14 +288,14 @@ window.onload = function() {
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $case_law_page_count*page_list;
 					  for ($i = 0; $i < count($case_law); $i++) {
 						  $count++ ?>
                        <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
                        <td><p>
                   <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
-                   <cite><?php echo $case_law[$i]['citation']; ?></cite><br>
+                   <cite><strong><?php echo $case_law[$i]['citation']; ?></strong></cite><br>
                    <strong style="color:#00F"><?php echo $common->getLine($case_law[$i]['section_content']); ?></strong><br></a>
                    <?php echo nl2br($common->truncate($case_law[$i]['section_content'], 250)); ?><br>
                    <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">read more</a></p>
@@ -205,12 +310,13 @@ window.onload = function() {
                       </tr>
                     </tfoot>
                     </table>
+                    <?php $pagination->draw($case_law_page_count, $postData, $case_law_count, $redirect, 'case_law'); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
             <?php foreach ($doc as $key => $value) { ?>
-            <div class="tab-pane" id="2_<?php echo $key; ?>">
+            <div class="tab-pane<?php if ((isset($_GET['tab'])) && ($_GET['tab'] == $key)) { ?> active<?php } ?>" id="2_<?php echo $key; ?>">
 				<?php if (count($doc[$key]) > 0) {
           $jsLisst .= "#table_".$key.","; ?>
                     <table width="100%" border="0" id="table_<?php echo $key; ?>">
@@ -222,7 +328,7 @@ window.onload = function() {
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $page_count*page_list;
 					  for ($i = 0; $i < count($doc[$key]); $i++) {
 						  $count++ ?>
                        <tr>
@@ -242,12 +348,13 @@ window.onload = function() {
                       </tr>
                     </tfoot>
                     </table>
+                    <?php $pagination->draw($page_count, $postData, $doc_count[$key], $redirect, $key); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
             <?php } ?>
-            <div class="tab-pane" id="3">
+            <div class="tab-pane<?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'reg')) { ?> active<?php } ?>" id="3">
 				<?php if (count($reg) > 0) { ?>
                     <table width="100%" border="0" id="example4">
                     <thead>
@@ -258,7 +365,7 @@ window.onload = function() {
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $reg_page_count*page_list;
 					  for ($i = 0; $i < count($reg); $i++) {
 						  $count++ ?>
                           <tr>
@@ -284,11 +391,12 @@ window.onload = function() {
                       </tr>
                     </tfoot>
                     </table>
+                    <?php $pagination->draw($reg_page_count, $postData, $reg_count, $redirect, 'reg'); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
             </div>
-            <div class="tab-pane" id="4">
+            <div class="tab-pane<?php if ((isset($_GET['tab'])) && ($_GET['tab'] == 'dic')) { ?> active<?php } ?>" id="4">
 				<?php if (count($dic) > 0) { ?>
                     <table width="100%" border="0" id="example5">
                     <thead>
@@ -299,7 +407,7 @@ window.onload = function() {
                     </thead>
                     <tbody>
 					  <?php 
-					  $count = 0;
+					  $count = $dic_page_count*page_list;
 					  for ($i = 0; $i < count($dic); $i++) {
 						  $count++ ?>
                           <tr>
@@ -316,6 +424,7 @@ window.onload = function() {
                       </tr>
                     </tfoot>
                     </table>
+                    <?php $pagination->draw($dic_page_count, $postData, $dic_count, $redirect, 'dic'); ?>
                 <?php } else { ?>
                     <p>No result for this item now</p>
                 <?php } ?>
@@ -323,75 +432,67 @@ window.onload = function() {
         </div>
     <?php } ?>
    </div>
+   </div>
 </div>
 <?php $pages->rightColumnAdvert(); ?>   
 </div>
 </div>
-                <!-- End of Page Container -->
+  <!-- End of Page Container -->
 
-                <!-- Start of Footer -->
-                <footer id="footer-wrapper">
-                        <?php $pages->footer(); ?>
-                        <!-- end of #footer -->
+  <!-- Start of Footer -->
+  <footer id="footer-wrapper">
+  <?php $pages->footer(); ?>
+  <!-- end of #footer -->
 
-                        <!-- Footer Bottom -->
-                       <?php $pages->footerButtom(); ?>
-                        <!-- End of Footer Bottom -->
-                </footer>
-                <!-- End of Footer -->
+  <!-- Footer Bottom -->
+  <?php $pages->footerButtom(); ?>
+  <!-- End of Footer Bottom -->
+  </footer>
+  <!-- End of Footer -->
 
-                <a href="#top" id="scroll-top"></a>
+  <a href="#top" id="scroll-top"></a>
 
-                <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->
-                <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>
-                <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
-                <script type='text/javascript' src='js/jquery.liveSearchd5f7.js?ver=2.0'></script>
-				<script type='text/javascript' src='js/jflickrfeed.js'></script>
-                <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
-                <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
-                <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
-                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
-                <script type='text/javascript' src='js/frontEnd.js'></script>
-				<script type='text/javascript' src="js/navAccordion.min.js"></script>
-                
-                <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-                <script language="javascript" src="js/bootstrap.min.js"></script>
-                <script src="js/pagination.js"></script>
-				<link rel="stylesheet" href="css/jquery.ui.datatables.css">
-                <script src="management/plugins/datatables/jquery.dataTables.min.js"></script>
-				<script type="text/javascript">
-                    var sprycheckbox1 = new Spry.Widget.ValidationCheckbox("sprycheckbox1");
-					$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-						//something
-					});
-                    $(function() {
-        				$("#example1,<?php echo $jsLisst; ?>#example4,#example5").dataTable( {
-						  "pageLength": 50,
-						  "bLengthChange": false,
-						  "bFilter":false
-						  
-						} );
-                        $( "#s" ).autocomplete({
-                          source: "includes/scripts/auto_home.php?type=SAN"
-                        });
-                    });
-					
-					function saveResult() {
-						var data = '<?php echo $postData; ?>';
-						if (data != "") {
-							var person = prompt("Please enter a name for the search result", "");
-							if ((person != null) && (person.length > 0)) {
-								$.post( "includes/scripts/search_result.php", { data: data, title: person } );
-								alert("Search result saved as "+person);
-							} else {
-								saveResult();
-							}
-						}else {
-							alert("You cannot save this page");
-						}
-					}
-				</script>
-        </body>
+  <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->
+  <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>
+  <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
+  <script type='text/javascript' src='js/jquery.liveSearchd5f7.js?ver=2.0'></script>
+  <script type='text/javascript' src='js/jflickrfeed.js'></script>
+  <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
+  <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
+  <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+  <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
+  <script type='text/javascript' src='js/frontEnd.js'></script>
+  <script type='text/javascript' src="js/navAccordion.min.js"></script>
+  
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script language="javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    var sprycheckbox1 = new Spry.Widget.ValidationCheckbox("sprycheckbox1");
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    //something
+    });
+    $(function() {
+      $( "#s" ).autocomplete({
+        source: "includes/scripts/auto_home.php?type=SAN"
+      });
+    });
+
+    function saveResult() {
+      var data = '<?php echo $postData; ?>';
+      if (data != "") {
+        var person = prompt("Please enter a name for the search result", "");
+        if ((person != null) && (person.length > 0)) {
+          $.post( "includes/scripts/search_result.php", { data: data, title: person } );
+          alert("Search result saved as "+person);
+        } else {
+          saveResult();
+        }
+      }else {
+        alert("You cannot save this page");
+      }
+    }
+  </script>
+  </body>
 
 
 </html>

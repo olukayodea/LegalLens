@@ -155,6 +155,14 @@ var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "emai
 var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3");
 var sprytextarea1 = new Spry.Widget.ValidationTextarea("sprytextarea1");
         </script>
+          <script src="https://www.google.com/recaptcha/api.js?render=6LcWZo8UAAAAABUYrbZ_lqFVn_qvvjcwTP2BWUaF"></script>
+  <script>
+  grecaptcha.ready(function() {
+      grecaptcha.execute('6LcWZo8UAAAAABUYrbZ_lqFVn_qvvjcwTP2BWUaF', {action: 'homepage'}).then(function(token) {
+         ...
+      });
+  });
+  </script>
         </body>
 
 

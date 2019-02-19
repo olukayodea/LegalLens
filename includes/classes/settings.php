@@ -2,6 +2,7 @@
 	class settings extends common {
 		function add($array) {
 			$page_view = $this->mysql_prep($array['page_view']);
+			$page_list = $this->mysql_prep($array['page_list']);
 			$instagram = $this->mysql_prep($array['instagram']);
 			$facebook = $this->mysql_prep($array['facebook']);
 			$flickr = $this->mysql_prep($array['flickr']);
@@ -18,6 +19,7 @@
 			$country = $this->mysql_prep($array['country']);
 
 			$this->modify("page_view", $page_view);
+			$this->modify("page_list", $page_list);
 			$this->modify("instagram", $instagram);
 			$this->modify("facebook", $facebook);
 			$this->modify("flickr", $flickr);

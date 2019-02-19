@@ -169,7 +169,5 @@
 				<script type='text/javascript' src="js/navAccordion.min.js"></script>
 
         </body>
-
-
 </html>
 

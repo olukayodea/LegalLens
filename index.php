@@ -65,8 +65,8 @@
 			
 			header("location: ./?error=".urlencode($er));
 		}
-    } else if (isset($_POST['registerButton'])) {
-		$add = $users->create($_POST);
+  } else if (isset($_POST['registerButton'])) {
+		echo $add = $users->create($_POST);
 		
 		if ($add) {
 			header("location: home");
@@ -443,6 +443,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <script type='text/javascript' src='js/jquery.form.js'></script>
                 <script type='text/javascript' src='js/jquery.validate.min.js'></script>
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
                 <script type='text/javascript' src='js/custom.js'></script>
         <script type="text/javascript">
 <?php if (isset($_REQUEST['register'])) { ?>

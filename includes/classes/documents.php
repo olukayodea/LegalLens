@@ -2,7 +2,7 @@
 	class documents extends common {
 		function add($array) {
 			global $categories;
-			$title = (($this->mysql_prep($array['title'])));
+			$title = htmlentities(($this->mysql_prep($array['title'])));
 			$cat = $this->mysql_prep($array['cat_id']);
 			$category_name = $this->mysql_prep($array['cat']);
 			$owner = $this->mysql_prep($array['owner']);

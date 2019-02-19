@@ -1,7 +1,7 @@
 <?php
 	class advert extends common {
 		function add($array, $file) {
-			$title = $this->mysql_prep($array['title']);
+			$title = htmlentities($this->mysql_prep($array['title']));
 			$status = $this->mysql_prep($array['status']);
 			$duration= strtotime($this->mysql_prep($array['duration']));
 			$url = $this->mysql_prep($array['url']);

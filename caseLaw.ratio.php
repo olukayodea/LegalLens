@@ -1,36 +1,28 @@
 <?php
-	$redirect = "mobile_clause.data";
+	$redirect = "caseLaw.ratio";
 	include_once("includes/functions.php");
-	//include_once("includes/session.php");
+	include_once("includes/session.php");
 	
 	if (isset($_REQUEST['id'])) {
 		$id = $common->get_prep($_REQUEST['id']);
 		$tag = "Documents issued by ".$id;
 	} else {
-		header("location: clause");
+		header("location: caseLaw");
+	}
+	if (isset($_REQUEST['jump'])) {
+		$jump = intval($common->get_prep($_REQUEST['jump']));
+	} else {
+		$jump = 0;
 	}
 	
-	if (isset($_REQUEST['view'])) {
-		$view = $common->get_prep($_REQUEST['view']);
+	$data = $caselaw->getOne($id);
+	if ($jump == 0) {
+		$list = $caselaw->sortAll($id, "areas", "status", "active", false, false, 'title');
 	} else {
-		header("location: clause");
-	}
-	
-	if ($view == "Clauses") {
-		$data = $drafting->getOne($id);
-		$list = $drafting_sections->sortAll($id, "drafting", "status", "active");
-	} else if ($view == "Agreement") {
-		$data = $drafting->getOne($id);
-		$list = $drafting_sections->sortAll($id, "drafting", "status", "active");
-	} else if ($view == "Forms") {
-		$data = $drafting->getOne($id);
-		$list = $drafting_sections->sortAll($id, "drafting", "status", "active");
-	} else {
-		$data = $drafting->getOne($drafting_sections->getOneField($id, "ref", "drafting"));
-		$list = $drafting_sections->sortAll($id, "ref", "status", "active");
+		$list = $caselaw->sortAll($id, "areas", "status", "active", "ref", $jump);
 	}
 ?>
-<!doctype html>
+<!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
@@ -62,38 +54,57 @@
 
         <body>
 
-                <!-- Start of Page Container -->
-                <div>
-                <div>
-                
+                <!-- Start of Header -->
+                <div class="header-wrapper">
+                        <?php $pages->headerFiles(); ?>
+                </div>
+                <!-- End of Header -->
 
-<div>
+                <!-- Start of Search Wrapper -->
+                <div class="search-area-wrapper_two">
+                </div>
+                <!-- End of Search Wrapper -->
+
+                <!-- Start of Page Container -->
+                <div class="page-container">
+                <div class="container">
+                <div class="row">
+                    <div class="span3">
+                    	<?php $pages->sidelinks(); ?>
+    
+                	</div>
+
+<div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
-       <h3 style="" align="center"><?php echo $data['title']; ?></h3>
+       <h3 style="" align="center"><?php echo ucfirst(strtolower($id)); ?></h3>
        <?php for ($i = 0; $i < count($list); $i++) { ?>
-       <p><?php if ($list[$i]['section_no'] != "") { ?>
-       <strong><?php echo $list[$i]['section_no']; ?></strong><br>
-       <?php } ?>
-       <?php echo nl2br($list[$i]['section_content']); ?></p>
-       <?php if ($list[$i]['file'] != "") {
-       if ($view != "Clauses") { ?>
-       <p><a href="<?php echo URL; ?>library/agreement/<?php echo $list[$i]['file']; ?>" target="_blank">Click here to download file</a></p>
-       <?php } ?>
-       <p><object data="<?php echo URL; ?>library/agreement/<?php echo $list[$i]['file']; ?>" width="100%" height="800px"></object></p>
-       <?php } ?>
+        <?php echo $i+1; ?>&nbsp;&nbsp;&nbsp;<strong><a href="<?php echo URL; ?>caselaw.view?id=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a></strong><br>
        <?php } ?>
        
 	 </div>
 
    </div>
 </div>
-                  </div> <!--end row -->      
+<?php $pages->rightColumnAdvert(); ?>
+                </div> <!--end row -->      
 			</div><!-- end container-->
                 </div>
                 <!-- End of Page Container -->
 
+                <!-- Start of Footer -->
+                <footer id="footer-wrapper">
+                        <?php $pages->footer(); ?>
+                        <!-- end of #footer -->
+
+                        <!-- Footer Bottom -->
+                       <?php $pages->footerButtom(); ?>
+                        <!-- End of Footer Bottom -->
+                </footer>
+                <!-- End of Footer -->
+
                 <a href="#top" id="scroll-top"></a>
+
                 <!-- script -->
                <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->
                 <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>

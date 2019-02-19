@@ -2,25 +2,48 @@
 	class drafting extends common {
 		function add($array) {
 			$categories = new categories;
-			$title = ucfirst(strtolower($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucfirst(strtolower($this->mysql_prep($array['title']))));
 			$type = $this->mysql_prep($array['type']);
 			$owner = $this->mysql_prep($array['owner']);
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);
 			
+			global $db;
+			$value_array = array(
+							':title' => $title, 
+							':type' => $type,
+							':owner' => $owner,
+							':status' => $status, 
+							':create_time' => $create_time,
+							':modify_time' => $modify_time
+							);
 			if ($ref != "") {
 				$firstpart = "`ref`, ";
-				$secondPArt = "'".$ref."', ";
+				$secondPArt = ":ref, ";
+				$value_array[':ref'] = $ref;
 				$log = "Modified object ".$title;
 			} else {
 				$firstpart = "";
 				$secondPArt = "";
 				$log = "Created object ".$title;
+			}			
+			
+			try {
+				$sql = $db->prepare("INSERT INTO `list_library` (".$firstpart."`title`, `type`, `owner`, `status`, `create_time`, `modify_time`) 
+				VALUES (".$secondPArt.":title, :type, :owner, :status, :create_time, :modify_time)
+					ON DUPLICATE KEY UPDATE 
+						`title` = :title,
+						`type` = :type,
+						`owner` = :owner,
+						`status` = :status,
+						`modify_time` = :modify_time
+					");
+				$sql->execute($value_array);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
-			
-			$sql = mysql_query("INSERT INTO `drafting` (".$firstpart."`title`,`type`,`owner`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$title."','".$type."','".$owner."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `title` = '".$title."',`type`='".$type."',`status`='".$status."', `modify_time` = '".$modify_time."'") or die (mysql_error());
-			
+
 			if ($sql) {
 				$id = $db->lastInsertId();
 				
@@ -42,9 +65,26 @@
 		function remove($id) {
 			$id = $this->mysql_prep($id);
 			$modDate = time();
-			$sql = mysql_query("DELETE FROM `drafting` WHERE ref = '".$id."'") or die (mysql_error());
-			$sql = mysql_query("DELETE FROM `drafting_sections` WHERE drafting = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `drafting` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			try {
+				$sql = $db->prepare("DELETE FROM `drafting_sections` WHERE `drafting` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 			
 				//add to log
@@ -65,11 +105,21 @@
 		function modifyOne($tag, $value, $id) {
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
-			$modDate = time();
-			$sql = mysql_query("UPDATE `drafting` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
+			$modDate = time();			
 			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `drafting` SET  `".$tag."` = :value, `modify_time` = '".$modDate."' WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modify_time' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
-				
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -86,13 +136,15 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `drafting` ORDER BY `title` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
 					$result[$count]['type'] = $row['type'];
@@ -107,12 +159,15 @@
 		}
 		
 		function listAllHome($type) {
-			$sql = mysql_query("SELECT * FROM `drafting` WHERE `type` = '".$type."' AND `status` = 'active' ORDER BY `title` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `type` = '".$type."' AND `status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$tag = substr(ucwords(strtolower($row['title'])), 0, 1);
 					$count = count($result[$tag]);
 					$result[$tag][$count]['ref'] = $row['ref'];
@@ -129,14 +184,15 @@
 		}		
 		
 		function quickSearch($val, $type) {
-			$val = $this->mysql_prep($val);
-			$sql = mysql_query("SELECT * FROM `drafting` WHERE `title` LIKE '%".$val."%' AND `type` = '".$type."' AND `status` = 'active' ORDER BY `title` ASC LIMIT 20") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `title` LIKE '%".$val."%' AND `type` = '".$type."' AND `status` = 'active' ORDER BY `title` ASC LIMIT 20");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['label'] = ucwords(strtolower($row['title']));
 					$result[$count]['category'] = "Draft Clauses";
 					$result[$count]['type'] = "Clauses";
@@ -148,14 +204,15 @@
 		}		
 		
 		function quickSearchSections($val, $type) {
-			$val = $this->mysql_prep($val);
-			$sql = mysql_query("SELECT `drafting`.`title`, `drafting`.`ref` AS 'draft_ID', `drafting_sections`.`section_content`, `drafting_sections`.`tags`, `drafting_sections`.`ref` AS 'section_ID' FROM `drafting`, `drafting_sections` WHERE `drafting`.`ref` = `drafting_sections`.`drafting` AND `drafting`.`status` = 'active' AND `drafting_sections`.`status` = 'active' AND `drafting`.`type` = '".$type."' AND (`drafting_sections`.`tags` LIKE '%".$val."%' OR `drafting_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`drafting_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `title` ASC LIMIT 20") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT `drafting`.`title`, `drafting`.`ref` AS 'draft_ID', `drafting_sections`.`section_content`, `drafting_sections`.`tags`, `drafting_sections`.`ref` AS 'section_ID' FROM `drafting`, `drafting_sections` WHERE `drafting`.`ref` = `drafting_sections`.`drafting` AND `drafting`.`status` = 'active' AND `drafting_sections`.`status` = 'active' AND `drafting`.`type` = '".$type."' AND (`drafting_sections`.`tags` LIKE '%".$val."%' OR `drafting_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`drafting_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `title` ASC LIMIT 20");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['label'] = substr(ucwords(strtolower($row['section_content'])), 0, 50)."...";
 					$result[$count]['category'] = "Section found in ".$row['title'];
 					$result[$count]['type'] = "Section";
@@ -168,12 +225,15 @@
 		
 		function fullSearch($val, $type) {
 			$val = $this->mysql_prep($val);
-			$sql = mysql_query("SELECT `drafting`.`title`, `drafting`.`ref`, `drafting`.`type`, `drafting`.`status`, `drafting`.`create_time`, `drafting`.`modify_time` FROM `drafting`, `drafting_sections` WHERE `drafting`.`ref` = `drafting_sections`.`drafting` AND `drafting`.`status` = 'active' AND `drafting_sections`.`status` = 'active' AND `drafting`.`type` = '".$type."' AND (`drafting`.`title` LIKE '%".$val."%' OR `drafting_sections`.`tags` LIKE '%".$val."%' OR `drafting_sections`.`tags` LIKE '%".$val."%' OR `drafting_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`drafting_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `title` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT `drafting`.`title`, `drafting`.`ref`, `drafting`.`type`, `drafting`.`status`, `drafting`.`create_time`, `drafting`.`modify_time` FROM `drafting`, `drafting_sections` WHERE `drafting`.`ref` = `drafting_sections`.`drafting` AND `drafting`.`status` = 'active' AND `drafting_sections`.`status` = 'active' AND `drafting`.`type` = '".$type."' AND (`drafting`.`title` LIKE '%".$val."%' OR `drafting_sections`.`tags` LIKE '%".$val."%' OR `drafting_sections`.`tags` LIKE '%".$val."%' OR `drafting_sections`.`section_content` LIKE '%".$val."%' OR MATCH(`drafting_sections`.`section_content`) AGAINST ('".$val."')) ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$tag = substr(ucwords(strtolower($row['title'])), 0, 1);
 					$count = count($result[$tag]);
 					$result[$tag][$count]['ref'] = $row['ref'];
@@ -214,13 +274,16 @@
 		
 		function lisstMultiple($array) {
 			$list = implode(",", $array);
-			$sql = mysql_query("SELECT * FROM `drafting` WHERE ref IN (".$list.") ORDER BY `title` ASC") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE ref IN (".$list.") ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
 					$result[$count]['type'] = $row['type'];
@@ -234,28 +297,35 @@
 			}
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order='ref', $dir="ASC") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
 			
-			$sql = mysql_query("SELECT * FROM `drafting` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` ASC") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `drafting` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ".$dir);
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
 					$result[$count]['type'] = $row['type'];
@@ -271,12 +341,24 @@
 		
 		function getOne($id, $tag='ref') {
 			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `drafting` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
+
+
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM drafting WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			if ($sql) {
 				$result = array();
 				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
+				if ($sql->rowCount() == 1) {
+					$row = $sql->fetch(PDO::FETCH_ASSOC);
 					$result['ref'] = $row['ref'];
 					$result['title'] = ucwords(strtolower($row['title']));
 					$result['type'] = $row['type'];

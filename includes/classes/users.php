@@ -331,6 +331,8 @@
 			$phone = $this->mysql_prep($array['phone']);
 			$subscription_type = "";
 			$subscription = "";
+			$subscription_group = "";
+			$status = "NEW";
 			$date_time = time();
 			$modify_time = time();
 			
@@ -338,7 +340,7 @@
 
 				global $db;
 				try {
-					$sql = $db->prepare("INSERT INTO `users` (`last_name`,`password`,`username`,`other_names`,`email`,`phone`,`subscription_type`,`subscription`,`status`,`date_time`,`modify_time`) VALUES (:last_name,:password,:username,:other_names,:email,:phone,:subscription_type,:subscription,:status,:date_time,:modify_time)");
+					$sql = $db->prepare("INSERT INTO `users` (`last_name`,`password`,`username`,`other_names`,`email`,`phone`,`subscription_group`,`subscription_type`,`subscription`,`status`,`date_time`,`modify_time`) VALUES (:last_name,:password,:username,:other_names,:email,:phone,:subscription_group,:subscription_type,:subscription,:status,:date_time,:modify_time)");
 					$sql->execute(array(
 								':last_name' => $last_name, 
 								':password' => sha1($password), 
@@ -385,7 +387,8 @@
 				$loginArray['email'] = $email;
 				$loginArray['password'] = $password;
 				$login = $this->login($loginArray);
-				return $ref;
+				
+				return $id;
 			} else {
 				return false;
 			}

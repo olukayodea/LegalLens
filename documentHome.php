@@ -75,15 +75,9 @@
                 <div class="container">
                 <div class="row">
                     <div class="span3">
-				   <section class="widget">
-                        <div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>
-                       Current session started: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br>
-                        Last logged in: <?php echo @date('l jS \of F Y h:i:s A', $last_login); ?><br>
-                        <?php $pages->sideMenu(); ?></div>
-                   	  </section>
-<section>
-                    	<?php $pages->sidelinks(); ?>
-            </section>
+                        <?php $pages->sidelinks(); ?>
+                        
+    
                 	</div>
 
 <div class="span7">
@@ -148,12 +142,15 @@
                 <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
                 <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
                 <script type='text/javascript' src='js/frontEnd.js'></script>
 				<script type='text/javascript' src="js/navAccordion.min.js"></script>
                 
                 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
                 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-                <script src="js/pagination.js"></script>
+  
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script language="javascript" src="js/bootstrap.min.js"></script>
                 
                 
 	<script>
