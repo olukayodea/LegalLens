@@ -140,13 +140,26 @@
                                 
                                   </tr>
                                  <tr>
-                                <td width="25%">Payment Model</td>
-                                <td><select name="payment_type" id="payment_type" class="form-control" required>
+                                <td width="25%">Payment Channel</td>
+                                <td><select name="payment_type" id="payment_type" class="form-control" required onChange="getPayment(this.value)">
                                   <option value="">Select One</option>
                                   <option value="Online">Online Payment</option>
                                   <option value="Others">Other Channels</option>
                                 </select></td>
                                   </tr>
+                                 <tr>
+                                <td width="25%">Payment Frequency</td>
+                                <td><select name="payment_frequency" id="payment_frequency" class="form-control" required disabled>
+                                  <option value="Single">Single Payment</option>
+                                  <option value="Renew">Auto Renew</option>
+                                </select></td>
+                                  </tr>
+                                 <div id="showCard" style="display:none;">
+                                  <tr>
+                                   <td>Subscription Fees</td>
+                                   <td align="right"><span id="s_fee"><?php echo NGN; ?> 0.00</span></td>
+                                 </tr>
+                                 </div>
                                  <tr>
                                    <td>Subscription Fees</td>
                                    <td align="right"><span id="s_fee"><?php echo NGN; ?> 0.00</span></td>

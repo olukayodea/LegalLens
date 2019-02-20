@@ -66,11 +66,11 @@ function getbill(val, users) {
 			document.getElementById('n_total').innerHTML = "&#8358; "+formatNumber(myJson[3]);
 			document.getElementById('total').value = myJson[3];
 			if (myJson[3] < 1) {
-				document.getElementById('payment_type').setAttribute("readonly", "readonly");
-				alert("hide");
+				document.getElementById('payment_type').setAttribute("disabled", "disabled");
+				document.getElementById('payment_frequency').setAttribute("disabled", "disabled");
 			} else {
-				document.getElementById('payment_type').removeAttribute("readonly");
-				alert("show");
+				document.getElementById('payment_type').removeAttribute("disabled");
+				document.getElementById('payment_frequency').removeAttribute("disabled");
 			}
 		} else {
 			alert("An error occured, please try again later");
@@ -78,6 +78,14 @@ function getbill(val, users) {
 	})
 	.fail(function(data) {
 	});
+}
+
+function getPayment(val) {
+	if (val == "Online") {
+		document.getElementById('payment_frequency').removeAttribute("disabled");
+	} else {
+		document.getElementById('payment_frequency').setAttribute("disabled", "disabled");
+	}
 }
 
 function toggleStatus(val) {
