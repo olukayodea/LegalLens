@@ -2,8 +2,8 @@
 	class faq extends common {
 		function add($array) {
 			$ref = $this->mysql_prep($array['ref']);
-			$title = $this->mysql_prep($array['title']);
-			$content = $this->mysql_prep($array['content']);
+			$title = htmlentities($this->mysql_prep($array['title']));
+			$content = htmlentities($this->mysql_prep($array['content']));
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();
 			

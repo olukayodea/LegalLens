@@ -7,6 +7,7 @@
 			$key = $data[0];
 			$mode = strtolower($data[1]);
 			$action = strtolower($data[2]);
+			$string = strtolower($data[3]);
 			
 			//get additional data			
 			$return = false;
@@ -29,10 +30,12 @@
 								if ($login == 0) {
 									$return['header']['status'] = "ERROR";
 									$return['header']['code'] = "107";
+									$return['header']['error'] = "Invalid login";
 									//invalid login
 								} else if ($login == 1) {
 									$return['header']['status'] = "ERROR";
 									$return['header']['code'] = "108";
+									$return['header']['error'] = "login on three or more devices";
 									//login on three or more devices
 								} else {
 									$return['header']['status'] = 'DONE';
@@ -40,6 +43,49 @@
 									$return['header']['completedTime'] = date('l jS \of F Y h:i:s A');
 									$login['current_time'] = time();
 									$return['body'] = $login;
+								}
+								break;
+							case "register";
+								$array_data = $app_data['user'];
+								$register = $users->create($array_data);
+								if ($register) {
+									$return['header']['status'] = 'DONE';
+									$return['header']['code'] = "200";
+									$return['header']['completedTime'] = date('l jS \of F Y h:i:s A');
+									$return['body'] = $login;
+								} else {
+									$return['header']['status'] = "ERROR";
+									$return['header']['code'] = "107";
+									$return['header']['error'] = "Invalid registration";
+									//invalid registration
+								}
+								break;
+							case "changepassword";
+								$array_data = $app_data['user'];
+								$register = $users->activate($array_data['newPassword'], $array_data['ref']);
+								if ($register) {
+									$return['header']['status'] = 'DONE';
+									$return['header']['code'] = "200";
+									$return['header']['completedTime'] = date('l jS \of F Y h:i:s A');
+								} else {
+									$return['header']['status'] = "ERROR";
+									$return['header']['code'] = "107";
+									$return['header']['error'] = "Invalid activation";
+									//invalid activation
+								}
+								break;
+							case "passwordreset";
+								$pass = $users->passwordReset($this->mysql_prep($string));
+								if ($pass) {
+									$return['header']['status'] = 'DONE';
+									$return['header']['code'] = "200";
+									$return['header']['completedTime'] = date('l jS \of F Y h:i:s A');
+									$return['header']['message'] = "Please check ".$string." for details on how to create a new password";
+								} else {
+									$return['header']['status'] = "ERROR";
+									$return['header']['code'] = "107";
+									$return['header']['error'] = "we can not verify this email address, or the user with this email address does not exist on our system. If you believe this email address is correct, please contact the administrator";
+									//invalid registration
 								}
 								break;
 							case "logout":
@@ -67,10 +113,12 @@
 									} else {
 										$return['header']['status'] = "ERROR";
 										$return['header']['code'] = "116";
+										$return['header']['error'] = "cannot get details";
 									}
 								} else {
 									$return['header']['status'] = "ERROR";
 									$return['header']['code'] = "100";
+									$return['header']['error'] = "user not logged in";
 								}
 								break;
 							case "updatedetails":
@@ -87,13 +135,17 @@
 									} else {
 										$return['header']['status'] = "ERROR";
 										$return['header']['code'] = "110";
+										$return['header']['error'] = "update not complete";
 									}
 								} else {
 									$return['header']['status'] = "ERROR";
 									$return['header']['code'] = "100";
+									$return['header']['error'] = "user not logged in";
 								}
 								break;
 						}
+						break;
+					case "subscription":
 						break;
 					case "quickfind":
 						if ($usersControl->checkLogin($app_id) == true) {
@@ -133,6 +185,7 @@
 						} else {
 							$return['header']['status'] = "ERROR";
 							$return['header']['code'] = "100";
+							$return['header']['error'] = "user not logged in";
 						}
 						break;
 					case "category":

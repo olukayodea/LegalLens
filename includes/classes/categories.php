@@ -1,7 +1,7 @@
 <?php
 	class categories extends common {
 		function add($array) {
-			$title = ucfirst(strtolower($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucfirst(strtolower($this->mysql_prep($array['title']))));
 			$parent_id = $this->mysql_prep($array['cat_id']);
 			$priority = $this->mysql_prep($array['priority']);
 			$status = $this->mysql_prep($array['status']);
@@ -249,6 +249,17 @@
 				}
 				$result .= "</li>";
 				$result .= "</ul>";
+			}
+			return $result;
+		}
+		
+		function gettreeCheckBox($id) {
+			$ids = $this->sortAll($id, "parent_id", false, false, false, false, "title");
+			$result = "";
+			if (count($ids) > 0) {
+				for ($i = 0; $i < count($ids); $i++) {
+					$result .= "<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type='checkbox' name='filter[]' id='filter_".$id."_".$i."' class='filter_".$id."' data-main='no' value='".$ids[$i]['ref']."'>&nbsp;".ucfirst(strtolower($ids[$i]['title']))."</label>";
+				}
 			}
 			return $result;
 		}

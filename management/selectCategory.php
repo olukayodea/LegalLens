@@ -9,6 +9,7 @@
 
 <html lang="en">
 <head>
+    <meta charset="utf-8">
 <title>jQuery-Menu Plugin Examples</title>
     <meta charset="UTF-8">
     

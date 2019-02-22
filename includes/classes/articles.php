@@ -1,7 +1,7 @@
 <?php
 	class articles extends common {
 		function add($array) {
-			$title = $this->mysql_prep($array['title']);
+			$title = htmlentities($this->mysql_prep($array['title']));
 			$status = $this->mysql_prep($array['status']);
 			$type = $this->mysql_prep($array['type']);
 			$owner = $this->mysql_prep($array['owner']);

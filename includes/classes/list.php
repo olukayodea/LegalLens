@@ -1,14 +1,14 @@
 <?php
 	class listItem extends common {
 		function add($array) {
-			$title = ucwords(($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucwords(($this->mysql_prep($array['title']))));
 			$type = $this->mysql_prep($array['type']);
 			$pref = $this->mysql_prep($array['pref']);
 			$status = $this->mysql_prep($array['status']);
 			$court = $this->mysql_prep($array['court']);
 			$year = $this->mysql_prep($array['year']);
 			$state = $this->mysql_prep($array['state']);
-			$details = $this->mysql_prep($array['details']);
+			$details = htmlentities($this->mysql_prep($array['details']));
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);
 				

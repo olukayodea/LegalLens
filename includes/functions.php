@@ -5,9 +5,16 @@
 	$pageUR1 = $_SERVER["SERVER_NAME"];
 	$curdomain = str_replace("www.", "", $pageUR1);
 
-	if (($curdomain == "legallens.com.ng/") || ($curdomain == "legallens.com.ng") || ($curdomain == "dev.legallens.net/") || ($curdomain == "dev.legallens.net") ) {
+	if (($curdomain == "legallens.com.ng/") || ($curdomain == "legallens.com.ng")) {
 		ini_set("session.cookie_domain", ".legallens.com.ng/");
 		define("URL", "https://legallens.com.ng/", true);
+		define("servername", "localhost", true);
+		define("dbusername", "legallen_main", true);
+		define("dbpassword", "=uS%2bMuBS+(", true);
+		define("dbname", "legallen_main", true);
+	} else if (($curdomain == "dev.legallens.net/") || ($curdomain == "dev.legallens.net") ) {
+		ini_set("session.cookie_domain", ".legallens.com.ng/");
+		define("URL", "http://dev.legallens.net/", true);
 		define("servername", "localhost", true);
 		define("dbusername", "legallen_main", true);
 		define("dbpassword", "=uS%2bMuBS+(", true);
@@ -104,9 +111,11 @@
 	$forum_login = new forum_login;
 	
 	include_once("classes/search.php");
+	include_once("classes/searchHome.php");
 	include_once("classes/search.suggest.php");
 	include_once("classes/search.users.php");
 	$search = new search;
+	$searchHome = new searchHome;
 	$search_result = new search_result;
 	$searchUsers = new searchUsers;
 	
@@ -123,6 +132,7 @@
 	include_once("classes/pages.php");
 	include_once("classes/adminPages.php");
 	include_once("classes/api.php");
+	include_once("classes/pagination.php");
 	$news = new news;
 	$advert = new advert;
 	$slider = new slider;
@@ -136,6 +146,7 @@
 	$friendzone = new friendzone;
 	$api = new api;
 	
+	define("page_list", $settings->getOne("page_list"));
 	define("facebook", $settings->getOne("facebook"));
 	define("instagram", $settings->getOne("instagram"));
 	define("flickr", $settings->getOne("flickr"));
@@ -150,4 +161,5 @@
 	$page_content = new page_content;
 	$pages = new pages;
 	$adminPages = new adminPages;
+	$pagination = new pagination;
 ?>

@@ -1,9 +1,9 @@
 <?php
 	class knowledge_base extends common {
 		function add($array) {
-			$title = ucfirst(strtolower($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucfirst(strtolower($this->mysql_prep($array['title']))));
 			$category = implode(",",$array['category']);
-			$content = $this->mysql_prep($array['content']);
+			$content = htmlentities($this->mysql_prep($array['content']));
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);

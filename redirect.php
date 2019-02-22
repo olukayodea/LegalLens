@@ -23,6 +23,7 @@
 ?>
 <html>
 <head>
+    <meta charset="utf-8">
 <title>Please Wait...</title>
 </head>
 <body onLoad="document.submit2gtpay_form.submit()">

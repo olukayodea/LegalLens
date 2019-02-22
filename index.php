@@ -20,7 +20,9 @@
 		header("location: ./");
 	}
 	
-	if (isset($_COOKIE['hash'])) {
+	if (isset($_GET['confirm'])) {
+		$c_login = $users->loginCookie();
+	} else if (isset($_COOKIE['hash'])) {
 		$c_login = $users->loginCookie();
 		if ($c_login) {
 			header("location: ".$tagLink);
@@ -29,7 +31,6 @@
 		}
 	} else if ((!isset($_GET['confirm'])) && (isset($_SESSION['users']['ref'])) && (trim($_SESSION['users']['subscription']) < time())) {
 		header("location: managesubscription?renew");
-	} else if (isset($_GET['confirm'])) {
 	} else if (isset($_SESSION['users']['ref']) ) {
 		header("location: home");
 	}
@@ -64,10 +65,8 @@
 			
 			header("location: ./?error=".urlencode($er));
 		}
-    }
-	
-	if (isset($_POST['registerButton'])) {
-		$add = $users->create($_POST);
+  } else if (isset($_POST['registerButton'])) {
+		echo $add = $users->create($_POST);
 		
 		if ($add) {
 			header("location: home");
@@ -78,7 +77,7 @@
 	
 	$content = nl2br($page_content->getOneField("home", "title", "content"));
 ?>
-<!doctype html>
+<!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
@@ -86,6 +85,7 @@
         
 <!-- Mirrored from inspirythemes.biz/html-templates/knowledgebase-html/index.html by HTTrack Website Copier/3.x [XR&CO'2013], Sun, 27 Mar 2016 11:14:22 GMT -->
 <head>
+    <meta charset="utf-8">
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -107,26 +107,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   });
 </script>
 
-                <!-- META TAGS -->
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta name="description" content="LegalLens offers fast legal research, Agreement Templates, Nigerian laws, Law dictionary & more">
+    <!-- META TAGS -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LegalLens offers fast legal research, Agreement Templates, Nigerian laws, Law dictionary & more">
 
-                <title>Search laws, judgments &amp; Agreement templates digitally - LegalLens</title>
+    <title>Search laws, judgments &amp; Agreement templates digitally - LegalLens</title>
 
-                <link rel="shortcut icon" href="images/favicon.png" />
+    <link rel="shortcut icon" href="images/favicon.png" />
 
+    <!-- Google Web Fonts-->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
 
-                <!-- Google Web Fonts-->
-                <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
-                <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-                <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-
-                <!-- Style Sheet-->
-                <link rel="stylesheet" href="style.css"/>
-                <link rel='stylesheet' id='bootstrap-css-css'  href='css/bootstrap5152.css?ver=1.0' type='text/css' media='all' />
-                <link rel='stylesheet' id='responsive-css-css'  href='css/responsive5152.css?ver=1.0' type='text/css' media='all' />
-                <link rel='stylesheet' id='pretty-photo-css-css'  href='js/prettyphoto/prettyPhotoaeb9.css?ver=3.1.4' type='text/css' media='all' />
+    <!-- Style Sheet-->
+    <link rel="stylesheet" href="style.css"/>
+    <link rel='stylesheet' id='bootstrap-css-css'  href='css/bootstrap5152.css?ver=1.0' type='text/css' media='all' />
+    <link rel='stylesheet' id='responsive-css-css'  href='css/responsive5152.css?ver=1.0' type='text/css' media='all' />
+    <link rel='stylesheet' id='pretty-photo-css-css'  href='js/prettyphoto/prettyPhotoaeb9.css?ver=3.1.4' type='text/css' media='all' />
 		<link rel='stylesheet' id='main-css-css'  href='css/main5152.css?ver=1.0' type='text/css' media='all' />
 		<link rel='stylesheet' id='blue-skin-css'  href='css/blue-skin5152.css?ver=1.0' type='text/css' media='all' />
 		<link rel='stylesheet' id='custom-css-css'  href='css/custom5152.html?ver=1.0' type='text/css' media='all' />
@@ -444,6 +443,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <script type='text/javascript' src='js/jquery.form.js'></script>
                 <script type='text/javascript' src='js/jquery.validate.min.js'></script>
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
+                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
                 <script type='text/javascript' src='js/custom.js'></script>
         <script type="text/javascript">
 <?php if (isset($_REQUEST['register'])) { ?>

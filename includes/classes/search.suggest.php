@@ -1,7 +1,7 @@
 <?php
 	class search_result extends common {
 		function add($array) {
-			$title = ucfirst(strtolower($this->mysql_prep($array['title'])));
+			$title = htmlentities(ucfirst(strtolower($this->mysql_prep($array['title']))));
 			$users = $this->mysql_prep($array['users']);
 			$data = $array['data'];
 			$create_time = time();
@@ -154,7 +154,6 @@
 				$result = array();
 				if ($sql->rowCount() == 1) {
 					$row = $sql->fetch(PDO::FETCH_ASSOC);
-					$row = mysql_fetch_array($sql);
 					$result['ref'] = $row['ref'];
 					$result['title'] = ucwords(strtolower($row['title']));
 					$result['users'] = $row['users'];

@@ -5,7 +5,7 @@
 		header("location: ?done");
 	}
 ?>
-<!doctype html>
+<!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
         <!--[if IE 7]>    <html class="lt-ie9 lt-ie8" lang="en-US"> <![endif]-->
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
@@ -13,6 +13,7 @@
         
 
 <head>
+    <meta charset="utf-8">
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
 <script src="SpryAssets/SpryValidationTextarea.js" type="text/javascript"></script>
@@ -26,7 +27,7 @@
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title>Contact legallens, contact legal lens, legallens contact details</title>
+                <title>Contact legallens</title>
                 <meta name="description" content="Get in touch with the Legal Lens team and we'd respond within 24hrs">
 
         <?php $pages->head(); ?>
@@ -154,6 +155,14 @@ var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "emai
 var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3");
 var sprytextarea1 = new Spry.Widget.ValidationTextarea("sprytextarea1");
         </script>
+          <script src="https://www.google.com/recaptcha/api.js?render=6LcWZo8UAAAAABUYrbZ_lqFVn_qvvjcwTP2BWUaF"></script>
+  <script>
+  grecaptcha.ready(function() {
+      grecaptcha.execute('6LcWZo8UAAAAABUYrbZ_lqFVn_qvvjcwTP2BWUaF', {action: 'homepage'}).then(function(token) {
+         ...
+      });
+  });
+  </script>
         </body>
 
 

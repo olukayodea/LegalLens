@@ -2,29 +2,52 @@
 	class drafting_sections extends common {
 		function add($array) {
 			$drafting = $this->mysql_prep($array['drafting']);
-			$section_content = $this->mysql_prep($array['section_content']);
+			$section_content = htmlentities($this->mysql_prep($array['section_content']));
 			$tags = $this->mysql_prep($array['tags']);
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);
-			
+
+
+			global $db;
+			$value_array = array(
+							':section_content' => $section_content, 
+							':status' => $status, 
+							':drafting' => $drafting,
+							':tags' => $tags,
+							':create_time' => $create_time,
+							':modify_time' => $modify_time
+							);
 			if ($ref != "") {
 				$firstpart = "`ref`, ";
-				$secondPArt = "'".$ref."', ";
-				$log = "Modified object ".$section_no;
+				$secondPArt = ":ref, ";
+				$value_array[':ref'] = $ref;
+				$log = "Modified object ";
 			} else {
 				$firstpart = "";
 				$secondPArt = "";
-				$log = "Created object ".$section_no;
+				$log = "Created object ";
+			}			
+			
+			try {
+				$sql = $db->prepare("INSERT INTO `drafting_sections` (".$firstpart."`drafting`, `section_content`, `status`, `tags`, `create_time`, `modify_time`) 
+				VALUES (".$secondPArt.":drafting, :section_content, :status, :tags, :create_time, :modify_time)
+					ON DUPLICATE KEY UPDATE 
+						`section_content` = :section_content,
+						`status` = :status,
+						`tags` = :tags,
+						`modify_time` = :modify_time
+					");
+				$sql->execute($value_array);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
-			
-			$sql = mysql_query("INSERT INTO `drafting_sections` (".$firstpart."`drafting`, `section_content`,`tags`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$drafting."','".$section_content."','".$tags."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `section_content` = '".$section_content."', `status` = '".$status."', `tags` = '".$tags."', `modify_time` = '".$modify_time."'") or die (mysql_error());
-			
+						
 			if ($sql) {
 				$id = $db->lastInsertId();
 				if ($ref == "") {
-					$doc = new drafting;
-					$doc->modifyOne("status", "active", $drafting);
+					$doc = new articles;
+					$doc->modifyOne("status", "active", $article);
 				}
 				//mysql_query("ALTER TABLE drafting_sections ADD FULLTEXT (section_content);") or die (mysql_error());
 				//add to log
@@ -49,8 +72,17 @@
 			$data = $this->getOne($id);
 			
 			@unlink("../library/agreement/".$data['file']);
-			$sql = mysql_query("DELETE FROM `drafting_sections` WHERE ref = '".$id."'") or die (mysql_error());
 			
+			global $db;
+			try {
+				$sql = $db->prepare("DELETE FROM `drafting_sections` WHERE `ref` =:id");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 			
 				//add to log
@@ -72,10 +104,19 @@
 			$value = $this->mysql_prep($value);
 			$id = $this->mysql_prep($id);
 			$modDate = time();
-			$sql = mysql_query("UPDATE `drafting_sections` SET `".$tag."` = '".$value."', `modify_time` = '".$modDate."' WHERE ref = '".$id."'") or die (mysql_error());
-			
+			global $db;
+			try {
+				$sql = $db->prepare("UPDATE `drafting_sections` SET  `".$tag."` = :value, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql->execute(
+					array(
+					':value' => $value,
+					':modifyTime' => time(),
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
-				
 				//add to log
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
@@ -92,106 +133,76 @@
 		}
 		
 		function listAll() {
-			$sql = mysql_query("SELECT * FROM `drafting_sections` ORDER BY `ref` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['drafting'] = $row['drafting'];
-					$result[$count]['section_content'] = $row['section_content'];
-					$result[$count]['tags'] = $row['tags'];
-					$result[$count]['file'] = $row['file'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting_sections` ORDER BY `ref` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function lisstMultiple($array) {
 			$list = implode(",", $array);
-			$sql = mysql_query("SELECT * FROM `drafting_sections` WHERE ref IN (".$list.") ORDER BY `section_no` ASC") or die (mysql_error());
-			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['drafting'] = $row['drafting'];
-					$result[$count]['section_content'] = $row['section_content'];
-					$result[$count]['tags'] = $row['tags'];
-					$result[$count]['file'] = $row['file'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting_sections` WHERE ref IN (".$list.") ORDER BY `section_no` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
-		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false) {
-			$id = $this->mysql_prep($id);
-			$id2 = $this->mysql_prep($id2);
-			$id3 = $this->mysql_prep($id3);
+		function sortAll($id, $tag, $tag2=false, $id2=false, $tag3=false, $id3=false, $order="ref") {
+			$token = array(':id' => $id);
 			if ($tag2 != false) {
-				$sqlTag = " AND `".$tag2."` = '".$id2."'";
+				$sqlTag = " AND `".$tag2."` = :id2";
+				$token[':id2'] = $id2;
 			} else {
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag .= " AND `".$tag3."` = '".$id3."'";
+				$sqlTag = " AND `".$tag3."` = :id3";
+				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
 			}
-			$sql = mysql_query("SELECT * FROM `drafting_sections` WHERE `".$tag."` = '".$id."'".$sqlTag." ORDER BY `ref` ASC") or die (mysql_error());
 			
-			if ($sql) {
-				$result = array();
-				$count = 0;
-				
-				while ($row = mysql_fetch_array($sql)) {
-					$result[$count]['ref'] = $row['ref'];
-					$result[$count]['drafting'] = $row['drafting'];
-					$result[$count]['section_content'] = $row['section_content'];
-					$result[$count]['tags'] = $row['tags'];
-					$result[$count]['file'] = $row['file'];
-					$result[$count]['status'] = $row['status'];
-					$result[$count]['create_time'] = $row['create_time'];
-					$result[$count]['modify_time'] = $row['modify_time'];
-					$count++;
-				}
-				return $this->out_prep($result);
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM `drafting_sections` WHERE `".$tag."` = :id".$sqlTag." ORDER BY `".$order."` ASC");
+								
+				$sql->execute($token);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
 		}
 		
 		function getOne($id, $tag='ref') {
-			$id = $this->mysql_prep($id);
-			$sql = mysql_query("SELECT * FROM `drafting_sections` WHERE `".$tag."` = '".$id."' ORDER BY `ref` DESC LIMIT 1") or die (mysql_error());
-			if ($sql) {
-				$result = array();
-				
-				if (mysql_num_rows($sql) == 1) {
-					$row = mysql_fetch_array($sql);
-					$result['ref'] = $row['ref'];
-					$result['drafting'] = $row['drafting'];
-					$result['section_content'] = $row['section_content'];
-					$result['tags'] = $row['tags'];
-					$result['file'] = $row['file'];
-					$result['status'] = $row['status'];
-					$result['create_time'] = $row['create_time'];
-					$result['modify_time'] = $row['modify_time'];
-					return $this->out_prep($result);
-				} else {
-					return false;
-				}
+			global $db;
+			try {
+				$sql = $db->prepare("SELECT * FROM drafting_sections WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
+				$sql->execute(
+					array(
+					':id' => $id)
+				);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
 			}
+			
+			$result = array();
+			$row = $sql->fetch(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
 		}
 		
 		function getOneField($id, $tag="ref", $ref="section_no") {

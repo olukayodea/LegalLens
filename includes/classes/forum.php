@@ -1,8 +1,8 @@
 <?php
 	class forum_categories extends common {
 		function add($array) {
-			$cat_name = $this->mysql_prep($array['cat_name']);
-			$cat_description = $this->mysql_prep($array['cat_description']);
+			$cat_name = htmlentities($this->mysql_prep($array['cat_name']));
+			$cat_description = htmlentities($this->mysql_prep($array['cat_description']));
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();
 			$cat_id = $this->mysql_prep($array['cat_id']);
