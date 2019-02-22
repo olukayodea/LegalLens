@@ -4,7 +4,11 @@
 	if (isset($_POST['submit'])) {
 		$sub_data = $subscriptions->getOne($_POST['package']);
 		$amount = $sub_data['amount']*$_POST['num_user'];
-		$discount = ((1 - ($_POST['total']/$amount)) * 100);
+		if ($amount > 0) {
+			$discount = ((1 - ($_POST['total']/$amount)) * 100);
+		} else {
+			$discount = 0;
+		}
 			
 		$array['order_owner'] = $_POST['order_owner'];
 		$array['order_subscription'] = $_POST['package'];

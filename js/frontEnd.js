@@ -67,10 +67,10 @@ function getbill(val, users) {
 			document.getElementById('total').value = myJson[3];
 			if (myJson[3] < 1) {
 				document.getElementById('payment_type').setAttribute("readonly", "readonly");
-				alert("hide");
+				//alert("hide");
 			} else {
 				document.getElementById('payment_type').removeAttribute("readonly");
-				alert("show");
+				//alert("show");
 			}
 		} else {
 			alert("An error occured, please try again later");
