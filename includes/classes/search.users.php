@@ -83,6 +83,7 @@
 			}
 			if ($sql) {
 				$result = array();
+				$count = 0;
 				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
@@ -103,6 +104,7 @@
 			}
 			if ($sql) {
 				$result = array();
+				$count = 0;
 				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['title'] = ucwords(strtolower($row['title']));
