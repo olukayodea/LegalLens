@@ -210,5 +210,76 @@
 			$data = $this->getOne($id, $tag);
 			return $data[$ref];
 		}
+
+		function postTransaction($array) {
+			global $users;
+			$order_owner = $users->listOne($array['order_owner']);
+			$carddetail['PBFPubKey'] 		= PBFPubKey;
+			$carddetail['cardno'] 			= preg_replace('/\s+/', '', $array['cardno']);
+			$carddetail['cvv'] 				= $array['cvv'];
+			$carddetail['expirymonth'] 		= $array['mm'];
+			$carddetail['expiryyear'] 		= $array['yy'];
+			$carddetail['currency'] 		= "NGN";
+			$carddetail['country'] 			= "NG";
+			$carddetail['amount'] 			= $array['total'];
+			$carddetail['email'] 			= $order_owner['email'];
+			$carddetail['phonenumber'] 		= $order_owner['phone'];
+			$carddetail['firstname'] 		= $order_owner['other_names'];
+			$carddetail['lastname'] 		= $order_owner['last_name'];
+			$carddetail['meta']['user'] 	= $array['order_owner'];
+			$carddetail['meta']['order'] 	= $array['order'];
+			$carddetail['meta']['tx_id'] 	= $array['tx_id'];
+			$carddetail['IP']				= $_SERVER['REMOTE_ADDR'];
+			$carddetail['txRef']			= "SUB_".$array['order']."_".$array['tx_id']."_".time();
+			$carddetail['suggested_auth']	= @$array['suggested_auth'];
+			$carddetail['pin']				= @$array['pin'];
+			$carddetail['billingzip'] 		= @$array['billingzip'];
+			$carddetail['billingcity'] 		= @$array['billingcity'];
+			$carddetail['billingaddress'] 	= @$array['billingaddress'];
+			$carddetail['billingstate'] 	= @$array['billingstate'];
+			$carddetail['billingcountry'] 	= @$array['billingcountry'];
+			$carddetail['redirect_url'] 	= URL."flResponse";
+
+			//Rave Encode
+			$key = $this->getKey(SecKey);
+			$dataReq = json_encode($carddetail);
+			$post_enc = $this->encrypt3Des( $dataReq, $key );
+
+			$postdata = array(
+				'PBFPubKey' => PBFPubKey,
+				'client' => $post_enc,
+				'alg' => '3DES-24');
+			$ch = curl_init();
+
+			curl_setopt($ch, CURLOPT_URL, flCharge);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postdata)); //Post Fields
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 200);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 200);
+			
+			$headers = array('Content-Type: application/json');
+			
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+			curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__)."/cacert.pem");
+			
+			$request = curl_exec($ch);
+			
+			curl_close($ch);
+
+			if ($request) {
+				echo "<pre>";
+				print_r($request);
+				return $request;
+			}else{
+				if(curl_error($ch))
+				{
+					echo 'error:' . curl_error($ch);
+				}
+			}
+			
+		}
 	}
 ?>

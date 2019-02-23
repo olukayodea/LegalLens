@@ -7,25 +7,31 @@
 
 	if (($curdomain == "legallens.com.ng/") || ($curdomain == "legallens.com.ng")) {
 		ini_set("session.cookie_domain", ".legallens.com.ng/");
-		define("URL", "https://legallens.com.ng/", true);
-		define("servername", "localhost", true);
-		define("dbusername", "legallen_main", true);
-		define("dbpassword", "=uS%2bMuBS+(", true);
-		define("dbname", "legallen_main", true);
+		$URL = "https://legallens.com.ng/";
+		$servername = "localhost";
+		$dbusername = "legallen_main";
+		$dbpassword = "=uS%2bMuBS+(";
+		$dbname = "legallen_main";
 	} else if (($curdomain == "dev.legallens.net/") || ($curdomain == "dev.legallens.net") ) {
 		ini_set("session.cookie_domain", ".legallens.com.ng/");
-		define("URL", "http://dev.legallens.net/", true);
-		define("servername", "localhost", true);
-		define("dbusername", "legallen_main", true);
-		define("dbpassword", "=uS%2bMuBS+(", true);
-		define("dbname", "legallen_main", true);
+		$URL = "http://dev.legallens.net/";
+		$servername = "localhost";
+		$dbusername = "legallen_main";
+		$dbpassword = "=uS%2bMuBS+(";
+		$dbname = "legallen_main";
 	} else { 
-		define("URL", "http://127.0.0.1/legallens/", true);
-		define("servername", "localhost", true);
-		define("dbusername", "root", true);
-		define("dbpassword", "mysql", true);
-		define("dbname", "linnkste_legalens", true);
+		$URL = "http://127.0.0.1/legallens/";
+		$servername = "localhost";
+		$dbusername = "root";
+		$dbpassword = "mysql";
+		$dbname = "linnkste_legalens";
 	}
+
+	define("URL", $URL, true);
+	define("servername",  $servername, true);
+	define("dbusername",  $dbusername, true);
+	define("dbpassword",  $dbpassword, true);
+	define("dbname",  $dbname, true);
 	
 	define("limit", 20, true);
 	
@@ -37,6 +43,12 @@
 	define("URLClients", URL."clients/", true);
 	define("replyMail", "do-not-reply@legallens.com.ng", true);
 	define("NGN", "&#8358;", true);
+
+	define("PBFPubKey", "FLWPUBK-c5327fab43d186ad575ade63e781a50c-X", true);
+	define("SecKey", "FLWSECK-6b8179de305467437ac49d99b9c647ce-X", true);
+	define("flCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/charge", true);
+	define("flValidateCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/validatecharge", true);
+	define("flVerify", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify", true);
 	include_once("classes/common.php");
 	$common = new common;
 

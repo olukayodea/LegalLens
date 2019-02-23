@@ -18,11 +18,11 @@
 				$firstpart = "`cat_id`, ";
 				$secondPArt = ":cat_id, ";
 				$value_array[':cat_id'] = $cat_id;
-				$log = "Modified object ".$title;
+				$log = "Modified object ".$cat_name;
 			} else {
 				$firstpart = "";
 				$secondPArt = "";
-				$log = "Created object ".$title;
+				$log = "Created object ".$cat_name;
 			}			
 			
 			try {
@@ -45,8 +45,8 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = $tag;
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['desc'] = $log;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -76,7 +76,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed regulator id #".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -108,7 +108,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "Modified ".$tag." with ".$value;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -216,8 +216,8 @@
 							);
 			
 			try {
-				$sql = $db->prepare("INSERT INTO `forum_posts` (".$firstpart."`post_content`, `post_date`, `status`, `post_by`, `post_topic`)
-				VALUES (".$secondPArt.":post_content, :post_date, :status, :post_by, :post_topic)
+				$sql = $db->prepare("INSERT INTO `forum_posts` (`post_content`, `post_date`, `status`, `post_by`, `post_topic`)
+				VALUES (:post_content, :post_date, :status, :post_by, :post_topic)
 					ON DUPLICATE KEY UPDATE 
 						`post_content` = :post_content,
 						`post_date` = :post_date,
@@ -400,15 +400,15 @@
 							':topic_by' => $topic_by,
 							':topic_cat' => $topic_cat
 							);
-			if ($cat_id != "") {
+			if ($topic_id != "") {
 				$firstpart = "`topic_id`, ";
 				$secondPArt = ":topic_id, ";
 				$value_array[':topic_id'] = $topic_id;
-				$log = "Modified object ".$title;
+				$log = "Modified object ".$topic_subject;
 			} else {
 				$firstpart = "";
 				$secondPArt = "";
-				$log = "Created object ".$title;
+				$log = "Created object ".$topic_subject;
 			}			
 			
 			try {
@@ -574,15 +574,13 @@
 							':timestamp' => $timestamp,
 							':email' => $email
 							);
-			if ($cat_id != "") {
+			if ($ref != "") {
 				$firstpart = "`topic_id`, ";
 				$secondPArt = ":topic_id, ";
-				$value_array[':topic_id'] = $topic_id;
-				$log = "Modified object ".$title;
+				$value_array[':ref'] = $ref;
 			} else {
 				$firstpart = "";
 				$secondPArt = "";
-				$log = "Created object ".$title;
 			}			
 			
 			try {

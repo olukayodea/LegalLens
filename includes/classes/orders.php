@@ -11,12 +11,13 @@
 			$order_subscription_type = $this->mysql_prep($array['order_subscription_type']);
 			$order_users = $this->mysql_prep($array['order_users']);
 			$payment_type = $this->mysql_prep($array['payment_type']);
+			$payment_frequency = $this->mysql_prep($array['payment_frequency']);
 			$create_time = $modify_time = time();			
 
 			global $db;
 			try {
-				$sql = $db->prepare("INSERT INTO `orders` (`order_owner`,`order_amount_net`,`order_subscription`,`order_amount_discount`,`order_amount_gross`,`order_subscription_type`,`payment_type`,`order_users`,`create_time`,`modify_time`) 
-				VALUES (:order_owner,:order_amount_net,:order_subscription,:order_amount_discount,:order_amount_gross,:order_subscription_type,:payment_type,:order_users,:create_time,:modify_time)");
+				$sql = $db->prepare("INSERT INTO `orders` (`order_owner`,`order_amount_net`,`order_subscription`,`order_amount_discount`,`order_amount_gross`,`order_subscription_type`,`payment_type`,`payment_frequency`,`order_users`,`create_time`,`modify_time`) 
+				VALUES (:order_owner,:order_amount_net,:order_subscription,:order_amount_discount,:order_amount_gross,:order_subscription_type,:payment_type,:payment_frequency,:order_users,:create_time,:modify_time)");
 				$sql->execute(array(
 							':order_owner' => $order_owner, 
 							':order_amount_net' => $order_amount_net, 
@@ -25,6 +26,7 @@
 							':order_amount_gross' => $order_amount_gross,
 							':order_subscription_type' => $order_subscription_type,
 							':payment_type' => $payment_type,
+							':payment_frequency' => $payment_frequency,
 							':order_users' => $order_users,
 							':create_time' => $create_time,
 							':modify_time' => $modify_time));
@@ -52,7 +54,7 @@
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "users";
 				$logArray['owner_id'] = $_SESSION['users']['ref'];
-				$logArray['desc'] = $log;
+				$logArray['desc'] = "Created new Order";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -83,7 +85,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "modified field ".$tag." as ".$value." for object";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -167,7 +169,6 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			
-			$result = array();
 			$row = $sql->fetch(PDO::FETCH_ASSOC);
 				
 			return $this->out_prep($row);
@@ -237,6 +238,7 @@
 			$users->modifyOne("subscription_type_name", $sub_data['title'], $data['order_owner']);
 			$users->modifyOne("subscription_group", $data['order_owner'], $data['order_owner']);
 			$users->modifyOne("subscription_order", $id, $data['order_owner']);
+			$users->modifyOne("payment_frequency", $id, $data['payment_frequency']);
 			$users->modifyOne("last_subscription", time(), $data['order_owner']);
 			$_SESSION['users']['subscription'] = $newTime;
 			$_SESSION['users']['subscription_group_onwer'] = $data['order_owner'];

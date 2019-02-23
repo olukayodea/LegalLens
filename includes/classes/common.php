@@ -1,29 +1,5 @@
 <?php
 	class common {
-		function curlPost($url, $fields) {
-			//extract data from the post
-			extract($_POST);
-			foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
-			rtrim($fields_string,'&');
-			
-			//open connection
-			$ch = curl_init();
-			
-			//set the url, number of POST vars, POST data
-			curl_setopt($ch,CURLOPT_URL,$url);
-			curl_setopt($ch,CURLOPT_POST,count($fields));
-			curl_setopt($ch,CURLOPT_POSTFIELDS,$fields_string);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			
-			
-			//execute post
-			$result = curl_exec($ch);
-			
-			//close connection
-			curl_close($ch);
-			return $result;
-		}
-		
 		function curl_file_get_contents($url) {
 			if(strstr($url, "https") == 0) {
 				return self::curl_file_get_contents_https($url);
@@ -69,14 +45,6 @@
 		}
 		
 		function mysql_prep($value) {
-			$magic_quotes_active = get_magic_quotes_gpc();
-			//$new_enough_php = function_exists( "mysql_real_escape_string" ); 
-			if($new_enough_php) { 
-				if($magic_quotes_active) { $value = stripslashes($value); }
-				$value = mysql_real_escape_string($value);
-			}else{ 
-				if(!$magic_quotes_active) {$value = addslashes($value); }
-			}
 			return $value;
 		}
 		
@@ -87,7 +55,7 @@
 			$pass = '' ; 
 			$count = strlen($chars);
 			while ($i <= $len) { 
-				$num = rand() % $count; 
+				$num = (rand() % $count); 
 				$tmp = substr($chars, $num, 1); 
 				$pass = $pass . $tmp; 
 				$i++; 
@@ -416,6 +384,22 @@
 				//Prevent the rest of the script from executing.
 				exit;
 			}
+		}
+
+		function getKey($seckey){
+			$hashedkey = md5($seckey);
+			$hashedkeylast12 = substr($hashedkey, -12);
+
+			$seckeyadjusted = str_replace("FLWSECK-", "", $seckey);
+			$seckeyadjustedfirst12 = substr($seckeyadjusted, 0, 12);
+
+			$encryptionkey = $seckeyadjustedfirst12.$hashedkeylast12;
+			return $encryptionkey;
+		}
+
+		function encrypt3Des($data, $key) {
+			$encData = openssl_encrypt($data, 'DES-EDE3', $key, OPENSSL_RAW_DATA);
+			return base64_encode($encData);
 		}
 	}
 ?>

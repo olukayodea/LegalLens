@@ -64,8 +64,8 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = $tag;
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['desc'] = $log;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -92,7 +92,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed caselaw section id #".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -125,7 +125,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "Modified ".$tag." with ".$value;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;

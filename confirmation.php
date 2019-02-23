@@ -10,6 +10,7 @@
 	}
 	
 	$data = $orders->getOne($id);
+	$userData = $users->listOne($data['order_owner']);
 	$transaction_data = $transactions->getOne($id, "order_id");
 	$urlData = json_decode(base64_decode($token), true);
 	$sub_list = $users->sortAll($ref, "subscription_group_onwer", "subscription_group", 1);
@@ -94,10 +95,14 @@
                         <?php } ?>
                         
                         <?php if (($data['order_status'] == "COMPLETE") && ($urlData['Amount'] > 0) ) { ?>
-                        <p><strong>Payments has been confirmed for this order</strong></p>
+                        <p><strong>Payments has been confirmed for this order. <?php if ($urlData['isRenew'] == true) { ?>This transaction will automatically renew on <?php echo date('l jS \of F Y h:i:s A', $userData['subscription']); } ?> </strong></p>
                         <p>Transaction Time: <strong><?php echo $urlData['TransactionDate']; ?></strong><br>
                         Amount Charged: <strong><?php echo NGN.number_format($data['order_amount_net'], 2); ?></strong><br />
+                        <?php if ($urlData['isRenew'] == true) { ?>
+                        Amount Processed at Gateway: <strong><?php echo NGN.number_format($urlData['Amount'], 2); ?></strong><br />
+                        <?php } else { ?>
                         Amount Processed at Gateway: <strong><?php echo NGN.number_format($urlData['Amount']/100, 2); ?></strong><br />
+                        <?php } ?>
                         Transaction Reference: <strong><?php echo $urlData['MerchantReference']; ?></strong><br />
                         Payment Gateway Reference: <strong><?php echo $urlData['PaymentReference']; ?></strong><br />
                         Card Number: <strong>**** **** **** <?php echo $urlData['CardNumber']; ?></strong><br />
@@ -177,9 +182,7 @@
 
                     <!-- start of sidebar -->
                     <aside class="span4 page-sidebar">
-                        <section class="widget">
-                        	<div class="login-widget">Welcome, <?php echo $last_name." ".$other_names; ?><br>Last logged in: <?php echo date('l jS \of F Y h:i:s A', $loginTime); ?><br><a href="<?php echo URL; ?>managesubscription">Manage Subscription</a><br><a href="<?php echo URL; ?>support">Help and Support</a><br><br><a href="<?php echo URL; ?>userprofile">View profile</a><br><a href="<?php echo URL; ?>managesavedpages">Manage saved pages</a><br><a href="<?php echo URL; ?>?logout">Logout</a></div>
-                            
+                        <section class="widget">                            
                             <div align="center">
                                     <a href="<?php echo URL; ?>helpAndSupport" ><img src="<?php echo URL; ?>/images/help.png" width="100" /></a><br />
                                     <h3 class="title">Need Help?</h3>
@@ -217,8 +220,8 @@
                 <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
                 <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
+				        <script type='text/javascript' src="js/navAccordion.min.js"></script>
                 <script type='text/javascript' src='js/frontEnd.js'></script>
-
         </body>
 
 

@@ -16,12 +16,12 @@
 		$array['order_amount_net'] = $_POST['total'];
 		$array['order_subscription_type'] = $_POST['type'];
 		$array['payment_type'] = $_POST['payment_type'];
+		$array['payment_frequency'] = $_POST['payment_frequency'];
 		$array['order_amount_discount'] = $discount;
 		$array['order_amount_gross'] = $amount;
 		
 		$create = $orders->create($array);
 		
-		//$create = "1_1";
 		if ($create) {
 			$res = explode("_", $create);
 			$data = $orders->getOne($res[0]);
@@ -36,6 +36,54 @@
 				$response = json_encode($array);
 				$token = base64_encode($response);
 				header("location: confirmation?id=".$data['ref']."&token=".$token);
+			} elseif ($array['payment_frequency'] == "Renew") {
+				global $transactions;
+				$_POST['order_owner'] = $data['order_owner'];
+				$_POST['order'] = $res[0];
+				$_POST['tx_id'] = $res[1];
+				$trannsData = $transactions->postTransaction($_POST);
+				$result = json_decode($trannsData, true);
+				if (($result['status'] == "success") && ($result['message'] == "AUTH_SUGGESTION")) {
+					if ($result['data']['suggested_auth'] == "PIN") {
+						header("location: flPin?data=".base64_encode(json_encode($_POST)));
+					} else if (($result['data']['suggested_auth'] == "AVS_VBVSECURECODE") || ($result['data']['suggested_auth'] == "NOAUTH_INTERNATIONAL") ){
+						$_POST['suggested_auth'] = $result['data']['suggested_auth'];
+						$trannsData_auth = $transactions->postTransaction($_POST);
+						$result_auth = json_decode($trannsData_auth, true);
+
+						if (($result_auth['status'] == "success") && ($result_auth['data']['chargeResponseCode'] == "00")) {
+							header("location: flConfirm?txRef=".$result_auth['data']['txRef']);
+						} else if (($result_auth['status'] == "success") && ($result_auth['data']['chargeResponseCode'] == "02")) {
+							if ($result_auth['data']['authModelUsed'] == "PIN") {
+								header("location: flPin?otp&flwRef=".$result_auth['data']['flwRef']."&data=".base64_encode(json_encode($_POST))."&msg=".$result_auth['data']['chargeResponseMessage']);
+							} else if ($result_auth['data']['authModelUsed'] == "VBVSECURECODE") {
+								header("location: ".$result_auth['data']['authurl']);
+							}  else if ($result_auth['data']['authModelUsed'] == "ACCESS_OTP") {
+								header("location: ".$result_auth['data']['authurl']);
+							} 
+						} else {
+							$orders->updateOne("order_status", "CANCELLED", $res[0]);
+							$orders->updateOne("payment_status", "CANCELLED", $res[0]);
+							$transactions->updateOne("transaction_status", "CANCELLED", $res[1]);
+							header("location: managesubscription?error=".$result_auth['message']);
+						}
+					}
+				} else if (($result['status'] == "success") && ($result['data']['chargeResponseCode'] == "02")) {
+					if ($result['data']['authModelUsed'] == "PIN") {
+						header("location: flPin?otp&flwRef=".$result['data']['flwRef']."&data=".base64_encode(json_encode($_POST))."&msg=".$result['data']['chargeResponseMessage']);
+					} else if ($result['data']['authModelUsed'] == "VBVSECURECODE") {
+						header("location: ".$result['data']['authurl']);
+					}  else if ($result['data']['authModelUsed'] == "ACCESS_OTP") {
+						header("location: ".$result['data']['authurl']);
+					} 
+				} else if (($result['status'] == "success") && ($result['data']['chargeResponseCode'] == "00")) {
+					header("location: flConfirm?txRef=".$result['data']['txRef']);
+				} else {
+					$orders->updateOne("order_status", "CANCELLED", $res[0]);
+					$orders->updateOne("payment_status", "CANCELLED", $res[0]);
+					$transactions->updateOne("transaction_status", "CANCELLED", $res[1]);
+					header("location: managesubscription?error=".$result['message']);
+				}
 			} elseif ($data['payment_type'] == "Online") {
 				//for online Payment
 				//$transData = $transactions->getOne($add, "order_id");

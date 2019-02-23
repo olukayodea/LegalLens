@@ -1,7 +1,7 @@
 <?php
 	class admin extends common {
 		function activate($password) {
-			$id = $_SESSION['admin']['id'];
+			$id = intval($_SESSION['admin']['id']);
 			$password = $this->mysql_prep($password);
 			$array = array();
 			$array['id'] = $id;
@@ -25,9 +25,9 @@
 					
 					//add to log
 					$logArray['object'] = get_class($this);
-					$logArray['object_id'] = $_SESSION['admin']['id'];
+					$logArray['object_id'] = intval($_SESSION['admin']['id']);
 					$logArray['owner'] = "admin";
-					$logArray['owner_id'] = $_SESSION['admin']['id'];
+					$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 					$logArray['desc'] = "activated user account";
 					$logArray['create_time'] = time();
 					$system_log = new system_log;
@@ -59,7 +59,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "deactivated user account";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -90,7 +90,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "deleted user account";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -138,9 +138,9 @@
 				
 				//add to log
 				$logArray['object'] = get_class($this);
-				$logArray['object_id'] = $_SESSION['admin']['id'];
+				$logArray['object_id'] = intval($_SESSION['admin']['id']);
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "initiate system account logiin";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -160,15 +160,13 @@
 		function logout() {
 			//add to log
 			$logArray['object'] = get_class($this);
-			$logArray['object_id'] = $_SESSION['admin']['id'];
+			$logArray['object_id'] = intval($_SESSION['admin']['id']);
 			$logArray['owner'] = "admin";
-			$logArray['owner_id'] = $_SESSION['admin']['id'];
+			$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 			$logArray['desc'] = "logged out of account";
 			$logArray['create_time'] = time();
 			$system_log = new system_log;
 			$system_log->create($logArray);
-			$logout_time = date("Y-m-d H:i:s");
-			$session_id = session_id();
 			$_SESSION = array();
 			if(isset($_COOKIE[session_name()])) {
 				setcookie(session_name(), '', time()-42000, '/');
@@ -190,6 +188,7 @@
 		}
 		
 		function create ($array) {
+			global $db;
 			$password = $this->createRandomPassword();
 			$name = $this->mysql_prep($array['name']);
 			$username_temp = str_replace(" ","", $name);
@@ -226,7 +225,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "created user account ".$username;
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -246,7 +245,7 @@
 				$messageToClient = $this->curl_file_get_contents($mailUrl);
 				
 				$mail['from'] = $contact;
-				$mail['to'] = $title." <".$email.">";
+				$mail['to'] = $client;
 				$mail['subject'] = $subjectToClient;
 				$mail['body'] = $messageToClient;
 				
@@ -332,7 +331,7 @@
 					$_SESSION['admin']['name'] = $name;
 					$_SESSION['admin']['phone'] = $phone;
 					$_SESSION['admin']['email'] = $email;
-					$_SESSION['admin']['adminType'] = $read;
+					$_SESSION['admin']['adminType'] = $adminType;
 					$_SESSION['admin']['timeStamp'] = $timeStamp;
 				}
 				
@@ -340,7 +339,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "updated user account";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -353,7 +352,6 @@
 		
 		function passwordReset($email) {
 			$check = $this->checkAccount($email);
-			$timeStamp = time();
 			
 			if ($check == 1) {
 				$data = $this->listOne($email, "email");
@@ -391,9 +389,9 @@
 				$alerts->sendEmail($mail);
 				//add to log
 				$logArray['object'] = get_class($this);
-				$logArray['object_id'] = $id;
+				$logArray['object_id'] = $data['id'];
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "updated password";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -407,7 +405,6 @@
 		function updatePassword($array) {
 			$id = $this->mysql_prep($array['id']);
 			$password = $this->mysql_prep(trim($array['password']));
-			$timeStamp = time();
 	
 			global $db;
 			try {
@@ -415,7 +412,7 @@
 				$sql->execute(
 					array(':timeStamp' => time(), 
 					':password' => sha1($password),
-					':id' => $data['id'])
+					':id' => $array['id'])
 				);
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
@@ -446,7 +443,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "updated password";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -459,11 +456,6 @@
 		
 		function listAll() {
 			global $db;
-			if (isset($_SESSION['admin']['country'])) {
-				$added = "`adminType` IN (SELECT `id` FROM `admintypes` WHERE `country` LIKE '%".$_SESSION['admin']['country']."%' ) AND ";
-			} else {
-				$added = "";
-			}
 			try {
 				$sql = $db->query("SELECT * FROM `admin` WHERE `status` != 'DELETED'");
 			} catch(PDOException $ex) {
@@ -478,7 +470,7 @@
 		function countAl() {
 			global $db;
 			try {
-				$sql = $db->query("SELECT COUNT(*) FROM admin WHERE status != 'DELETED'");
+				$sql = $db->query("SELECT COUNT(*) FROM `admin` WHERE status != 'DELETED'");
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
@@ -489,7 +481,7 @@
 		function sortList($tag, $id) {
 			global $db;
 			try {
-				$sql = $db->prepare("SELECT * FROM admin WHERE `".$tag."` = :id");
+				$sql = $db->prepare("SELECT * FROM `admin` WHERE `".$tag."` = :id");
 				$sql->execute(
 					array(
 					':id' => $id)
@@ -498,7 +490,6 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			
-			$result = array();
 			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
 				
 			return $this->out_prep($row);
@@ -507,7 +498,7 @@
 		function listOne($id, $tag='id') {
 			global $db;
 			try {
-				$sql = $db->prepare("SELECT * FROM admin WHERE `".$tag."` = :id AND `status` != 'DELETED'");
+				$sql = $db->prepare("SELECT * FROM `admin` WHERE `".$tag."` = :id AND `status` != 'DELETED'");
 				$sql->execute(
 					array(
 					':id' => $id)
@@ -516,7 +507,6 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			
-			$result = array();
 			$row = $sql->fetch(PDO::FETCH_ASSOC);
 				
 			return $this->out_prep($row);
@@ -528,6 +518,13 @@
 		}
 		
 		function createAdminType($array) {
+			$title = $this->mysql_prep($array['title']);
+			$id = $this->mysql_prep($array['id']);
+			$pages = implode(",", $array['pages']);
+			$country = implode(",", $array['country']);
+			$createTime = $modifyTime = time();
+			$creator = $lastModified = intval($_SESSION['admin']['id']);
+			
 			global $db;
 			$value_array = array(':title' => $array['title'], 
 							':level' => $array['level'], 
@@ -536,6 +533,7 @@
 							':modify' => intval($array['modify']), 
 							':mainPage' => $array['mainPage'], 
 							':pages' => $pages, 
+							':country' => $country,
 							':createTime' => $createTime, 
 							':modifyTime' => $modifyTime, 
 							':creator' => $creator, 
@@ -578,8 +576,8 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = "created new admin type ".$title;
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['desc'] = $log;
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -597,7 +595,6 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			
-			$result = array();
 			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
 				
 			return $this->out_prep($row);
@@ -615,7 +612,6 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			
-			$result = array();
 			$row = $sql->fetch(PDO::FETCH_ASSOC);
 				
 			return $this->out_prep($row);

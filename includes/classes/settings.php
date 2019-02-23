@@ -36,21 +36,12 @@
 			$this->modify("country", $country);
 			
 			//add to log
-			$logArray['object'] = get_class($this);
-			$logArray['object_id'] = $id;
-			$logArray['owner'] = "admin";
-			$logArray['owner_id'] = $_SESSION['admin']['id'];
-			$logArray['desc'] = "Updated system settings";
-			$logArray['create_date'] = time();
-			$system_log = new system_log;
-			$system_log->create($logArray);
 			return true;
 		}
 
 
 		function modify($title, $value) {
 			global $db;
-			$created = $modified = time();
 			
 			try {
 				$sql = $db->prepare("INSERT INTO `settings` (

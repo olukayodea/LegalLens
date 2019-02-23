@@ -42,7 +42,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "updated page content for ".$title;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -76,7 +76,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "Modified ".$tag." with ".$value;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;

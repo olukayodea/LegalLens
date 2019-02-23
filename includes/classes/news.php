@@ -12,6 +12,7 @@
 							':title' => $title, 
 							':content' => $content,
 							':status' => $status,
+							':create_time' => $create_time,
 							':modify_time' => $modify_time
 							);
 			if ($ref != "") {
@@ -26,8 +27,8 @@
 			}			
 			
 			try {
-				$sql = $db->prepare("INSERT INTO `news` (".$firstpart."`title`, `content`, `modify_time`)
-				VALUES (".$secondPArt.":title, :content, :modify_time)
+				$sql = $db->prepare("INSERT INTO `news` (".$firstpart."`title`, `content`,`create_time`, `modify_time`)
+				VALUES (".$secondPArt.":title, :content, :create_time, :modify_time)
 					ON DUPLICATE KEY UPDATE 
 						`content` = :content,
 						`status` = :status,
@@ -44,8 +45,8 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = $tag;
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['desc'] = $log;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -56,6 +57,7 @@
 		}
 		
 		function remove($id) {
+			global $db;
 			$id = $this->mysql_prep($id);
 			try {
 				$sql = $db->prepare("DELETE FROM `news` WHERE `ref` =:id");
@@ -72,7 +74,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed news id #".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;

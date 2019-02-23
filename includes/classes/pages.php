@@ -27,6 +27,7 @@
 			<link rel='stylesheet' id='blue-skin-css'  href='<?php echo URL; ?>css/blue-skin5152.css?ver=1.0' type='text/css' media='all' />
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
             <link rel="stylesheet" href="<?php echo URL; ?>css/pagination.css" />
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 			
 			<!--<script type='text/javascript' src='js/jquery-1.8.3.min.js'></script>
 			

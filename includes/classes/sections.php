@@ -3,7 +3,6 @@
 		function add($array) {
 			$document = $this->mysql_prep($array['document']);
 			$section_no = htmlentities($this->mysql_prep($array['section_no']));
-			$sub_section = $this->mysql_prep($array['sub_section']);
 			$section_content = htmlentities($this->mysql_prep($array['section_content']));
 			$tags = $this->mysql_prep($array['tags']);
 			$court = $this->mysql_prep($array['court']);
@@ -75,8 +74,8 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = $tag;
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['desc'] = $log;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -104,7 +103,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed document section id #".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -136,7 +135,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "Modified ".$tag." with ".$value;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -156,6 +155,7 @@
 			}
 			if ($sql) {
 				$result = array();
+				$count = 0;
 				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['document'] = $row['document'];
@@ -184,6 +184,7 @@
 			}
 			if ($sql) {
 				$result = array();
+				$count = 0;
 				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['document'] = $row['document'];

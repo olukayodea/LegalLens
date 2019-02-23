@@ -23,9 +23,9 @@
 		if ($sessionTime < time()) {
 			//add to log
 			$logArray['object'] = "users";
-			$logArray['object_id'] = $_SESSION['admin']['id'];
+			$logArray['object_id'] = intval($_SESSION['admin']['id']);
 			$logArray['owner'] = "admin";
-			$logArray['owner_id'] = $_SESSION['admin']['id'];
+			$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 			$logArray['desc'] = "Session timed out";
 			$logArray['create_time'] = time();
 			$system_log = new system_log;

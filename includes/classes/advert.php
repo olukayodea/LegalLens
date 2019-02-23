@@ -44,7 +44,7 @@
 					$logArray['object'] = get_class($this);
 					$logArray['object_id'] = $id;
 					$logArray['owner'] = "admin";
-					$logArray['owner_id'] = $_SESSION['admin']['id'];
+					$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 					$logArray['desc'] = "created advert ".$title;
 					$logArray['create_date'] = time();
 					$system_log = new system_log;
@@ -140,7 +140,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed advert Item with Ref ".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -173,7 +173,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "modified advert ".$tag." to ".$value." for Ref ".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -372,7 +372,7 @@
 					$logArray['object'] = get_class($this);
 					$logArray['object_id'] = $id;
 					$logArray['owner'] = "admin";
-					$logArray['owner_id'] = $_SESSION['admin']['id'];
+					$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 					$logArray['desc'] = "created slider ".$id;
 					$logArray['create_date'] = time();
 					$system_log = new system_log;
@@ -409,7 +409,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed advert Item with Ref ".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;

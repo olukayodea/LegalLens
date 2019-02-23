@@ -153,15 +153,6 @@
 			}
 			
 			if ($sql) {
-				//add to log
-				$logArray['object'] = get_class($this);
-				$logArray['object_id'] = $id;
-				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = "opened notifications";
-				$logArray['create_time'] = time();
-				$system_log = new system_log;
-				$system_log->create($logArray);
 				return true;
 			} else {
 				return false;

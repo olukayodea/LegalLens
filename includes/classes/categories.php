@@ -52,8 +52,8 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
-				$logArray['desc'] = $tag;
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['desc'] = $log;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -82,7 +82,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed category id #".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -266,6 +266,7 @@
 		
 		function showLink($id) {
 			$list = $this->listLink($id);
+			$link = "";
 			for ($i = (count($list) - 1); $i >= 0; $i--) {
 				$link .= " ".$list[$i]['title'].' > ';
 			}
@@ -277,7 +278,6 @@
 		function listLink($id) {
 			$result = "";
 			$count = 0;
-			$loop = true;
 			$one = $this->getOne($id);
 			$result[$count]['ref'] = $one['ref'];
 			$result[$count]['title'] = $one['title'];
@@ -322,7 +322,7 @@
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
-			
+			$result = "";
 			if ($sql) {
 				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result .= $this->listLinkList($row['ref']);

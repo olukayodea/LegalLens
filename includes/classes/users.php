@@ -8,7 +8,6 @@
 			$array = array();
 			$array['ref'] = $ref;
 			$array['password'] = $password;
-			$modify_time = time();
 			$change = self::updatePassword($array);
 			
 			if ($change){
@@ -35,7 +34,6 @@
 		
 		function passwordReset($email) {
 			$check = $this->checkAccount($email);
-			$timeStamp = time();
 			
 			if ($check == 1) {
 				$data = $this->listOne($email, "email");
@@ -74,9 +72,9 @@
 				$alerts->sendEmail($mail);
 				//add to log
 				$logArray['object'] = get_class($this);
-				$logArray['object_id'] = $id;
+				$logArray['object_id'] = $data['id'];
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "updated password";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -89,7 +87,6 @@
 		
 		function deactivate($ref) {
 			$ref = $this->mysql_prep($ref);
-			$modify_time = time();
 			global $db;
 			try {
 				$sql = $db->prepare("UPDATE `users` SET `status` = 'INACTIVE', `modify_time` = :modifyTime WHERE `ref`=:id");
@@ -111,7 +108,6 @@
 		
 		function delete($ref) {
 			$ref = $this->mysql_prep($ref);
-			$modify_time = time();
 
 			global $db;
 			try {
@@ -259,7 +255,6 @@
 				} else {
 					$this->addLog($row['ref']);
 					$subscriptions = new subscriptions;
-					$status = $row['status'];
 					$result['ref'] = $row['ref'];
 					$result['email'] = $row['email'];
 					$result['last_name'] = $row['last_name'];
@@ -281,8 +276,6 @@
 		
 		function logout() {
 			$usersControl = new usersControl;
-			$logout_time = date("Y-m-d H:i:s");
-			$session_id = session_id();
 			$_SESSION = array();
 			if(isset($_COOKIE[session_name()])) {
 				setcookie(session_name(), '', time()-42000, '/');
@@ -296,8 +289,6 @@
 		
 		function logoutApp($hash) {
 			$usersControl = new usersControl;
-			$logout_time = date("Y-m-d H:i:s");
-			$session_id = session_id();
 			$_SESSION = array();
 			if(isset($_COOKIE[session_name()])) {
 				setcookie(session_name(), '', time()-42000, '/');
@@ -386,7 +377,7 @@
 				$loginArray = array();
 				$loginArray['email'] = $email;
 				$loginArray['password'] = $password;
-				$login = $this->login($loginArray);
+				$this->login($loginArray);
 				
 				return $id;
 			} else {
@@ -421,7 +412,6 @@
 			$email = $this->mysql_prep($array['email']);
 			$phone = $this->mysql_prep($array['phone']);
 			$address = $this->mysql_prep($array['address']);
-			$modify_time = time();
 
 			global $db;
 			try {
@@ -441,7 +431,7 @@
 			}
 						
 			if ($sql) {
-				if ($ref == $result['ref']) {
+				if ($ref == $_SESSION['users']['ref']) {
 					$_SESSION['users']['email'] = $email;
 					$_SESSION['users']['last_name'] = $last_name;
 					$_SESSION['users']['other_names'] = $other_names;
@@ -456,7 +446,6 @@
 		function updatePassword($array) {
 			$ref = $this->mysql_prep($array['ref']);
 			$password = $this->mysql_prep(trim($array['password']));
-			$modify_time = time();
 
 			global $db;
 			try {
@@ -551,7 +540,6 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			
-			$result = array();
 			$row = $sql->fetch(PDO::FETCH_ASSOC);
 				
 			return $this->out_prep($row);
@@ -608,7 +596,6 @@
 					$logArray['create_time'] = time();
 					$system_log = new system_log;
 					$system_log->create($logArray);
-					$ref = mysql_insert_id();
 					
 					$client = $last_name." ".$other_names." <".$email.">";
 					$subjectToClient = "LegalLens User Account";
@@ -620,7 +607,6 @@
 						'&last_name='.urlencode($last_name).
 						'&other_names='.urlencode($other_names).
 						'&email='.urlencode($email).
-						'&phone='.urlencode($phone).
 						'&password='.urlencode($password);
 					$mailUrl = URL."includes/emails/welcome_group.php?".$fields;
 					$messageToClient = $this->curl_file_get_contents($mailUrl);

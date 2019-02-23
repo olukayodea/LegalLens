@@ -53,7 +53,7 @@
                             </h2>
                             <hr>
                             <?php if (isset($_GET['error'])) { ?>
-                            <p class="error">Y<?php echo $_GET['error']; ?></p>
+                            <p class="error"><?php echo $_GET['error']; ?></p>
                             <?php } ?>
                             <p>Hi <?php echo $last_name." ".$other_names; ?>, please review your current subscription data below</p>
                             <?php if (isset($_GET['renew'])) { ?>
@@ -98,7 +98,7 @@
                                   </tr>
                                 </tbody>
                               </table>		
-                            <table width=300 class="table table-hover" align=center>
+                            <table width=300 class="table table-hover">
                                 <thead>
                                   <tr>
                                 <th colspan=2>Subscription</th>
@@ -150,31 +150,81 @@
                                   </tr>
                                  <tr>
                                 <td width="25%">Payment Frequency</td>
-                                <td><select name="payment_frequency" id="payment_frequency" class="form-control" required disabled>
+                                <td><select name="payment_frequency" id="payment_frequency" class="form-control" required onChange="openCard(this.value)" disabled>
                                   <option value="Single">Single Payment</option>
                                   <option value="Renew">Auto Renew</option>
                                 </select></td>
                                   </tr>
-                                 <div id="showCard" style="display:none;">
+                                </tbody>
+                              </table>		
+                              <div id="showCard" style="display:none;">
+                              <table width=300 class="table table-hover">
+                                <thead>
                                   <tr>
-                                   <td>Subscription Fees</td>
+                                <th colspan=2>Payment Details</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                   <td width="25%">Card Number</td>
+                                   <td><input type="text" name="cardno" id="cardno" required placeholder="XXXX XXXX XXXX XXXX" onKeyUp="displayCardType(this.value)"><span id="cardLogo"></span></td>
+                                 </tr>
+                                  <tr>
+                                   <td width="25%">Card Expiry (MM/YY)</td>
+                                   <td><input type="number" maxlength="2" size="2" name="mm" id="mm" required placeholder="MM" pattern="[0-9.]+" onKeyUp="monthCheck()" max="12"> <input type="number" maxlength="2" size="2" name="yy" id="yy" required placeholder="YY" pattern="[0-9.]+" onKeyUp="yearCheck()" max="99"></td>
+                                 </tr>
+                                  <tr>
+                                   <td width="25%">CVV</td>
+                                   <td><input type="number" maxlength="3" size="3" name="cvv" id="cvv" required placeholder="CVV" max="999"> </td>
+                                 </tr>
+                                  <tr>
+                                   <td width="25%">Billing Address</td>
+                                   <td><input type="text" name="billingaddress" id="billingaddress" required placeholder="123 Steet Address"></td>
+                                 </tr>
+                                  <tr>
+                                   <td width="25%">Billing City</td>
+                                   <td><input type="text" name="billingcity" id="billingcity" required placeholder="City"></td>
+                                 </tr>
+                                  <tr>
+                                   <td width="25%">Billing ZIP/Post Code</td>
+                                   <td><input type="text" name="billingzip" id="billingzip" placeholder="ZIP/Post Code"></td>
+                                 </tr>
+                                  <tr>
+                                   <td width="25%">Billing State</td>
+                                   <td><input type="text" name="billingstate" id="billingstate" required placeholder="State"></td>
+                                 </tr>
+                                  <tr>
+                                   <td width="25%">Billing State</td>
+                                   <td><input type="text" name="billingcountry" id="billingcountry" required placeholder="Country"></td>
+                                 </tr>
+                                  <tr>
+                                   <td colspan="2" align="right">Powered by Rave&TRADE; by <a href='https://flutterwave.com/int/online-payments-products/rave/'>Flutterwave</a></td>
+                                 </tr>
+                                </tbody>
+                              </table>		
+                              </div>
+                              <table width=300 class="table table-hover">
+                                <thead>
+                                  <tr>
+                                <th colspan=2>Order Summary</th>
+                                
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                 <tr>
+                                   <td width="25%">Subscription Fees</td>
                                    <td align="right"><span id="s_fee"><?php echo NGN; ?> 0.00</span></td>
                                  </tr>
-                                 </div>
                                  <tr>
-                                   <td>Subscription Fees</td>
-                                   <td align="right"><span id="s_fee"><?php echo NGN; ?> 0.00</span></td>
-                                 </tr>
-                                 <tr>
-                                   <td>Gross Total</td>
+                                   <td width="25%">Gross Total</td>
                                    <td align="right"><span id="g_total"><?php echo NGN; ?> 0.00</span></td>
                                  </tr>
                                  <tr>
-                                   <td>Group Discount</td>
+                                   <td width="25%">Group Discount</td>
                                    <td align="right"><span id="d_disc">0%</span></td>
                                  </tr>
                                  <tr>
-                                   <td>Net Total</td>
+                                   <td width="25%">Net Total</td>
                                    <td align="right"><span id="n_total"><?php echo NGN; ?> 0.00</span></td>
                                  </tr>
                                  <tr>
@@ -192,6 +242,11 @@
                                   <tr>
                                 <td width="25%">Subscription Type</td>
                                 <td><?php echo $subscriptions->getOneField($subscription_type, "ref", "type"); ?></td>
+                                
+                                  </tr>
+                                  <tr>
+                                <td width="25%">Renewal Option</td>
+                                <td><?php echo $users->getOneField($ref, "ref", "payment_frequency"); ?></td>
                                 
                                   </tr>
                                   <tr>
@@ -215,8 +270,6 @@
                           </div>
                     </div>
                     <!-- end of page content -->
-
-
                     <!-- start of sidebar -->
                     <aside class="span4 page-sidebar">
                         <section class="widget">
@@ -255,8 +308,8 @@
                 <!-- script -->
                     <!-- DataTables -->
                 <script src="management/plugins/datatables/jquery.dataTables.min.js"></script>
-                <script src="management/plugin
-                <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>s/datatables/dataTables.bootstrap.min.js"></script>
+                <script src="management/plugins/datatables/dataTables.bootstrap.min.js"></script>
+                <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>
                 <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
                 <script type='text/javascript' src='js/jquery.liveSearchd5f7.js?ver=2.0'></script>
 				<script type='text/javascript' src='js/jflickrfeed.js'></script>

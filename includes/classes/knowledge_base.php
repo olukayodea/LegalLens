@@ -58,7 +58,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "created knowledge_base ".$title;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -87,7 +87,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed knowledge_base Item with Ref ".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -315,7 +315,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "created owner ".$title;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -344,7 +344,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed owner knowledge_base_category with Ref ".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -463,7 +463,7 @@
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
-
+			$result = "";
 			if ($sql) {
 				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result .= $row['title'].", ";
@@ -481,7 +481,8 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 
-			if ($sql) {				
+			if ($sql) {		
+				$result = "";		
 				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					if($mobile)
 					$result .= "<a href='".URL."mobilehelpAndSupport?c=".$row['ref']."'>".$row['title']."</a>, ";

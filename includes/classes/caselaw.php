@@ -56,7 +56,7 @@
 					$secondPArt = "";
 					$log = "Created object ".$title;
 				}	
-				
+				$dupPart = "";
 				if ($file_data != "") {
 					$firstpart .= "`file`, ";
 					$secondPArt .= "'".$file_data."', ";
@@ -88,8 +88,8 @@
 					$logArray['object'] = get_class($this);
 					$logArray['object_id'] = $id;
 					$logArray['owner'] = "admin";
-					$logArray['owner_id'] = $_SESSION['admin']['id'];
-					$logArray['desc'] = $tag;
+					$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+					$logArray['desc'] = $log;
 					$logArray['create_date'] = time();
 					$system_log = new system_log;
 					$system_log->create($logArray);
@@ -133,7 +133,6 @@
 				$extension = strtolower($extension);
 				
 				if ($extension == "pdf") {
-					$size=filesize($array['media_file']['tmp_name']);
 					
 					$userDoc = "../library/caselaws/";
 					$file = time().rand(100, 999).".".$extension;
@@ -162,7 +161,6 @@
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
-			$modDate = time();
 			
 			$data = $this->getOne($id);
 			
@@ -184,7 +182,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "removed case law id #".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -227,7 +225,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['admin']['id'];
+				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
 				$logArray['desc'] = "Modified ".$tag." with ".$value;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -252,7 +250,6 @@
 		}
 		
 		function listAllHome($court=false, $filter="title") {
-			$caselaw_area = new caselaw_area;
 			if ($court != false) {
 				$addition = "`court` = '".$court."' AND ";
 			} else {
@@ -283,7 +280,7 @@
 		
 		function quickSearchSections($val, $court=false) {
 			$val = $this->mysql_prep($val);
-			if ($reporter != false) {
+			if ($court != false) {
 				$addition = "`caselaw`.`court` = '".$court."' AND ";
 			} else {
 				$addition = "";
@@ -343,7 +340,7 @@
 		function fullSearch($val, $court=false,$filter="title") {
 			$caselaw_area = new caselaw_area;
 			$val = $this->mysql_prep($val);
-			if ($reporter != false) {
+			if ($court != false) {
 				$addition = "`caselaw`.`court` = '".$court."' AND ";
 			} else {
 				$addition = "";
@@ -391,7 +388,7 @@
 			$listReg = $caselaw_area->sortAll("active", "status");
 			$result = array();
 			//for ($i = 0; $i < count($listReg); $i++) {
-				$tag = $listReg[$i]['title'];
+				//$tag = $listReg[$i]['title'];
 				//$sql = mysql_query("SELECT * FROM `caselaw` WHERE `title` LIKE '".$val."%' AND ".$addition."`status` = 'active' AND `areas` LIKE '%".$tag."%' ORDER BY `title` ASC") or die (mysql_error());
 				
 				global $db;
