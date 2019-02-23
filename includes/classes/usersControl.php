@@ -110,7 +110,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "users";
-				$logArray['owner_id'] = $_SESSION['users']['ref'];
+				$logArray['owner_id'] = intval($_SESSION['users']['ref']);
 				$logArray['desc'] = "modified fieeld ".$tag." with value ".$value." for entry ID ".$id;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
@@ -324,7 +324,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = $_SESSION['users']['ref'];
+				$logArray['owner_id'] = intval($_SESSION['users']['ref']);
 				$logArray['desc'] = "removed new device running ".$data['browser_name']." on ".$data['os']." near ".$data['loc_city']." ".$data['loc_region']." ";
 				$logArray['create_date'] = time();
 				$system_log = new system_log;

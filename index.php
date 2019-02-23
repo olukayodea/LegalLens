@@ -34,8 +34,8 @@
 	} else if (isset($_SESSION['users']['ref']) ) {
 		header("location: home");
 	}
-	
-	if (isset($_POST['submit3'])) {
+
+  if (isset($_POST['submit3'])) {
 		$change = $users->activate($common->mysql_prep($_POST['newPassword']));
 		if ($change) {
 			header("location: home");

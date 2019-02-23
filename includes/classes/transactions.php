@@ -29,7 +29,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "users";
-				$logArray['owner_id'] = $_SESSION['users']['ref'];
+				$logArray['owner_id'] = intval($_SESSION['users']['ref']);
 				$logArray['desc'] = "created transaction ID ".$transaction_id;
 				$logArray['create_time'] = time();
 				$system_log = new system_log;

@@ -45,7 +45,7 @@
 				$logArray['object'] = get_class($this);
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "users";
-				$logArray['owner_id'] = $_SESSION['users']['ref'];
+				$logArray['owner_id'] = intval($_SESSION['users']['ref']);
 				$logArray['desc'] = "cleared search history";
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
