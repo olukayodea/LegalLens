@@ -270,8 +270,6 @@
 			curl_close($ch);
 
 			if ($request) {
-				echo "<pre>";
-				print_r($request);
 				return $request;
 			}else{
 				if(curl_error($ch))
