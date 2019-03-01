@@ -66,7 +66,7 @@
 			header("location: ./?error=".urlencode($er));
 		}
   } else if (isset($_POST['registerButton'])) {
-		echo $add = $users->create($_POST);
+		$add = $users->create($_POST);
 		
 		if ($add) {
 			header("location: home");
