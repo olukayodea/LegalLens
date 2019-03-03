@@ -341,7 +341,6 @@
 		
 		function sendContact($array) {
 			$name = $this->get_prep($array['name']);
-			$email = $this->get_prep($array['email']);
 			$reason = $this->get_prep($array['reason']);
 			$message = $this->get_prep($array['message']);
 			
@@ -358,7 +357,7 @@
 			
 			
 			$mail['from'] = $contact;
-			$mail['subject'] = $reason;
+			$mail['subject'] = $subjectToClient;
 			$mail['body'] = $messageToClient;
 			
 
