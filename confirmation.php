@@ -4,13 +4,28 @@
 	include_once("includes/session.php");
 	if (isset($_REQUEST['id'])) {
 		$id = $common->mysql_prep($_REQUEST['id']);
-		$token = $common->mysql_prep($_REQUEST['token']);
+    $token = $common->mysql_prep($_REQUEST['token']);
+    
 	} else {
 		header("location: home?error=".urlencode("There was an error processing your order, please try again"));
 	}
 	
 	$data = $orders->getOne($id);
-	$userData = $users->listOne($data['order_owner']);
+  $userData = $users->listOne($data['order_owner']);
+
+  $subscription = trim($userData['subscription']);
+  $subscription_type = trim($userData['subscription_type']);
+  $subscription_group = trim($userData['subscription_group']);
+  if ($userData['payment_frequency'] == "Single") {
+    $sub_Renw = "No Auto-renew";
+    $sub_type = "Not Applicable";
+  } else {
+    $expiryDate = $subscription-(60*60*24*3);
+    $sub_Renw = "Automatic Renewal";
+    $sub_type = "Auto renew on ".date('l jS \of F Y h:i:s A', $expiryDate);
+  }
+  $subscription_group_onwer = trim($userData['subscription_group_onwer']);
+
 	$transaction_data = $transactions->getOne($id, "order_id");
 	$urlData = json_decode(base64_decode($token), true);
 	$sub_list = $users->sortAll($ref, "subscription_group_onwer", "subscription_group", 1);
@@ -153,7 +168,7 @@
                                 <tbody>
                                   <tr>
                                 <td width="25%">Current Subscription</td>
-                                <td><?php echo $subscriptions->getOneField($subscription_type); ?></td>
+                                <td><?php echo $subscriptions->getOneField($subscription_type)." (".$sub_Renw.")"; ?></td>
                                 
                                   </tr>
                                   <tr>
@@ -163,9 +178,18 @@
                                   </tr>
                                   <tr>
                                 <td width="25%">Expiry Date</td>
-                                <td><?php echo date('l jS \of F Y h:i:s A', $subscription); ?></td>
+                                <td><?php echo date('l jS \of F Y h:i:s A', $subscription)." (".$sub_type.")"; ?></td>
                                 
                                   </tr>
+                                <?php if ($userData['payment_frequency'] == "Renew") { ?>
+                                  <tr>
+                                <td width="25%">Auto Rewew</td>
+                                <td><?php echo $sub_type; ?>
+                                <br>
+                                <a href="managesubscription?cancel" onClick="return confirm('Your subscription will not <?php echo $sub_type; ?> after this action. are you sure you want to continue ?')"> cancel auto renew</a></td>
+                                
+                                  </tr>
+                                <?php } ?>
                                   <?php if (($subscription_group_onwer == $ref) && ($subscription_group == 1)) { ?>
                                   <tr>
                                 <td width="25%">Subscription Users</td>
