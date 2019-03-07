@@ -1,12 +1,15 @@
 <?php
-	include_once("../functions.php");
-	include_once("..//scripts/qrcode.php");
-	$id = $common->get_prep($_REQUEST['id']);
-	$last_name = $common->get_prep($_REQUEST['last_name']);
-	$other_names = $common->get_prep($_REQUEST['other_names']);
-	$email = $common->get_prep($_REQUEST['email']);
-	$status = $common->get_prep($_REQUEST['status']);
-	$time = $common->get_prep($_REQUEST['time']);
+    include_once("../functions.php");
+    include_once("..//scripts/qrcode.php");
+    $id = $common->get_prep($_REQUEST['ref']);
+    $last_name = $common->get_prep($_REQUEST['last_name']);
+    $other_names = $common->get_prep($_REQUEST['other_names']);
+    $email = $common->get_prep($_REQUEST['email']);
+    $userData = $users->listOne($id);
+
+    $subscription = trim($userData['subscription']);
+    $subscription_type = trim($userData['subscription_type']);
+    $subscription_group = trim($userData['subscription_group']);
 ?>
 <html>
 <head>
@@ -68,8 +71,14 @@ body,td,th {
   <tr>
     <td>
     <p class="title2">Hello <?php echo $last_name; ?>, </p>
-    <p class="text">your support ticket has been update and the status is now <strong><?php echo $help->status($status); ?></strong></p>
-    <p class="text"><a href="<?php echo URL;  ?>support.read?id=<?php echo $id; ?>">click here</a> to read the updates on your ticket </p>
+    <p class="text">The following modification has occured on your account</p>
+    <p class="text">Your auto renewal instruction for the subscription listed below has been revoked, this subscription will now expire on <?php echo date('l jS \of F Y h:i:s A', $subscription); ?></p>
+    <p class="text">
+    Current Subscription
+    <strong><?php echo $subscriptions->getOneField($subscription_type); ?></strong>
+    Subscription Type
+    <strong><?php echo $subscriptions->getOneField($subscription_type, "ref", "type"); ?></strong></p>\
+    <p class="text">All saved authorizartion details has been deleted and you will need to provide your credit card details when next you wnat to activate the auto renew function. If you did not authorize this change, please contact support immediately</p>
     <p>
       <span class="text">Regards,</span><br>
   <span class="text">LegalLens.com.ng</span><span class="text"></span></p>

@@ -1,8 +1,55 @@
 <?php
 	$redirect = "managesubscription";
 	include_once("includes/functions.php");
-	include_once("includes/session.php");
-	
+  include_once("includes/session.php");
+
+  $userData = $users->listOne($ref);
+  if (isset($_REQUEST['cancel'])) {
+    if ($userData['payment_frequency'] == "Renew") {
+      if ($users->modifyOne("payment_frequency", "Single", $ref)) {
+					$client = $last_name." ".$other_names." <".$email.">";
+					$subjectToClient = "Modification to your LegalLens Account";
+					
+					$contact = "LegalLens <".replyMail.">";
+						
+					$fields = 'subject='.urlencode($subjectToClient).
+						'&ref='.urlencode($ref).
+						'&last_name='.urlencode($last_name).
+						'&other_names='.urlencode($other_names).
+						'&email='.urlencode($email);
+					$mailUrl = URL."includes/emails/account_subscription.php?".$fields;
+					$messageToClient = $common->curl_file_get_contents($mailUrl);
+					
+					$mail['from'] = $contact;
+					$mail['to'] = $client;
+					$mail['subject'] = $subjectToClient;
+					$mail['body'] = $messageToClient;
+					
+					$alerts = new alerts;
+          $alerts->sendEmail($mail);
+          $users->modifyOne("card_token", "", $ref);
+
+          header("location: ?done");
+      } else {
+        header("location: ?error=".urlencode("an error occured"));
+      }
+    }
+    header("location: ?done");
+	}
+
+  $subscription = trim($userData['subscription']);
+  $subscription_type = trim($userData['subscription_type']);
+  $subscription_group = trim($userData['subscription_group']);
+
+  if ($userData['payment_frequency'] == "Single") {
+    $sub_Renw = "No Auto-renew";
+    $sub_type = "Not Applicable";
+  } else {
+    $expiryDate = $subscription-(60*60*24*3);
+    $sub_Renw = "Automatic Renewal";
+    $sub_type = "Auto renew on ".date('l jS \of F Y h:i:s A', $expiryDate);
+  }
+
 	$sub_list = $users->sortAll($ref, "subscription_group_onwer", "subscription_group", 1);
 ?>
 <!doctype html>
@@ -52,7 +99,9 @@
                                     Manage Subscription
                             </h2>
                             <hr>
-                            <?php if (isset($_GET['error'])) { ?>
+                            <?php if (isset($_GET['done'])) { ?>
+                            <p class="success">Action Completed Successfully</p>
+                            <?php } if (isset($_GET['error'])) { ?>
                             <p class="error"><?php echo $_GET['error']; ?></p>
                             <?php } ?>
                             <p>Hi <?php echo $last_name." ".$other_names; ?>, please review your current subscription data below</p>
@@ -116,7 +165,7 @@
                                   </tr>
                                   <tr>
                                 <td width="25%">Current Subscription</td>
-                                <td><?php echo $subscriptions->getOneField($subscription_type); ?></td>
+                                <td><?php echo $subscriptions->getOneField($subscription_type)." (".$sub_Renw.")"; ?></td>
                                 
                                   </tr>
                               <?php if (($subscription == "") || ($subscription <  time()) || (isset($_GET['renew']))) { ?>
@@ -251,9 +300,18 @@
                                   </tr>
                                   <tr>
                                 <td width="25%">Expiry Date</td>
-                                <td><?php echo date('l jS \of F Y h:i:s A', $subscription); ?></td>
+                                <td><?php echo date('l jS \of F Y h:i:s A', $subscription)." (".$sub_type.")"; ?></td>
                                 
                                   </tr>
+                                <?php if ($userData['payment_frequency'] == "Renew") { ?>
+                                  <tr>
+                                <td width="25%">Auto Rewew</td>
+                                <td><?php echo $sub_type; ?>
+                                <br>
+                                <a href="managesubscription?cancel" onClick="return confirm('Your subscription will not <?php echo $sub_type; ?> after this action. are you sure you want to continue ?')"> cancel auto renew</a></td>
+                                
+                                  </tr>
+                                <?php } ?>
                                   <?php if (($subscription_group_onwer == $ref) && ($subscription_group == 1)) { ?>
                                   <tr>
                                 <td width="25%">Subscription Users</td>
