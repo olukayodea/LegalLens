@@ -2,12 +2,11 @@
 	class searchHome extends common {
 		function create($array, $page_array) {
 			$val = $this->mysql_prep($array['s']);
-			global $categories;
 			$cat = "";
 			$count = 0;
 			
-            $result['doc'][$array['parameter'][$i]] = $this->searchCategory($val, $page_array['law']);
-            $result['doc_count'][$array['parameter'][$i]] = $c = $this->searchCategoryCount($val, $cat);
+            $result['doc'][$array['parameter']] = $this->searchCategory($val, $page_array['law']);
+            $result['doc_count'][$array['parameter']] = $c = $this->searchCategoryCount($val, $cat);
 
             $result['case_law'] = $this->searchCase($val, $page_array['case_law']);
             $result['case_law_count'] = $c = $this->searchCaseCount($val);
