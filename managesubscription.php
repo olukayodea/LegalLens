@@ -100,7 +100,7 @@
                             </h2>
                             <hr>
                             <?php if (isset($_GET['done'])) { ?>
-                            <p class="error">Action Completed Successfully</p>
+                            <p class="success">Action Completed Successfully</p>
                             <?php } if (isset($_GET['error'])) { ?>
                             <p class="error"><?php echo $_GET['error']; ?></p>
                             <?php } ?>
