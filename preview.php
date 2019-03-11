@@ -13,15 +13,15 @@
 	
 	if (isset($_REQUEST['cancel'])) {
 		$orders->updateOne("order_status", "CANCELLED", $data['ref']);
-		$orders->updateOne("payment_status", "CANCELLED", $data['ref']);
 		$transactions->updateOne("transaction_status", "CANCELLED", $transactionData['ref']);
 		
 		header("location: home");
 	} else if (isset($_REQUEST['others'])) {
-		$orders->updateOne("order_payment", "cash", $data['ref']);
+    $orders->updateOne("payment_type", "cash", $data['ref']);
 		$transactions->updateOne("transaction_channel", "cash", $transactionData['ref']);
 		
 		$array['ResponseCode'] = "00";
+		$array['Amount'] = $transactionData['amount'];
 		$array['TransactionDate'] = date('l jS \of F Y h:i:s A', $data['create_time']);
 		$response = json_encode($array);
 		$token = base64_encode($response);

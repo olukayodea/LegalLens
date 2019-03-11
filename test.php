@@ -3,8 +3,8 @@
 	$product_id = 6224;
 	$key = $product_key+$product_id;
 	$hash = hash("sha256", $key);
-	//$u = "http://127.0.0.1/legallens/";
-	$u = "http://legallens.com.ng/";
+	$u = "http://127.0.0.1/legallens/";
+	//$u = "http://legallens.com.ng/";
 	
 	/*//Login
 	//JSON Example
@@ -54,14 +54,14 @@
 
 	$URL = $u."api/".$hash."/users/passwordReset/olukayode.adebiyi@gmail.com";  */
 
-/*	//logout
+	//logout
 	//JSON Example
 	$array['product_key'] = $product_key;
 	$array['product_id'] = $product_id;
 	$xml_data = json_encode($array);
 	$type = "text/json";
 
-	$URL = $u."api/".$hash."/category";  */
+	$URL = $u."api/".$hash."/category"; 
 	
 /*	//update
 	//JSON Example

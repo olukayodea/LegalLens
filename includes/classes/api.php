@@ -193,28 +193,58 @@
 						$list_array = array();
 						$list = $categories->sortAll("0", "parent_id", "status", "active");
 						for ($i = 0; $i < count($list); $i++) {
+							$list_array['parent'] = 0;
 							$list_array['title'] = $list[$i]['title'];
-							$list_array['url'] = URL."mobile_document?sort=".$list[$i]['ref'];
+							$list_array['url'] = URL."mobile_document_home?sort=".$list[$i]['ref'];
+
+							$subList = $categories->sortAll($list[$i]['ref'], "parent_id", "status", "active");
+							for ($j = 0; $j < count($subList); $j++) {
+								$list_array['child'][$j]['parent'] = $subList[$j]['ref'];
+								$list_array['child'][$j]['title'] = $subList[$j]['title'];
+								$list_array['child'][$j]['url'] = URL."mobile_document?sort=".$subList[$j]['ref'];
+							
+							}
+							
 							$result[] = $list_array;
 						}
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Case law";
 						$list_array['url'] = URL."mobile_caseLaw";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Regulations /Circular";
 						$list_array['url'] = URL."mobile_regulations";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Clauses";
 						$list_array['url'] = URL."mobile_clause";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Agreements";
 						$list_array['url'] = URL."mobile_agreements";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Forms";
 						$list_array['url'] = URL."mobile_forms";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Dictionary";
 						$list_array['url'] = URL."mobile_dictionary";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
+						$list_array['title'] = "Subscription";
+						$list_array['url'] = URL."mobile_subscription";
+						$list_array['child'] = "";
+						$result[] = $list_array;
+
+						echo "<pre>";
+						print_r($result);
 						
 						$return['header']['status'] = 'DONE';
 						$return['header']['code'] = "200";

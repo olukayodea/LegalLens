@@ -11,6 +11,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule api/(.*)$ api/homePage.php?request=$1 [QSA,NC,L]
 RewriteRule regulations/(.*?)$ regulations.php?id=$1
 RewriteRule articles/(.*?)$ articles.php?id=$1
+RewriteRule response/(.*?)$ response.php?mobile=$1 [QSA,NC,L]
+RewriteRule flResponse/(.*?)$ flResponse.php?mobile [QSA,NC,L]
 RewriteRule category/([a-zA-Z)([0-9]+)/(.*?)/$ Forum.topics.php?id=$1
 RewriteRule topics/([a-zA-Z)([0-9]+)/(.*?)/$ Forum.post.php?id=$1
 RewriteRule news/([a-zA-Z)([0-9]+)/(.*?)/$ news_post.php?id=$1

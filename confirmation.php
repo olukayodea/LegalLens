@@ -97,7 +97,7 @@
                         Transaction Time: <strong><?php echo $urlData['TransactionDate']; ?></strong><br />
                         Transaction Amount: <strong><?php echo NGN.number_format($transaction_data['amount'], 2); ?></strong><br>
                         Transaction Status Description: <strong><?php echo $urlData['ResponseDescription']; ?></strong></p>
-                         <p><a href="<?php echo URL; ?>preview?others&id=<?php echo $id; ?>" onClick="return confirm('You have opted to pay for this order via other channels, do you wish to continue?')">Cick here to select other payment method</a></p>
+                         <p><a href="<?php echo URL; ?>preview?others&id=<?php echo $transaction_data['ref']; ?>" onClick="return confirm('You have opted to pay for this order via other channels, do you wish to continue?')">Cick here to select other payment method</a></p>
                         <p><a href="<?php echo URL; ?>redirect?retry&id=<?php echo $transaction_data['ref']; ?>">Cick here to retry online payment</a></p>
                         <?php } ?>
                         <?php if (($data['payment_type'] != "Online") && ($urlData['Amount'] > 0)) { ?>

@@ -73,8 +73,8 @@
                 
 
 <div>
-   <div style="border:1px solid #ccc; padding:10px">
-     <div style="margin-top:30px">
+	 <div style="border:1px solid #ccc; padding:10px">
+	 <div style="margin-top:30px">
        <h4 style="" align="center"><?php echo $categories->showLink($id); ?> </h4>
 		<form id="search-form2" class="search-form2 clearfix" method="post" action="" autocomplete="off">
 		        <input class="search-term2 required" type="text" id="s" name="s" placeholder="Type your search terms here" title="* Please enter a search term!" />
@@ -90,20 +90,17 @@
         <?php } ?>
         <p><a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=a">A</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=b">B</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=c">C</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=d">D</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=e">E</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=f">F</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=g">G</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=h">H</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=i">I</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=j">J</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=k">K</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=l">L</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=m">M</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=n">N</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=o">O</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=p">P</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=q">Q</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=r">R</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=s">S</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=t">T</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=u">U</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=v">V</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=w">W</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=x">X</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=y">Y</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=z">Z</a></p>
         <div id="easyPaginate">
-			<?php foreach ($list as $key => $value) { ?>
-                    <h4><?php echo $key; ?></h4>
-                    <?php for ($i = 0; $i < count($list[$key]); $i++) {
-                        $section_list = $sections->sortAll($list[$key][$i]['ref'], "document", "status", "active"); ?>
-                <span>
-                    <p><strong>
-                    <a href="<?php echo URL; ?>mobiledocument.view?view=Document&id=<?php echo $list[$key][$i]['ref']; ?>&jump=<?php echo intval($list[$key][$i]['section_ref']); ?>"><?php echo $list[$key][$i]['title']; ?></a></strong><br>
-                    <?php for ($j= 0; $j < count($section_list); $j++) { ?>
-                    <a href="<?php echo URL; ?>mobiledocument.read?id=<?php echo $list[$key][$i]['ref']; ?>&read=<?php echo $section_list[$j]['ref']; ?>"><?php echo nl2br(($section_list[$j]['section_no'])); ?></a>  
-                    <br>
-                    <?php } ?></p>
-				</span>
-                    <?php } ?>
-            <?php } ?>
+          <?php foreach ($list as $key => $value) { ?>
+              <h4><?php echo $key; ?></h4>
+              <?php for ($i = 0; $i < count($list[$key]); $i++) {
+              $section_list = $sections->sortAll($list[$key][$i]['ref'], "document", "status", "active"); ?>
+              <span>
+              <strong>
+              <a href="<?php echo URL; ?>mobiledocument.view?view=Document&id=<?php echo $list[$key][$i]['ref']; ?>&jump=<?php echo intval($list[$key][$i]['section_ref']); ?>"><?php echo $list[$key][$i]['title']; ?></a></strong><br>
+              </span>
+          <?php } ?>
+          <?php } ?>
+        </div>
        
 	 </div>
 
@@ -116,36 +113,30 @@
 
                 <a href="#top" id="scroll-top"></a>
                 <!-- script -->
-               <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->
-               	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-                <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>
-                <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
-                <script type='text/javascript' src='js/jquery.liveSearchd5f7.js?ver=2.0'></script>
-				<script type='text/javascript' src='js/jflickrfeed.js'></script>
-                <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
-                <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
-								<script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
-								<script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
-                <script type='text/javascript' src='js/frontEnd.js'></script>
-				<script type='text/javascript' src="js/navAccordion.min.js"></script>
+               <!-- <script type='text/javascript' src='<?php echo URL; ?>js/jquery-1.8.3.min.js'></script> -->
+                <script type='text/javascript' src='<?php echo URL; ?>js/jquery.easing.1.34e44.js?ver=1.3'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/jquery.liveSearchd5f7.js?ver=2.0'></script>
+				<script type='text/javascript' src='<?php echo URL; ?>js/jflickrfeed.js'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/jquery.formd471.js?ver=3.18'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
+                <script type='text/javascript' src="<?php echo URL; ?>js/jquery-twitterFetcher.js"></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/custom5152.js?ver=1.0'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/frontEnd.js'></script>
+				<script type='text/javascript' src="<?php echo URL; ?>js/navAccordion.min.js"></script>
                 
                 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
                 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-                <script src="js/pagination.js"></script>
+                <script src="<?php echo URL; ?>js/pagination.js"></script>
                 
                 
 	<script>
         $(function() {
-			$('#easyPaginate').easyPaginate({
-				paginateElement: 'span',
-				elementsPerPage: 3,
-				effect: 'climb'
-			});
             $( "#s" ).catcomplete({
       		  delay: 0,
               source: "includes/scripts/auto_complete_doc.php?sort=<?php echo $id; ?>&type=Law",
 				select: function( event, ui ) {
-					window.location='mobiledocument.view?id='+ui.item.code+"&view="+ui.item.type;
+					window.location='document.view?id='+ui.item.code+"&view="+ui.item.type;
 				}
             });
         });

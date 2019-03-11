@@ -213,6 +213,11 @@
 
 		function postTransaction($array) {
 			global $users;
+			if ($array['mobile'] == true) {
+				$mobile = "/mobile";
+			} else {
+				$mobile = "";
+			}
 			$order_owner = $users->listOne($array['order_owner']);
 			$carddetail['PBFPubKey'] 		= PBFPubKey;
 			$carddetail['cardno'] 			= preg_replace('/\s+/', '', $array['cardno']);
@@ -238,7 +243,7 @@
 			$carddetail['billingaddress'] 	= @$array['billingaddress'];
 			$carddetail['billingstate'] 	= @$array['billingstate'];
 			$carddetail['billingcountry'] 	= @$array['billingcountry'];
-			$carddetail['redirect_url'] 	= URL."flResponse";
+			$carddetail['redirect_url'] 	= URL."flResponse".$mobile;
 
 			//Rave Encode
 			$key = $this->getKey(SecKey);
