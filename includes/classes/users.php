@@ -410,17 +410,15 @@
 			$ref = $this->mysql_prep($array['ref']);
 			$last_name = $this->mysql_prep($array['last_name']);
 			$other_names = $this->mysql_prep($array['other_names']);
-			$email = $this->mysql_prep($array['email']);
 			$phone = $this->mysql_prep($array['phone']);
 
 			global $db;
 			try {
-				$sql = $db->prepare("UPDATE `users` SET `last_name` = :last_name, `other_names` = :other_names, `email` = :email, `phone` = :phone, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql = $db->prepare("UPDATE `users` SET `last_name` = :last_name, `other_names` = :other_names, `phone` = :phone, `modify_time` = :modifyTime WHERE `ref`=:id");
 				$sql->execute(
 					array(
 					':last_name' => $last_name,
 					':other_names' => $other_names,
-					':email' => $email,
 					':phone' => $phone,
 					':modifyTime' => time(),
 					':id' => $ref)
@@ -431,7 +429,6 @@
 						
 			if ($sql) {
 				if ($ref == $_SESSION['users']['ref']) {
-					$_SESSION['users']['email'] = $email;
 					$_SESSION['users']['last_name'] = $last_name;
 					$_SESSION['users']['other_names'] = $other_names;
 					$_SESSION['users']['phone'] = $phone;

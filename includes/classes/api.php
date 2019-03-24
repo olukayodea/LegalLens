@@ -62,7 +62,7 @@
 								break;
 							case "changepassword";
 								$array_data = $app_data['user'];
-								$register = $users->activate($array_data['newPassword'], $array_data['ref']);
+								$register = $users->activate($array_data['password'], $array_data['ref']);
 								if ($register) {
 									$return['header']['status'] = 'DONE';
 									$return['header']['code'] = "200";
