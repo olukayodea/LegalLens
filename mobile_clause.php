@@ -13,7 +13,7 @@
 		$list = $drafting->indexSearch($q, 'clause');
 	} else {
 		$list = $drafting->listAllHome("clause");
-	}
+	} 
 ?>
 <!doctype html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->

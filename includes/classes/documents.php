@@ -380,7 +380,7 @@
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag = " AND `".$tag3."` = :id3";
+				$sqlTag .= " AND `".$tag3."` = :id3";
 				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";

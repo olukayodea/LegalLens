@@ -19,12 +19,12 @@
 		$s = $common->get_prep($_REQUEST['return']);
 	}
 	
-	$data = $caselaw->getOne($id);
+  $data = $caselaw->getOne($id);
 	$list = $caselaw_sections->getOne($read);
-	$subList = $caselaw_sections->sortAll($read, "parent_issue", "status", "active");
 	$common->updateCounter($id, $read, "caseLaw");
 	
-	$text_data = $caselaw_sections->turnClickable($read);
+  $text_data = $caselaw_sections->turnClickable($read);
+  $listOthers = $caselaw_sections->sortAll($data['ref'], "caselaw", "status", "active");
 ?>
 <!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -116,9 +116,10 @@ $link .= $_SERVER['REQUEST_URI'];
      <div style="margin-top:30px">
        <?php if ((isset($s)) && ($s != "")) { ?>
        <p align="left"><a href="home?q=<?php echo $s; ?>" style="text-decoration:underline">Back to Search</a></p>
+       <?php } else { ?>
+       <p align="left"><a href="<?php echo URL; ?>caseLaw.ratio?id=<?php echo $data['areas']; ?>" style="text-decoration:underline">Back to <?php echo $data['areas']; ?></a></p>
        <?php } ?>
        <h3 style="" align="center"><?php echo $data['title']; ?></h3>
-       <p align="center"><?php echo $common->getLine($list['section_content']); ?></p>
        <p class="decorate"><?php echo nl2br($text_data); ?><br><br>
        <cite><?php echo $list['citation']; ?></cite>
 		<?php if ($data['file'] != "") { ?>
@@ -140,6 +141,13 @@ $link .= $_SERVER['REQUEST_URI'];
 			</div>
 		</div>
         <?php } ?>
+
+        <h3 style="" align="center">Other Ratios in <?php echo $data['title']; ?></h3>
+       <?php for ($i = 0; $i < count($listOthers); $i++) { ?>
+        <?php echo nl2br($common->truncateLine($listOthers[$i]['section_content'])); ?><br>
+       <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $id; ?>&read=<?php echo $listOthers[$i]['ref']; ?>">Read More</a><br>
+       <cite><strong><?php echo $listOthers[$i]['citation']; ?></strong></cite><br><br>
+       <?php } ?>
        
 	 </div>
 

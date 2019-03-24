@@ -86,6 +86,13 @@
 			return $text;
 		}
 		
+		function truncateLine($data) {
+			$split = explode(".", $data);
+			$text = $split[0];
+			$text = $text."... ";
+			return $text;
+		}
+		
 		function getLine($text) {
 			$word = explode(".", $text);
 			return $word[0];

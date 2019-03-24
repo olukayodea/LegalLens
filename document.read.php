@@ -20,10 +20,11 @@
 	
 	$data = $documents->getOne($id);
 	$list = $sections->getOne($read); 
-	$subList = $sections->sortAll($read, "document", "status", "active");
+	$subList = $sections->sortAll($id, "document", "status", "active");
 	$common->updateCounter($id, $read, "document");
 	$prev = $sections->gettPrevNext($read, "-");
-	$next = $sections->gettPrevNext($read, "+");
+  $next = $sections->gettPrevNext($read, "+");
+  
 ?>
 <!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -113,6 +114,10 @@ $link .= $_SERVER['REQUEST_URI'];
            <td align="left"><a href="<?php echo URL."document.view"."?id=".$id."&view=Document&jump=0"; ?>" style="text-decoration:underline">Section List</a></td>
            <td align="right">&nbsp;</td>
          </tr>
+         <tr>
+           <td align="left"><?php if (intval($prev) > 0) { ?><a href="<?php echo URL."document.read"."?id=".$id."&read=".$prev; ?>" style="text-decoration:underline">&lt; &lt; Previous Section</a><?php } ?></td>
+           <td align="right"<?php if (intval($next) > 0) { ?>><a href="<?php echo URL."document.read"."?id=".$id."&read=".$next; ?>" style="text-decoration:underline">Next Section &gt; &gt;</a><?php } ?></td>
+        </tr>
        </table>
 <h3 style="" align="center"><?php echo $data['title']; ?></h3>
        <p align="center"><strong><?php echo $list['section_no']; ?></strong></p>
@@ -120,9 +125,7 @@ $link .= $_SERVER['REQUEST_URI'];
        <?php if (count($subList) > 0) { ?>
            <h3 style="" align="center">Other Sections in This Document</h3>
            <?php for ($i = 0; $i < count($subList); $i++) { ?>
-           <p><strong><?php echo $subList['section_no']; ?></strong><br>
-		   <?php echo nl2br($common->truncate($subList[$i]['section_content'], 500)); ?><br>
-           <a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $subList[$i]['ref']; ?>">Read More</a></p>
+           <a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $subList[$i]['ref']; ?>"><strong><?php echo $subList[$i]['section_no']; ?></strong></a><br>
            <?php } ?>
        <?php } ?>
        

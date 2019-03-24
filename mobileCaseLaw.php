@@ -1,25 +1,36 @@
 <?php
-	$redirect = "mobile_caseLaw";
+	$redirect = "mobileCaseLaw";
 	include_once("includes/functions.php");
   include_once("includes/mobile_session.php");
   //include_once("includes/session.php");
-    
+      
 	if (isset($_REQUEST['sort'])) {
-    $id = $common->get_prep($_REQUEST['sort']);
-    header("location: caseLaw?sort=".urlencode($_REQUEST['sort']));
-} else {
-    $id = false;
-    $tag = "All Areas of Law";
-    $tag2 = " in ".$tag;
-}
-
-if (isset($_REQUEST['filter'])) {
-$filter = $common->get_prep($_REQUEST['filter']);
-} else {
-$filter = false;
-}
-
-$list = $caselaw->listCourt()
+		$id = $common->get_prep($_REQUEST['sort']);
+		$tag = "Case Law in ".$id;
+		$tag2 = " in ".$id;
+	} else {
+		$id = false;
+		$tag = "All Case Law";
+		$tag2 = " in ".$tag;
+	}
+	
+	if (isset($_REQUEST['filter'])) {
+		$filter = $common->get_prep($_REQUEST['filter']);
+	} else {
+		$filter = false;
+	}
+	
+	$filter = "title";
+	if (isset($_REQUEST['s'])) {
+		$s = $common->get_prep($_REQUEST['s']);
+		$list = $caselaw->fullSearch($s, $id, $filter);
+		$tag = "Search Result for <strong>'".$s."'</strong>".$tag2."";
+	} else if (isset($_REQUEST['q'])) {
+		$q = strtoupper($common->get_prep($_REQUEST['q']));
+		$list = $caselaw->indexSearch($q, $id, $filter);
+	} else {
+		$list = $caselaw->listAllHome($id, $filter);
+  }
 
 ?>
 <!doctype html>
@@ -77,17 +88,13 @@ $list = $caselaw->listCourt()
 		</form>
         <hr>
         <h4><?php echo $tag; ?></h4>
-        <?php if (isset($_REQUEST['s'])) { ?>
+		<?php if (isset($_REQUEST['s'])) { ?>
         <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
         <?php } ?>
-        <div id="easyPaginate">
-            <?php for ($i = 0; $i < count($list); $i++) {?>
-                <span>
-                    <strong>
-                    <a href="<?php echo URL; ?>mobile_caseLaw?sort=<?php echo urlencode($list[$i]['title']); ?>"><?php echo $list[$i]['title']; ?></a>
-                    </strong><br>
-                </span>
-            <?php } ?>
+        <p><a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=a">A</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=b">B</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=c">C</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=d">D</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=e">E</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=f">F</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=g">G</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=h">H</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=i">I</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=j">J</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=k">K</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=l">L</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=m">M</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=n">N</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=o">O</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=p">P</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=q">Q</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=r">R</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=s">S</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=t">T</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=u">U</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=v">V</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=w">W</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=x">X</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=y">Y</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=z">Z</a></p>
+        <?php for ($i = 0; $i < count($list); $i++) { ?>
+        <strong><a href="<?php echo URL; ?>mobilecaseLaw.ratio?id=<?php echo $list[$i]['areas']; ?>"><?php echo ucfirst(strtolower($list[$i]['areas'])); ?></a></strong><br>
+			<?php } ?>
         </div>
        
 	 </div>
