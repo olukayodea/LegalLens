@@ -128,7 +128,7 @@
 			return $this->out_prep($row);
 		}
 		
-		function sortAll($tag, $id, $limit=false, $id2=false, $tag2=false, $id3=false, $tag3=false, $order="ref") {
+		function sortAll($tag, $id, $id2=false, $tag2=false, $id3=false, $tag3=false, $order="ref") {
 			$token = array(':id' => $id);
 			if ($tag2 != false) {
 				$sqlTag = " AND `".$tag2."` = :id2";
@@ -189,7 +189,8 @@
 		}
 		
 		function orderNotification($id) {
-			$users = new users;
+			global $users;
+			global $alerts;
 			$data = $this->getOne($id);
 			$userData = $users->listOne($data['order_owner']);
 			
@@ -209,7 +210,6 @@
 			$mail['subject'] = $subjectToClient;
 			$mail['body'] = $messageToClient;
 			
-			$alerts = new alerts;
 			$alerts->sendEmail($mail);
 		}
 		

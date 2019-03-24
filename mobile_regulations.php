@@ -1,6 +1,7 @@
 <?php
 	$redirect = "mobile_regulations";
 	include_once("includes/functions.php");
+	include_once("includes/mobile_session.php");
 	//include_once("includes/session.php");
 	if ((isset($_REQUEST['id'])) && ($_REQUEST['id'] != "")) {
 		$id = $common->get_prep($_REQUEST['id']);

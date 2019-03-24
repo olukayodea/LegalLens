@@ -1,6 +1,7 @@
 <?php
 	$redirect = "mobilehome";
 	include_once("includes/functions.php");
+  include_once("includes/mobile_session.php");
   //include_once("includes/session.php");
   
 	

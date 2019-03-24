@@ -1,6 +1,7 @@
 <?php
 	$redirect = "mobile_subscription_users";
-	include_once("includes/functions.php");
+    include_once("includes/functions.php");
+    include_once("includes/mobile_session.php");
 	
 	if (($subscription_group_onwer != $ref) || ($subscription_group != 1)) {
 		header("location mobile_subscription?error=".urlencode("You don't have permission to view this page"));

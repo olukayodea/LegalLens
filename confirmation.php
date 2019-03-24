@@ -18,7 +18,7 @@
   $subscription_group = trim($userData['subscription_group']);
   if ($userData['payment_frequency'] == "Single") {
     $sub_Renw = "No Auto-renew";
-    $sub_type = "Not Applicable";
+    $sub_type = "Auto renewal not available ";
   } else {
     $expiryDate = $subscription-(60*60*24*3);
     $sub_Renw = "Automatic Renewal";

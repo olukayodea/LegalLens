@@ -25,7 +25,6 @@
 			$_POST['mobile'] = false;
 			$url = "";
 		}
-		
 			
 		$array['order_owner'] = $_POST['order_owner'];
 		$array['order_subscription'] = $_POST['package'];
@@ -36,9 +35,13 @@
 		$array['payment_frequency'] = $_POST['payment_frequency'];
 		$array['order_amount_discount'] = $discount;
 		$array['order_amount_gross'] = $amount;
+		if ($amount < 1) {
+			$array['payment_type'] = "Free";
+			$array['transaction_channel'] = "Free";
+			$array['payment_frequency'] = "Single";
+		}
 		
 		$create = $orders->create($array);
-		
 		if ($create) {
 			$res = explode("_", $create);
 			$data = $orders->getOne($res[0]);

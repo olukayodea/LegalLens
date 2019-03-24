@@ -80,7 +80,7 @@
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "users";
 				$logArray['owner_id'] = $user;
-				$logArray['desc'] = "added new device on ".$data['browser_name']." on ".$data['os']." near ".$data['loc_city']." ".$data['loc_region']." ";
+				$logArray['desc'] = "added new device on ".$array['browser_name']." on ".$array['os']." near ".$array['loc_city']." ".$array['loc_region']." ";
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -126,7 +126,7 @@
 				$rand = $_COOKIE['userID'];
 			} else {
 				$rand = rand(10000, 99999)."_".rand(10000, 99999);
-				setcookie("userID", $userID, time()+(60*60*24*30*6), "/");
+				setcookie("userID", $rand, time()+(60*60*24*30*6), "/");
 			}
 			$agent = $_SERVER['HTTP_USER_AGENT'];
 						

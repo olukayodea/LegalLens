@@ -1,6 +1,7 @@
 <?php
 	$redirect = "mobile_subscription";
     include_once("includes/functions.php");
+    include_once("includes/mobile_session.php");
 
   $userData = $users->listOne($ref);
   if (isset($_REQUEST['cancel'])) {
@@ -284,7 +285,7 @@
             <?php } else if ((time()+(60*60*24*3)) > $subscription) { ?>
                 <tr>
             <td width="25%">&nbsp;</td>
-            <td><a href="<?php echo URL; ?>mobile_subscription?renew">Renew Subscription</a></td>
+            <td><a href="<?php echo URL; ?>mobile_subscription?id=<?php echo $ref; ?>&renew">Renew Subscription</a></td>
             
                 </tr>
             <?php } else { ?>
@@ -308,14 +309,14 @@
             <td width="25%">Auto Rewew</td>
             <td><?php echo $sub_type; ?>
             <br>
-            <a href="mobile_subscription?cancel" onClick="return confirm('Your subscription will not <?php echo $sub_type; ?> after this action. are you sure you want to continue ?')"> cancel auto renew</a></td>
+            <a href="mobile_subscription?id=<?php echo $ref; ?>&cancel" onClick="return confirm('Your subscription will not <?php echo $sub_type; ?> after this action. are you sure you want to continue ?')"> cancel auto renew</a></td>
             
                 </tr>
             <?php } ?>
                 <?php if (($subscription_group_onwer == $ref) && ($subscription_group == 1)) { ?>
                 <tr>
             <td width="25%">Subscription Users</td>
-            <td><?php echo number_format(count($sub_list)); ?> [ <a href="<?php echo URL; ?>mobile_subscription_users">Manage Users</a> ]</td>
+            <td><?php echo number_format(count($sub_list)); ?> [ <a href="<?php echo URL; ?>mobile_subscription_users?id=<?php echo $ref; ?>">Manage Users</a> ]</td>
             
                 </tr>
                 <?php } ?>

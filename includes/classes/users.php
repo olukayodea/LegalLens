@@ -72,9 +72,9 @@
 				$alerts->sendEmail($mail);
 				//add to log
 				$logArray['object'] = get_class($this);
-				$logArray['object_id'] = $data['id'];
+				$logArray['object_id'] = intval($data['id']);
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['owner_id'] = intval($data['id']);
 				$logArray['desc'] = "updated password";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -263,6 +263,7 @@
 					$result['date_time'] = $row['date_time'];
 					$result['subscription'] = $row['subscription'];
 					$result['subscription_type'] = $subscriptions->getOneField($row['subscription_type']);
+					$result['subscription_url'] = URL."mobile_subscription?id=".$row['ref'];
 					$result['modify_time'] = $row['modify_time'];
 					$result['status'] = $row['status'];
 					$result['last_login'] = $row['last_login'];
@@ -411,18 +412,16 @@
 			$other_names = $this->mysql_prep($array['other_names']);
 			$email = $this->mysql_prep($array['email']);
 			$phone = $this->mysql_prep($array['phone']);
-			$address = $this->mysql_prep($array['address']);
 
 			global $db;
 			try {
-				$sql = $db->prepare("UPDATE `users` SET `last_name` = :last_name, `other_names` = :other_names, `email` = :email, `phone` = :phone, `address` = :address, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql = $db->prepare("UPDATE `users` SET `last_name` = :last_name, `other_names` = :other_names, `email` = :email, `phone` = :phone, `modify_time` = :modifyTime WHERE `ref`=:id");
 				$sql->execute(
 					array(
 					':last_name' => $last_name,
 					':other_names' => $other_names,
 					':email' => $email,
 					':phone' => $phone,
-					':address' => $address,
 					':modifyTime' => time(),
 					':id' => $ref)
 				);

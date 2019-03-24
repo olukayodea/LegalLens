@@ -1,6 +1,7 @@
 <?php
 	$redirect = "mobile_subscription";
 	include_once("includes/functions.php");
+  include_once("includes/mobile_session.php");
 	
 	if (isset($_REQUEST['id'])) {
 		echo $id = $common->mysql_prep($_REQUEST['id']);
