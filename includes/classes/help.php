@@ -33,7 +33,7 @@ class help extends common {
 								':user_id' => $user_id,
 								':admin_id' => $admin_id,
 								':response_id' => $response_id,
-								':file' => $file,
+								':file' => $upload_file,
 								':create_time' => $create_time,
 								':modify_time' => $modify_time));
 				} catch(PDOException $ex) {
@@ -62,7 +62,6 @@ class help extends common {
 		function uploadFile($array) {
 			ini_set("memory_limit", "200000000");
 						
-			$image = $array["media_file"]["name"];
 			$uploadedfile = $array['media_file']['tmp_name'];
 			$msg = array();
 			if ($array["media_file"]["error"] == 1) {
@@ -90,7 +89,7 @@ class help extends common {
 				$extension = strtolower($extension);
 				
 				if($array['media_file']['size'] < 2097152) {
-					$size=filesize($array['media_file']['tmp_name']);
+					//$size=filesize($array['media_file']['tmp_name']);
 					
 					$userDoc = "library/helpfiles/";
 					$file = time().rand(100, 999).".".$extension;
@@ -119,7 +118,6 @@ class help extends common {
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
-			$modDate = time();
 			
 			global $db;
 			try {
@@ -277,7 +275,7 @@ class help extends common {
 				'&email='.urlencode($email).
 				'&status='.urlencode($data['status']).
 				'&id='.urlencode($data['ref']).
-				'&time='.urlencode($modify_time);
+				'&time='.urlencode(time());
 			$mailUrl = URL."includes/emails/help_notfication.php?".$fields;
 			$messageToClient = $this->curl_file_get_contents($mailUrl);
 			

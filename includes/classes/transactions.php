@@ -284,5 +284,51 @@
 			}
 			
 		}
+
+		function postTransactionAuto($array) {
+			global $users;
+
+			$order_owner = $users->listOne($array['order_owner']);
+			$carddetail['SECKEY'] 			= SecKey;
+			$carddetail['token'] 			= $array['token'];
+			$carddetail['currency'] 		= "NGN";
+			$carddetail['country'] 			= "NG";
+			$carddetail['amount'] 			= $array['total'];
+			$carddetail['email'] 			= $order_owner['email'];
+			$carddetail['firstname'] 		= $order_owner['other_names'];
+			$carddetail['lastname'] 		= $order_owner['last_name'];
+			$carddetail['IP']				= $_SERVER['REMOTE_ADDR'];
+			$carddetail['txRef']			= "SUB_".$array['order']."_".$array['tx_id']."_".time();
+
+			$ch = curl_init();
+
+			curl_setopt($ch, CURLOPT_URL, tokenCharge);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($carddetail)); //Post Fields
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 200);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 200);
+			
+			$headers = array('Content-Type: application/json');
+			
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+			curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__)."/cacert.pem");
+			
+			$request = curl_exec($ch);
+			
+			curl_close($ch);
+
+			if ($request) {
+				return $request;
+			}else{
+				if(curl_error($ch))
+				{
+					echo 'error:' . curl_error($ch);
+				}
+			}
+			
+		}
 	}
 ?>

@@ -145,10 +145,10 @@
 			return $this->out_prep($row);
 		}
 		
-		function listAllHome($type=false, $filter="title") {			
+		function listAllHome($filter="title") {			
 			global $db;
 			try {
-				$sql = $db->query("SELECT * FROM `articles` WHERE ".$addition."`status` = 'active' ORDER BY `".$filter."` ASC");
+				$sql = $db->query("SELECT * FROM `articles` WHERE `status` = 'active' ORDER BY `".$filter."` ASC");
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}

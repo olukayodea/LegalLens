@@ -95,7 +95,7 @@
 			
 			global $db;
 			try {
-				$sql = $db->prepare("UPDATE `list_library` SET  `".$tag."` = :value, `modify_time` = '".$modDate."' WHERE `ref`=:id");
+				$sql = $db->prepare("UPDATE `list_library` SET  `".$tag."` = :value, `modify_time` = :modify_time WHERE `ref`=:id");
 				$sql->execute(
 					array(
 					':value' => $value,

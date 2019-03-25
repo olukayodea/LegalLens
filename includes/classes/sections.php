@@ -119,7 +119,7 @@
 			$id = $this->mysql_prep($id);
 			global $db;
 			try {
-				$sql = $db->prepare("UPDATE `sections` SET  `".$tag."` = :value, `modify_time` = '".$modDate."' WHERE `ref`=:id");
+				$sql = $db->prepare("UPDATE `sections` SET  `".$tag."` = :value, `modify_time` = :modify_time WHERE `ref`=:id");
 				$sql->execute(
 					array(
 					':value' => $value,

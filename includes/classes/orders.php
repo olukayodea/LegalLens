@@ -118,7 +118,7 @@
 		function dataRange($from, $to) {
 			global $db;
 			try {
-				$sql = $db->query("SELECT * FROM `orders` WHERE `modify_time` BETWEEN '".$from."' AND '".$to."' ORDER BY `modify_time` DESC".$add);
+				$sql = $db->query("SELECT * FROM `orders` WHERE `modify_time` BETWEEN '".$from."' AND '".$to."' ORDER BY `modify_time` DESC");
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
@@ -234,6 +234,7 @@
 			$newTime = time()+((60*60*24)*($b+$sub_data['validity']));
 			
 			$users->modifyOne("subscription",$newTime, $data['order_owner']);
+			$users->modifyOne("payment_frequency_retry",$newTime, $data['order_owner']);
 			$users->modifyOne("subscription_type", $order_subscription, $data['order_owner']);
 			$users->modifyOne("subscription_type_name", $sub_data['title'], $data['order_owner']);
 			$users->modifyOne("subscription_group", $data['order_owner'], $data['order_owner']);

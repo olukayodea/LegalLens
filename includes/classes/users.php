@@ -522,6 +522,20 @@
 			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
 			return $this->out_prep($row);
 		}
+
+		function listAllAutoRenew() {			
+			$time = time()+(60*60*24*3);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `users` WHERE status != 'DELETED' AND `payment_frequency` = 'Renew' AND `payment_frequency_retry_count` <= 3 AND `payment_frequency_retry` < ".time()." AND `subscription` < '".$time."' ORDER BY `ref` ASC LIMIT 10");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
+			return $this->out_prep($row);
+		}
 		
 		function listOne($ref, $tag='ref') {
 			$ref = $this->mysql_prep($ref);

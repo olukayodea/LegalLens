@@ -49,6 +49,7 @@
 	define("flCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/charge", true);
 	define("flValidateCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/validatecharge", true);
 	define("flVerify", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify", true);
+	define("tokenCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/tokenized/charge", true);
 	include_once("classes/common.php");
 	$common = new common;
 

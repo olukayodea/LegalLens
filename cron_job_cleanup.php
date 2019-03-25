@@ -20,8 +20,9 @@
 	
 	include_once("includes/classes/config.php");
 	include_once("includes/classes/common.php");
-	$db = new sql;
-	$connectDb = $db->connect();
+	$config = new config;
+	$db = $config->connect();
+	
 	$common = new common;
 	
 	//log and reports
