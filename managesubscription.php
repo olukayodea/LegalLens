@@ -216,23 +216,23 @@
                                 <tbody>
                                   <tr>
                                    <td width="25%">Card Number</td>
-                                   <td><input type="text" name="cardno" id="cardno" required placeholder="XXXX XXXX XXXX XXXX" onKeyUp="displayCardType(this.value)"><span id="cardLogo"></span></td>
+                                   <td><input type="text" name="cardno" id="cardno" placeholder="XXXX XXXX XXXX XXXX" onKeyUp="displayCardType(this.value)"><span id="cardLogo"></span></td>
                                  </tr>
                                   <tr>
                                    <td width="25%">Card Expiry (MM/YY)</td>
-                                   <td><input type="number" maxlength="2" size="2" name="mm" id="mm" required placeholder="MM" pattern="[0-9.]+" onKeyUp="monthCheck()" max="12"> <input type="number" maxlength="2" size="2" name="yy" id="yy" required placeholder="YY" pattern="[0-9.]+" onKeyUp="yearCheck()" max="99"></td>
+                                   <td><input type="number" maxlength="2" size="2" name="mm" id="mm" placeholder="MM" pattern="[0-9.]+" onKeyUp="monthCheck()" max="12"> <input type="number" maxlength="2" size="2" name="yy" id="yy" placeholder="YY" pattern="[0-9.]+" onKeyUp="yearCheck()" max="99"></td>
                                  </tr>
                                   <tr>
                                    <td width="25%">CVV</td>
-                                   <td><input type="number" maxlength="3" size="3" name="cvv" id="cvv" required placeholder="CVV" max="999"> </td>
+                                   <td><input type="number" maxlength="3" size="3" name="cvv" id="cvv" placeholder="CVV" max="999"> </td>
                                  </tr>
                                   <tr>
                                    <td width="25%">Billing Address</td>
-                                   <td><input type="text" name="billingaddress" id="billingaddress" required placeholder="123 Steet Address"></td>
+                                   <td><input type="text" name="billingaddress" id="billingaddress" placeholder="123 Steet Address"></td>
                                  </tr>
                                   <tr>
                                    <td width="25%">Billing City</td>
-                                   <td><input type="text" name="billingcity" id="billingcity" required placeholder="City"></td>
+                                   <td><input type="text" name="billingcity" id="billingcity" placeholder="City"></td>
                                  </tr>
                                   <tr>
                                    <td width="25%">Billing ZIP/Post Code</td>
@@ -240,11 +240,11 @@
                                  </tr>
                                   <tr>
                                    <td width="25%">Billing State</td>
-                                   <td><input type="text" name="billingstate" id="billingstate" required placeholder="State"></td>
+                                   <td><input type="text" name="billingstate" id="billingstate" placeholder="State"></td>
                                  </tr>
                                   <tr>
                                    <td width="25%">Billing State</td>
-                                   <td><input type="text" name="billingcountry" id="billingcountry" required placeholder="Country"></td>
+                                   <td><input type="text" name="billingcountry" id="billingcountry" placeholder="Country"></td>
                                  </tr>
                                   <tr>
                                    <td colspan="2" align="right">Powered by Rave&TRADE; by <a href='https://flutterwave.com/int/online-payments-products/rave/'>Flutterwave</a></td>

@@ -1,6 +1,7 @@
 <?php
 	$redirect = "mobiledocument.read";
 	include_once("includes/functions.php");
+  include_once("includes/mobile_session.php");
 	//include_once("includes/session.php");
 	
 	if (isset($_REQUEST['id'])) {
@@ -79,16 +80,19 @@
            <td align="left"><a href="<?php echo URL."mobiledocument.view"."?id=".$id."&view=Document&jump=0"; ?>" style="text-decoration:underline">Section List</a></td>
            <td align="right">&nbsp;</td>
          </tr>
+         <tr>
+       <td align="left"><?php if (intval($prev) > 0) { ?><a href="<?php echo URL."mobiledocument.read"."?id=".$id."&read=".$prev; ?>" style="text-decoration:underline">&lt; &lt; Previous Section</a><?php } ?></td>
+           <td align="right"<?php if (intval($next) > 0) { ?>><a href="<?php echo URL."mobiledocument.read"."?id=".$id."&read=".$next; ?>" style="text-decoration:underline">Next Section &gt; &gt;</a><?php } ?></td>
+         </tr>
        </table>
 <h3 style="" align="center"><?php echo $data['title']; ?></h3>
        <p align="center"><?php echo $list['section_no']; ?></p>
        <p><?php echo nl2br($list['section_content']); ?></p>
+
        <?php if (count($subList) > 0) { ?>
            <h3 style="" align="center">Other Sections in This Document</h3>
            <?php for ($i = 0; $i < count($subList); $i++) { ?>
-           <p><strong><?php echo $subList['section_no']; ?></strong><br>
-		   <?php echo nl2br($common->truncate($subList[$i]['section_content'], 500)); ?><br>
-           <a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $subList[$i]['ref']; ?>">Read More</a></p>
+           <a href="<?php echo URL; ?>mobiledocument.read?id=<?php echo $data['ref']; ?>&read=<?php echo $subList[$i]['ref']; ?>"><strong><?php echo $subList[$i]['section_no']; ?></strong></a><br>
            <?php } ?>
        <?php } ?>
        

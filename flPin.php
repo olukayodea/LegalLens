@@ -2,6 +2,16 @@
     include_once("includes/functions.php");
     $response = $_REQUEST['data'];
 
+    if (isset($_GET['mobile'])) {
+        $mobile = "mobile_";
+        $subscriptions_url = "mobile_subscription";
+        $url = "&mobile";
+    } else {
+        $mobile = "";
+        $subscriptions_url = "managesubscription";
+        $url = "";
+    }
+
     if (isset($_POST['submit2'])) {
         $postdata = array(
             'PBFPubKey' => PBFPubKey,
@@ -27,7 +37,7 @@
         $result = json_decode($request, true);
 
         if (($result['status'] == "success") && ($result['data']['data']['responsecode'] == "00")) {
-            header("location: flConfirm?txRef=".$result['data']['tx']['txRef']);
+            header("location: flConfirm?txRef=".$result['data']['tx']['txRef'].$url);
         } else {
             $error = "An error occured ".$result['message'];
         }
@@ -37,15 +47,16 @@
         $postData['pin'] = $_POST['pin'];
         $postData['suggested_auth'] = "PIN";
         $trannsData = $transactions->postTransaction($postData);
+
         $result = json_decode($trannsData, true);
         if (($result['status'] == "success") && ($result['data']['chargeResponseCode'] == "02")) {
             if ($result['data']['authModelUsed'] == "PIN") {
-                header("location: ?otp&flwRef=".$result['data']['flwRef']."&data=".$_POST['post']."&msg=".$result['data']['chargeResponseMessage']);
+                header("location: ?otp&flwRef=".$result['data']['flwRef']."&data=".$_POST['post']."&msg=".$result['data']['chargeResponseMessage'].$url);
             } else if ($result['data']['authModelUsed'] == "VBVSECURECODE") {
                 header("location: ".$result['data']['authurl']);
             } 
         } else {
-            header("location: managesubscription?error=".$result['message']);
+            header("location: ".$subscriptions_url."?error=".$result['message']);
         }
     }
 ?>

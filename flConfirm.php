@@ -2,6 +2,14 @@
     include_once("includes/functions.php");
     $result = array();
 
+    if (isset($_GET['mobile'])) {
+        $mobile = "mobile_";
+        $subscriptions_url = "mobile_subscription";
+    } else {
+        $mobile = "";
+        $subscriptions_url = "managesubscription";
+    }
+
     $postdata =  array( 
     'txref' => $_REQUEST['txRef'],
     'SECKEY' => SecKey
@@ -42,7 +50,7 @@
         $orders->updateOne("order_status", "CANCELLED", $txData[1]);
         $orders->updateOne("payment_status", "CANCELLED", $txData[1]);
         $transactions->updateOne("transaction_status", "CANCELLED", $txData[2]);
-        header("location: managesubscription?error=".$result->message);
+        header("location: ".$subscriptions_url."?error=".$result->message);
     }
 
     if('successful' == $result['data']['status'] && '00' == $result['data']['chargecode']){
@@ -69,6 +77,6 @@
         $urlData['ResponseDescription'] = $result['data']['vbvmessage'];
 
         $token = base64_encode(json_encode($urlData));
-	    header("location: confirmation?id=".$txData[1]."&token=".$token	);
+	    header("location: ".$mobile."confirmation?id=".$txData[1]."&token=".$token	);
     }
 ?>

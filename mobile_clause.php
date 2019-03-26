@@ -1,6 +1,7 @@
 <?php
 	$redirect = "mobile_clause";
 	include_once("includes/functions.php");
+	include_once("includes/mobile_session.php");
 	//include_once("includes/session.php");
 	
 	if (isset($_REQUEST['s'])) {
@@ -12,7 +13,7 @@
 		$list = $drafting->indexSearch($q, 'clause');
 	} else {
 		$list = $drafting->listAllHome("clause");
-	}
+	} 
 ?>
 <!doctype html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->

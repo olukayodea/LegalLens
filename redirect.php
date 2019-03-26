@@ -9,7 +9,13 @@
 	
 	$amount = $data['amount']*100;
 	$currency = 566;
-	$site_redirect_url = URL."response";
+
+	if (isset($_GET['mobile'])) {
+		$site_redirect_url = URL."response/mobile";
+	} else {
+		$site_redirect_url = URL."response";
+	}
+
 	if (isset($_REQUEST['retry'])) {
 		$txn_ref = $transaction_id = $transactions->confirmUnique($transactions->createUnique());
 		$transactions->updateOne("transaction_id", $txn_ref, $id);

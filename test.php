@@ -3,8 +3,9 @@
 	$product_id = 6224;
 	$key = $product_key+$product_id;
 	$hash = hash("sha256", $key);
-	//$u = "http://127.0.0.1/legallens/";
-	$u = "http://legallens.com.ng/";
+	$u = "http://127.0.0.1/legallens/";
+	//$u = "http://dev.legallens.net/";
+	//$u = "http://legallens.com.ng/";
 	
 	/*//Login
 	//JSON Example
@@ -34,16 +35,16 @@
 
 	$URL = $u."api/".$hash."/users/register";*/
 	
-/*	//Change Password
+	//Change Password
 	//JSON Example
 	$array['product_key'] = $product_key;
 	$array['product_id'] = $product_id;
-	$array['user']['password'] = "lolade";
+	$array['user']['password'] = "Password@1";
 	$array['user']['ref'] = "1";
 	$xml_data = json_encode($array);
 	$type = "text/json";
 
-	$URL = $u."api/".$hash."/users/changePassword";  */
+	$URL = $u."api/".$hash."/users/changePassword"; 
 
 /*	//Reset Password
 	//JSON Example
@@ -52,7 +53,7 @@
 	$xml_data = json_encode($array);
 	$type = "text/json";
 
-	$URL = $u."api/".$hash."/users/passwordReset/olukayode.adebiyi@gmail.com";  */
+	$URL = $u."api/".$hash."/users/passwordReset/olukayode.adebiyi@hotmail.co.uk"; */
 
 /*	//logout
 	//JSON Example
@@ -63,32 +64,29 @@
 
 	$URL = $u."api/".$hash."/category";  */
 	
-/*	//update
+	/*//update
 	//JSON Example
 	$array['product_key'] = $product_key;
 	$array['product_id'] = $product_id;
-	$array['mobile'] = "1234567890";
+	$array['mobile'] = "12345678909999999999";
 	$array['user']['ref'] = 1;
 	$array['user']['last_name'] = "Adebiyi";
 	$array['user']['other_names'] = "Olukayode";
-	$array['user']['email'] = "olukayode.adebiyi@hotmail.co.uk";
-	$array['user']['password'] = "lolade";
 	$array['user']['phone'] = "08182441752";
-	$array['user']['address'] = "some address";
 	$xml_data = json_encode($array);
 
-	$URL = $u."api/".$hash."/users/updatedetails";*/
+	$URL = $u."api/".$hash."/users/updatedetails"; */
 	
 	
-	/*//get details
+/*	//get details
 	//JSON Example
 	$array['product_key'] = $product_key;
 	$array['product_id'] = $product_id;
-	$array['mobile'] = "1234567890";
-	$array['user'] = 1;
+	$array['mobile'] = "12345678909999999999";
+	$array['user'] = 2;
 	$xml_data = json_encode($array);
 
-	$URL = $u."api/".$hash."/users/getDetails";*/
+	$URL = $u."api/".$hash."/users/getDetails";  */
 	
 		//quick find
 	/*//JSON Example

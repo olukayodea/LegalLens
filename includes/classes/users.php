@@ -72,9 +72,9 @@
 				$alerts->sendEmail($mail);
 				//add to log
 				$logArray['object'] = get_class($this);
-				$logArray['object_id'] = $data['id'];
+				$logArray['object_id'] = intval($data['id']);
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['owner_id'] = intval($data['id']);
 				$logArray['desc'] = "updated password";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
@@ -263,6 +263,7 @@
 					$result['date_time'] = $row['date_time'];
 					$result['subscription'] = $row['subscription'];
 					$result['subscription_type'] = $subscriptions->getOneField($row['subscription_type']);
+					$result['subscription_url'] = URL."mobile_subscription?id=".$row['ref'];
 					$result['modify_time'] = $row['modify_time'];
 					$result['status'] = $row['status'];
 					$result['last_login'] = $row['last_login'];
@@ -409,20 +410,16 @@
 			$ref = $this->mysql_prep($array['ref']);
 			$last_name = $this->mysql_prep($array['last_name']);
 			$other_names = $this->mysql_prep($array['other_names']);
-			$email = $this->mysql_prep($array['email']);
 			$phone = $this->mysql_prep($array['phone']);
-			$address = $this->mysql_prep($array['address']);
 
 			global $db;
 			try {
-				$sql = $db->prepare("UPDATE `users` SET `last_name` = :last_name, `other_names` = :other_names, `email` = :email, `phone` = :phone, `address` = :address, `modify_time` = :modifyTime WHERE `ref`=:id");
+				$sql = $db->prepare("UPDATE `users` SET `last_name` = :last_name, `other_names` = :other_names, `phone` = :phone, `modify_time` = :modifyTime WHERE `ref`=:id");
 				$sql->execute(
 					array(
 					':last_name' => $last_name,
 					':other_names' => $other_names,
-					':email' => $email,
 					':phone' => $phone,
-					':address' => $address,
 					':modifyTime' => time(),
 					':id' => $ref)
 				);
@@ -432,7 +429,6 @@
 						
 			if ($sql) {
 				if ($ref == $_SESSION['users']['ref']) {
-					$_SESSION['users']['email'] = $email;
 					$_SESSION['users']['last_name'] = $last_name;
 					$_SESSION['users']['other_names'] = $other_names;
 					$_SESSION['users']['phone'] = $phone;
@@ -508,7 +504,7 @@
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag = " AND `".$tag3."` = :id3";
+				$sqlTag .= " AND `".$tag3."` = :id3";
 				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
@@ -524,6 +520,20 @@
 			}
 			
 			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+			return $this->out_prep($row);
+		}
+
+		function listAllAutoRenew() {			
+			$time = time()+(60*60*24*3);
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `users` WHERE status != 'DELETED' AND `payment_frequency` = 'Renew' AND `payment_frequency_retry_count` <= 3 AND `payment_frequency_retry` < ".time()." AND `subscription` < '".$time."' ORDER BY `ref` ASC LIMIT 10");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+			
+			$row = $sql->fetchAll(PDO::FETCH_ASSOC);
+				
 			return $this->out_prep($row);
 		}
 		

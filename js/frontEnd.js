@@ -94,8 +94,22 @@ function getPayment(val) {
 function openCard(val) {
 	if (val == "Renew") {
 		document.getElementById("showCard").style.display = "block";
+		document.getElementById("cardno").setAttribute("required");
+		document.getElementById("mm").setAttribute("required");
+		document.getElementById("yy").setAttribute("required");
+		document.getElementById("billingaddress").setAttribute("required");
+		document.getElementById("billingcity").setAttribute("required");
+		document.getElementById("billingstate").setAttribute("required");
+		document.getElementById("billingcountry").setAttribute("required");
 	} else {
 		document.getElementById("showCard").style.display = "none";
+		document.getElementById("cardno").removeAttribute("required");
+		document.getElementById("mm").removeAttribute("required");
+		document.getElementById("yy").removeAttribute("required");
+		document.getElementById("billingaddress").removeAttribute("required");
+		document.getElementById("billingcity").removeAttribute("required");
+		document.getElementById("billingstate").removeAttribute("required");
+		document.getElementById("billingcountry").removeAttribute("required");
 	}
 }
 

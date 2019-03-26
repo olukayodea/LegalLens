@@ -3,8 +3,15 @@
 		
 	$mackey = "68466204A33A75724CC43810F794550093969EE824A02F959411D6601051E26D3DBD15C361DB827D4925883F926A455408ACC8E0DFDBAECAF6D4EF3363D4B3BC";
 	$product_id = 6699;
+
+
+	if (isset($_GET['mobile'])) {
+		$mobile = "mobile_";
+	} else {
+		$mobile = "";
+	}
 	
-	$txnref = $common->mysql_prep($_POST['txnref']);
+	$txnref = $common->mysql_prep($_REQUEST['txnref']);
 	//$txnref = "201629039";
 	
 	$data = $transactions->getOne($txnref, "transaction_id");
@@ -18,7 +25,8 @@
 	"transactionreference"=>$txnref,
 	"amount"=>$submittedamt
 	);
-	$outvalue = http_build_query($valuesforurl) . "\n";
+
+	$outvalue = http_build_query($valuesforurl);
 		
 	$url = "https://webpay.interswitchng.com/paydirect/api/v1/gettransaction.json?$outvalue "; // json
 	//$url = "https://stageserv.interswitchng.com/test_paydirect/api/v1/gettransaction.json?".$outvalue;
@@ -45,9 +53,7 @@
 	curl_close($ch);
 	
 	$rawData = json_decode($response, true);
-	
-	//print_r($rawData);
-	
+		
 	if ($rawData['ResponseCode'] == "00") {
 		$orders->updateOne("order_status", "COMPLETE", $data['order_id']);
 		$transactions->updateOne("transaction_status", "PAID", $data['ref']);
@@ -56,5 +62,5 @@
 	}
 	
 	$token = base64_encode($response);
-	header("location: confirmation?id=".$data['order_id']."&token=".$token	);
+	header("location: ".URL.$mobile."confirmation?id=".$data['order_id']."&token=".$token	);
 ?>

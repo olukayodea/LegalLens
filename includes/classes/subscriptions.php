@@ -32,8 +32,8 @@
 			}	
 			
 			try {
-				$sql = $db->prepare("INSERT INTO `subscriptions` (`title`, `status`, `validity`, `amount`, `type`, `create_time`, `modify_time`)
-				VALUES (:title, :status, :validity, :amount, :type, :create_time, :modify_time)
+				$sql = $db->prepare("INSERT INTO `subscriptions` (".$firstpart."`title`, `status`, `validity`, `amount`, `type`, `create_time`, `modify_time`)
+				VALUES (".$secondPArt.":title, :status, :validity, :amount, :type, :create_time, :modify_time)
 					ON DUPLICATE KEY UPDATE 
 						`status` = :status,
 						`title` = :title,
@@ -54,7 +54,7 @@
 				$logArray['object_id'] = $id;
 				$logArray['owner'] = "admin";
 				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
-				$logArray['desc'] = "created subscriptions ".$title;
+				$logArray['desc'] = "created subscriptions ".$log;
 				$logArray['create_date'] = time();
 				$system_log = new system_log;
 				$system_log->create($logArray);
@@ -151,7 +151,7 @@
 				$sqlTag = "";
 			}
 			if ($tag3 != false) {
-				$sqlTag = " AND `".$tag3."` = :id3";
+				$sqlTag .= " AND `".$tag3."` = :id3";
 				$token[':id3'] = $id3;
 			} else {
 				$sqlTag .= "";
@@ -197,7 +197,6 @@
 		}
 		
 		function getOne($id, $tag='ref') {
-
 			global $db;
 			try {
 				$sql = $db->prepare("SELECT * FROM subscriptions WHERE `".$tag."` = :id ORDER BY `ref` DESC LIMIT 1");
@@ -225,6 +224,130 @@
 		function getOneField($id, $tag="ref", $ref="title") {
 			$data = $this->getOne($id, $tag);
 			return $data[$ref];
+		}
+
+		function autoRenewal() {
+			global $users;
+			global $orders;
+			global $transactions;
+			$data = $users->listAllAutoRenew();
+
+			for ($i=0; $i < count($data); $i++) {
+				if ($data[$i]['card_token'] != "") {
+
+					$array = $orders->getOne($data[$i]['subscription_order']);
+
+					unset($array['modify_time']);
+					unset($array['create_time']);
+					unset($array['last_modified_by']);
+					unset($array['order_status']);
+					unset($array['ref']);
+					//$create = $orders->create($array);
+					$create = "199_198";
+
+					if ($create) {
+						$postData = array();
+						$splitOrderData = explode("_", $create);
+						$postData['token'] = $data[$i]['card_token'];
+						$postData['order_owner'] = $array['order_owner'];
+						$postData['total'] = $array['order_amount_net'];
+						$postData['order'] = $splitOrderData[0];
+						$postData['tx_id'] = $splitOrderData[1];
+
+						$trannsData = json_decode($transactions->postTransactionAuto($postData), true);
+
+						if (($trannsData['status'] == "success") && ($trannsData['data']['chargeResponseCode'] == "00")) {
+							$result = array();
+						
+							$postdata =  array( 
+							'txref' => $result['data']['txRef'],
+							'SECKEY' => SecKey
+							);
+						
+							$ch = curl_init();
+							curl_setopt($ch, CURLOPT_URL, flVerify);
+							curl_setopt($ch, CURLOPT_POST, 1);
+							curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($postdata));  //Post Fields
+							curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+						
+							$headers = ['Content-Type: application/json'];
+						
+							curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+							curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+							curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__)."/cacert.pem");
+						
+							$request = curl_exec ($ch);
+							$err = curl_error($ch);
+						
+							if($err){
+								// there was an error contacting rave
+								die('Curl returned error: ' . $err);
+							}
+						
+							curl_close ($ch);
+						
+							$result = json_decode($request, true);
+						
+							if('successful' == $result['data']['status'] && '00' == $result['data']['chargecode']){								
+								$orders->updateOne("order_status", "COMPLETE", $splitOrderData[0]);
+								$transactions->updateOne("transaction_status", "PAID", $splitOrderData[1]);
+								$orders->orderNotification($splitOrderData[0]);
+								$orders->updateSubscrption($splitOrderData[0]);
+								$users->modifyOne("payment_frequency_retry_count", 0, $data[$i]['ref']);
+								$error = false;
+							} else {
+								$users->modifyOne("payment_frequency_retry", time()+(60*60*6), $data[$i]['ref']);
+								$users->modifyOne("payment_frequency_retry_count", $data[$i]['payment_frequency_retry_count']+1, $data[$i]['ref']);
+								$orders->updateOne("order_status", "CANCELLED", $splitOrderData[0]);
+								$orders->updateOne("payment_status", "CANCELLED", $splitOrderData[0]);
+								$transactions->updateOne("transaction_status", "CANCELLED", $splitOrderData[1]);
+								$error = true;
+								$message = "The automatic renewal of your subscription was not successful due to the following reasons: ".$result['data']['status'].", we will try this payment again in 6 hours, if you continue to recieve this message, please log into your account and change your payment method";
+							}
+						} else {
+							$users->modifyOne("payment_frequency_retry", time()+(60*60*6), $data[$i]['ref']);
+							$users->modifyOne("payment_frequency_retry_count", $data[$i]['payment_frequency_retry_count']+1, $data[$i]['ref']);
+							$orders->updateOne("order_status", "CANCELLED", $splitOrderData[0]);
+							$orders->updateOne("payment_status", "CANCELLED", $splitOrderData[0]);
+							$transactions->updateOne("transaction_status", "CANCELLED", $splitOrderData[1]);
+							$message = "The automatic renewal of your subscription was not successful due to the following reasons: ".$result['data']['status'].", we will try this payment again in 6 hours, if you continue to recieve this message, please log into your account and change your payment method";
+							$error = true;
+						}
+
+						if ($error == true) {
+							$this->orderNotification($splitOrderData[0], $message);
+						}
+					}
+				}
+			}
+		}
+		
+		function orderNotification($id, $message) {
+			global $users;
+			global $orders;
+			global $alerts;
+			$data = $orders->getOne($id);
+			$userData = $users->listOne($data['order_owner']);
+			
+			$client = $userData['last_name']." ".$userData['other_names']." <".$userData['email'].">";
+			$subjectToClient = "LegalLens Subscription: New Order # ".$orders->orderID($id);
+			
+			$contact = "LegalLens <".replyMail.">";
+				
+			$fields = 'subject='.urlencode($subjectToClient).
+			'&id='.urlencode($id).
+			'&message='.urlencode($message);
+				
+			$mailUrl = URL."includes/emails/subscription_notification.php?".$fields;
+			$messageToClient = $this->curl_file_get_contents($mailUrl);
+						
+			$mail['from'] = $contact;
+			$mail['to'] = $client;
+			$mail['subject'] = $subjectToClient;
+			$mail['body'] = $messageToClient;
+			
+			$alerts->sendEmail($mail);
 		}
 	}
 ?>

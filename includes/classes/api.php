@@ -52,7 +52,7 @@
 									$return['header']['status'] = 'DONE';
 									$return['header']['code'] = "200";
 									$return['header']['completedTime'] = date('l jS \of F Y h:i:s A');
-									$return['body'] = $login;
+									$return['body'] = $register;
 								} else {
 									$return['header']['status'] = "ERROR";
 									$return['header']['code'] = "107";
@@ -62,7 +62,7 @@
 								break;
 							case "changepassword";
 								$array_data = $app_data['user'];
-								$register = $users->activate($array_data['newPassword'], $array_data['ref']);
+								$register = $users->activate($array_data['password'], $array_data['ref']);
 								if ($register) {
 									$return['header']['status'] = 'DONE';
 									$return['header']['code'] = "200";
@@ -107,7 +107,10 @@
 										unset($getDetails['subscription_group']);
 										unset($getDetails['subscription_group_onwer']);
 										unset($getDetails['subscription_order']);
-										$getDetails['subscription_group'] = $subscriptions->getOneField($getDetails['subscription_type']);
+										unset($getDetails['subscription_type_name']);
+										$getDetails['subscription_type_name'] = $subscriptions->getOneField($getDetails['subscription_type'], "ref", "title");
+										$getDetails['subscription_url'] = URL."mobile_subscription?id=".$array_data['ref'];
+
 										$getDetails['current_time'] = time();
 										$return['body']['userData'] = $getDetails;
 									} else {
@@ -172,7 +175,7 @@
 								case "search":
 									$search = new search;
 									$array_data = $app_data['data'];
-									$result = $search->create($array_data);
+									$result = $search->create($array_data, false);
 									
 									$return['header']['status'] = 'DONE';
 									$return['header']['code'] = "200";
@@ -193,27 +196,49 @@
 						$list_array = array();
 						$list = $categories->sortAll("0", "parent_id", "status", "active");
 						for ($i = 0; $i < count($list); $i++) {
+							$list_array['parent'] = 0;
 							$list_array['title'] = $list[$i]['title'];
-							$list_array['url'] = URL."mobile_document?sort=".$list[$i]['ref'];
+							$list_array['url'] = URL."mobile_document_home?sort=".$list[$i]['ref'];
+
+							$subList = $categories->sortAll($list[$i]['ref'], "parent_id", "status", "active");
+							for ($j = 0; $j < count($subList); $j++) {
+								$list_array['child'][$j]['parent'] = $subList[$j]['ref'];
+								$list_array['child'][$j]['title'] = $subList[$j]['title'];
+								$list_array['child'][$j]['url'] = URL."mobile_document?sort=".$subList[$j]['ref'];
+							
+							}
+							
 							$result[] = $list_array;
 						}
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Case law";
 						$list_array['url'] = URL."mobile_caseLaw";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Regulations /Circular";
 						$list_array['url'] = URL."mobile_regulations";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Clauses";
 						$list_array['url'] = URL."mobile_clause";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Agreements";
 						$list_array['url'] = URL."mobile_agreements";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Forms";
 						$list_array['url'] = URL."mobile_forms";
+						$list_array['child'] = "";
 						$result[] = $list_array;
+						$list_array['parent'] = 0;
 						$list_array['title'] = "Dictionary";
 						$list_array['url'] = URL."mobile_dictionary";
+						$list_array['child'] = "";
 						$result[] = $list_array;
 						
 						$return['header']['status'] = 'DONE';

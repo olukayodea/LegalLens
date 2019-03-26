@@ -1,25 +1,27 @@
 <?php
-	$redirect = "mobile_caseLaw";
+	$redirect = "mobileCaseLaw";
 	include_once("includes/functions.php");
-  include_once("includes/mobile_session.php");
-  //include_once("includes/session.php");
-    
-	if (isset($_REQUEST['sort'])) {
-    $id = $common->get_prep($_REQUEST['sort']);
-    header("location: caseLaw?sort=".urlencode($_REQUEST['sort']));
-} else {
-    $id = false;
-    $tag = "All Areas of Law";
-    $tag2 = " in ".$tag;
-}
-
-if (isset($_REQUEST['filter'])) {
-$filter = $common->get_prep($_REQUEST['filter']);
-} else {
-$filter = false;
-}
-
-$list = $caselaw->listCourt()
+    include_once("includes/mobile_session.php");
+    //include_once("includes/session.php");
+	
+	if (isset($_REQUEST['id'])) {
+		$id = $common->get_prep($_REQUEST['id']);
+		$tag = "Documents issued by ".$id;
+	} else {
+		header("location: caseLaw");
+	}
+	if (isset($_REQUEST['jump'])) {
+		$jump = intval($common->get_prep($_REQUEST['jump']));
+	} else {
+		$jump = 0;
+	}
+	
+	$data = $caselaw->getOne($id);
+	if ($jump == 0) {
+		$list = $caselaw->sortAll($id, "areas", "status", "active", false, false, 'title');
+	} else {
+		$list = $caselaw->sortAll($id, "areas", "status", "active", "ref", $jump);
+	}
 
 ?>
 <!doctype html>
@@ -67,28 +69,18 @@ $list = $caselaw->listCourt()
 <div>
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
-       <h4 style="" align="center">Case Law </h4>
-		<form id="search-form2" class="search-form2 clearfix" method="post" action="" autocomplete="off">
-		        <input class="search-term2 required" type="text" id="s" name="s" placeholder="Type your search terms here" title="* Please enter a search term!" />
-		        <input class="search-btn" type="submit" value="Search" />
-		        <span style="margin-left:-30px;margin-top:10px;">
-		        </span>
-		        <div id="search-error-container2"></div>
-		</form>
-        <hr>
-        <h4><?php echo $tag; ?></h4>
-        <?php if (isset($_REQUEST['s'])) { ?>
-        <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
-        <?php } ?>
-        <div id="easyPaginate">
-            <?php for ($i = 0; $i < count($list); $i++) {?>
-                <span>
-                    <strong>
-                    <a href="<?php echo URL; ?>mobile_caseLaw?sort=<?php echo urlencode($list[$i]['title']); ?>"><?php echo $list[$i]['title']; ?></a>
-                    </strong><br>
-                </span>
-            <?php } ?>
-        </div>
+     <h3 style="" align="center"><?php echo ucfirst(strtolower($id)); ?></h3>
+       <?php for ($i = 0; $i < count($list); $i++) { ?>
+        <h4><?php echo $i+1; ?>&nbsp;&nbsp;&nbsp;<strong><a href="<?php echo URL; ?>mobilecaselaw.view?id=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a></strong></h4>
+        <?php $listCase = $caselaw_sections->sortAll($list[$i]['ref'], "caselaw", "status", "active");
+                for ($j = 0; $j < count($listCase); $j++) { ?>
+                <span style="color: blue;"><?php echo nl2br($common->truncateLine($listCase[$j]['section_content'])); ?><span>
+               <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $listCase[$j]['ref']; ?>">Read More</a>
+                <br>
+                <cite style="font-size: 9px; color: black;"><?php echo $listCase[$j]['citation']; ?></cite><br>
+               <?php } ?>
+       <?php } ?>
+       <br><br>
        
 	 </div>
 

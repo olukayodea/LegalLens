@@ -393,7 +393,7 @@
 				
 				global $db;
 				try {
-					$sql = $db->query("SELECT * FROM `caselaw` WHERE `areas` LIKE '".$val."%' AND ".$addition."`status` = 'active' ORDER BY `title` ASC");
+					$sql = $db->query("SELECT * FROM `caselaw` WHERE `areas` LIKE '".$val."%' AND ".$addition."`status` = 'active' GROUP BY `areas` ORDER BY `title` ASC");
 				} catch(PDOException $ex) {
 					echo "An Error occured! ".$ex->getMessage(); 
 				}
@@ -402,18 +402,18 @@
 					$count = 0;
 					foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 						//$count = count($result[$tag]);
-						$result[$row['areas']][$count]['ref'] = $row['ref'];
-						$result[$row['areas']][$count]['section_ref'] = 0;
-						$result[$row['areas']][$count]['title'] = $row['title'];
-						$result[$row['areas']][$count]['status'] = $row['status'];
-						$result[$row['areas']][$count]['court'] = $row['court'];
-						$result[$row['areas']][$count]['owner'] = $row['owner'];
-						$result[$row['areas']][$count]['year'] = $row['year'];
-						$result[$row['areas']][$count]['areas'] = $row['areas'];
-						$result[$row['areas']][$count]['reporter'] = $row['reporter'];
-						$result[$row['areas']][$count]['file'] = $row['file'];
-						$result[$row['areas']][$count]['create_time'] = $row['create_time'];
-						$result[$row['areas']][$count]['modify_time'] = $row['modify_time'];
+						$result[$count]['ref'] = $row['ref'];
+						$result[$count]['section_ref'] = 0;
+						$result[$count]['title'] = $row['title'];
+						$result[$count]['status'] = $row['status'];
+						$result[$count]['court'] = $row['court'];
+						$result[$count]['owner'] = $row['owner'];
+						$result[$count]['year'] = $row['year'];
+						$result[$count]['areas'] = $row['areas'];
+						$result[$count]['reporter'] = $row['reporter'];
+						$result[$count]['file'] = $row['file'];
+						$result[$count]['create_time'] = $row['create_time'];
+						$result[$count]['modify_time'] = $row['modify_time'];
 						$count++;
 					}
 					ksort($result);
@@ -445,7 +445,7 @@
 					$sqlTag = "";
 				}
 				if ($tag3 != false) {
-					$sqlTag = " AND `".$tag3."` = :id3";
+					$sqlTag .= " AND `".$tag3."` = :id3";
 					$token[':id3'] = $id3;
 				} else {
 					$sqlTag .= "";

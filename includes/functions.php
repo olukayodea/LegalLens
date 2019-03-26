@@ -44,11 +44,19 @@
 	define("replyMail", "do-not-reply@legallens.com.ng", true);
 	define("NGN", "&#8358;", true);
 
-	define("PBFPubKey", "FLWPUBK-c5327fab43d186ad575ade63e781a50c-X", true);
-	define("SecKey", "FLWSECK-6b8179de305467437ac49d99b9c647ce-X", true);
-	define("flCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/charge", true);
-	define("flValidateCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/validatecharge", true);
-	define("flVerify", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify", true);
+	//define("PBFPubKey", "FLWPUBK-c5327fab43d186ad575ade63e781a50c-X", true);
+	define("PBFPubKey", "FLWPUBK-ea082a65616f96bb1aebdadd3689a394-X", true);
+	//define("SecKey", "FLWSECK-6b8179de305467437ac49d99b9c647ce-X", true);
+	define("SecKey", "FLWSECK-597a1c26983866efda2996f9e8a6034b-X", true);
+	//define("tokenCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/tokenized/charge", true);
+	//define("flVerify", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/verify", true);
+	define("tokenCharge", "https://api.ravepay.co/flwv3-pug/getpaidx/api/tokenized/charge", true);
+	define("flVerify", "https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/verify", true);
+
+	//define("flCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/charge", true);
+	//define("flValidateCharge", "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/validatecharge", true);
+	define("flCharge", "https://api.ravepay.co/flwv3-pug/getpaidx/api/charge", true);
+	define("flValidateCharge", "https://api.ravepay.co/flwv3-pug/getpaidx/api/validatecharge", true);
 	include_once("classes/common.php");
 	$common = new common;
 

@@ -42,7 +42,7 @@
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title><?php echo $data['title']; ?></title>
+                <title><?php echo $tag; ?></title>
     <?php $pages->head(); ?>
                 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
                 <!--[if lt IE 9]>
@@ -79,9 +79,16 @@
      <div style="margin-top:30px">
        <h3 style="" align="center"><?php echo ucfirst(strtolower($id)); ?></h3>
        <?php for ($i = 0; $i < count($list); $i++) { ?>
-        <?php echo $i+1; ?>&nbsp;&nbsp;&nbsp;<strong><a href="<?php echo URL; ?>caselaw.view?id=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a></strong><br>
+        <h4><?php echo $i+1; ?>&nbsp;&nbsp;&nbsp;<strong><a href="<?php echo URL; ?>caselaw.view?id=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a></strong></h4>
+        <?php $listCase = $caselaw_sections->sortAll($list[$i]['ref'], "caselaw", "status", "active");
+                for ($j = 0; $j < count($listCase); $j++) { ?>
+                <span style="color: blue;"><?php echo nl2br($common->truncateLine($listCase[$j]['section_content'])); ?><span>
+               <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $listCase[$j]['ref']; ?>">Read More</a>
+                <br>
+                <cite style="font-size: 9px; color: black;"><?php echo $listCase[$j]['citation']; ?></cite><br>
+               <?php } ?>
        <?php } ?>
-       
+       <br><br>
 	 </div>
 
    </div>

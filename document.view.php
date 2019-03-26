@@ -23,7 +23,6 @@
 		$data = $documents->getOne($sections->getOneField($id, "ref", "document"));
 		$list = $sections->sortAll($id, "ref", "status", "active");
 	}
-	
 ?>
 <!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->

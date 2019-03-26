@@ -389,9 +389,9 @@
 				$alerts->sendEmail($mail);
 				//add to log
 				$logArray['object'] = get_class($this);
-				$logArray['object_id'] = $data['id'];
+				$logArray['object_id'] = intval($data['id']);
 				$logArray['owner'] = "admin";
-				$logArray['owner_id'] = intval($_SESSION['admin']['id']);
+				$logArray['owner_id'] = intval($data['id']);
 				$logArray['desc'] = "updated password";
 				$logArray['create_time'] = time();
 				$system_log = new system_log;
