@@ -9,21 +9,6 @@
 			$status = $this->mysql_prep($array['status']);
 			$create_time = $modify_time = time();
 			$ref = $this->mysql_prep($array['ref']);
-			
-			if ($ref != "") {
-				$firstpart = "`ref`, ";
-				$secondPArt = "'".$ref."', ";
-				$log = "Modified object ".$section_no;
-			} else {
-				$firstpart = "";
-				$secondPArt = "";
-				$log = "Created object ".$section_no;
-			}
-			
-			$sql = mysql_query("INSERT INTO `sections` (".$firstpart."`document`,`section_no`, `section_content`,`tags`,`court`, `status`, `create_time`, `modify_time`) 
-			VALUES (".$secondPArt."'".$document."','".$section_no."','".$section_content."','".$tags."','".$court."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE 
-			`section_no` = '".$section_no."', `section_content` = '".$section_content."', `status` = '".$status."', `tags` = '".$tags."', `court` = '".$court."', `modify_time` = '".$modify_time."'") or die (mysql_error());
-			
 
 			global $db;
 			$value_array = array(

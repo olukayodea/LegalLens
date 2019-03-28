@@ -254,12 +254,17 @@
 		
 		function indexSearch($val, $type) {
 			$val = $this->mysql_prep($val);
-			$sql = mysql_query("SELECT * FROM `drafting` WHERE `title` LIKE '".$val."%' AND `type` = '".$type."' AND `status` = 'active' ORDER BY `title` ASC") or die (mysql_error());
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `drafting` WHERE `title` LIKE '".$val."%' AND `type` = '".$type."' AND `status` = 'active' ORDER BY `title` ASC");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
+
 			
 			if ($sql) {
 				$result = array();
-				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$tag = substr(ucwords(strtolower($row['title'])), 0, 1);
 					$count = count($result[$tag]);
 					$result[$tag][$count]['ref'] = $row['ref'];
@@ -387,13 +392,19 @@
 			if ($from != false) {
 				$ad = " AND `date_time` BETWEEN ".$from." AND ".$to;
 			}
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `counter_log` WHERE `type` = 'drafting' AND `id` IN (SELECT `ref` FROM `drafting` WHERE `owner` = '".$id."')");
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			
-			$sql = mysql_query("SELECT * FROM `counter_log` WHERE `type` = 'drafting' AND `id` IN (SELECT `ref` FROM `drafting` WHERE `owner` = '".$id."')");
 			if ($sql) {
 				$result = array();
 				$count = 0;
 				
-				while ($row = mysql_fetch_array($sql)) {
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['id'] = $row['id'];
 					$result[$count]['user_id'] = $row['user_id'];

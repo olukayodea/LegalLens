@@ -144,7 +144,6 @@
 		}
 		
 		function openNotification() {
-			$sql = mysql_query("UPDATE notification SET `status` = '1', `modify_time` = '".time()."'") or die (mysql_error());
 			global $db;
 			try {
 				$sql = $db->query("UPDATE `notification` SET `status` = '1', `modify_time` = '".time()."'");

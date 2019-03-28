@@ -45,18 +45,6 @@
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
-
-			if ($ref != "") {
-				$firstpart = "`ref`, ";
-				$secondPArt = "'".$ref."', ";
-				$log = "Modified object ".$section_no;
-			} else {
-				$firstpart = "";
-				$secondPArt = "";
-				$log = "Created object ".$section_no;
-			}
-			
-			$sql = mysql_query("INSERT INTO `regulations_sections` (".$firstpart."`regulations`,`section_no`, `section_content`,`tags`, `status`, `create_time`, `modify_time`) VALUES (".$secondPArt."'".$regulations."','".$section_no."','".$section_content."','".$tags."','".$status."', '".$create_time."', '".$modify_time."') ON DUPLICATE KEY UPDATE `section_no` = '".$section_no."', `section_content` = '".$section_content."', `status` = '".$status."', `tags` = '".$tags."', `modify_time` = '".$modify_time."'") or die (mysql_error());
 			
 			if ($sql) {
 				$id = $db->lastInsertId();

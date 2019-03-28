@@ -18,16 +18,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 */
-define ('DBPATH',servername);
-define ('DBUSER',dbusername);
-define ('DBPASS',dbpassword);
-define ('DBNAME',dbname);
-
-session_start();
-
-global $dbh;
-$dbh = mysql_connect(DBPATH,DBUSER,DBPASS);
-mysql_selectdb(DBNAME,$dbh);
 
 if ($_GET['action'] == "chatheartbeat") { chatHeartbeat(); } 
 if ($_GET['action'] == "sendchat") { sendChat(); } 
@@ -43,15 +33,21 @@ if (!isset($_SESSION['openChatBoxes'])) {
 }
 
 function chatHeartbeat() {
-	
-	$sql = "select * from chat where (chat.to = '".mysql_real_escape_string($_SESSION['users']['username'])."' AND recd = 0) order by id ASC";
-	$query = mysql_query($sql);
+	global $db;
+	try {
+		$sql = $db->prepare("select * from chat where (chat.to = :id AND recd = 0) order by id ASC");
+		$sql->execute(
+			array(
+			':id' => $_SESSION['users']['username'])
+		);
+	} catch(PDOException $ex) {
+		echo "An Error occured! ".$ex->getMessage(); 
+	}	
+
 	$items = '';
 
 	$chatBoxes = array();
-
-	while ($chat = mysql_fetch_array($query)) {
-
+	foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $chat) {
 		if (!isset($_SESSION['openChatBoxes'][$chat['from']]) && isset($_SESSION['chatHistory'][$chat['from']])) {
 			$items = $_SESSION['chatHistory'][$chat['from']];
 		}
@@ -115,8 +111,15 @@ EOD;
 	}
 }
 
-	$sql = "update chat set recd = 1 where chat.to = '".mysql_real_escape_string($_SESSION['users']['username'])."' and recd = 0";
-	$query = mysql_query($sql);
+	try {
+		$sql = $db->prepare("update chat set recd = 1 where chat.to = :id AND recd = 0");
+		$sql->execute(
+			array(
+			':id' => $_SESSION['users']['username'])
+		);
+	} catch(PDOException $ex) {
+		echo "An Error occured! ".$ex->getMessage(); 
+	}	
 
 	if ($items != '') {
 		$items = substr($items, 0, -1);
@@ -195,9 +198,21 @@ EOD;
 
 
 	unset($_SESSION['tsChatBoxes'][$_POST['to']]);
+	
+	global $db;
+	try {
+		$sql = $db->prepare("insert into chat (chat.from,chat.to,message,sent) values (:from, :to, :message,NOW())");
+		$sql->execute(
+			array(
+				':from' => $from,
+				':to' => $to,
+				':message' => $message
+			)
+		);
+	} catch(PDOException $ex) {
+		echo "An Error occured! ".$ex->getMessage(); 
+	}	
 
-	$sql = "insert into chat (chat.from,chat.to,message,sent) values ('".mysql_real_escape_string($from)."', '".mysql_real_escape_string($to)."','".mysql_real_escape_string($message)."',NOW())";
-	$query = mysql_query($sql);
 	echo "1";
 	exit(0);
 }

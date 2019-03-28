@@ -398,12 +398,16 @@
 			if ($from != false) {
 				$ad = " AND `date_time` BETWEEN ".$from." AND ".$to;
 			}
-			$sql = mysql_query("SELECT * FROM `counter_log` WHERE `type` = 'regulations' AND `id` IN (SELECT `ref` FROM `regulations` WHERE.`owner` = '".$id."')".$ad);
-			
+
+			global $db;
+			try {
+				$sql = $db->query("SELECT * FROM `counter_log` WHERE `type` = 'regulations' AND `id` IN (SELECT `ref` FROM `regulations` WHERE.`owner` = '".$id."')".$ad);
+			} catch(PDOException $ex) {
+				echo "An Error occured! ".$ex->getMessage(); 
+			}
 			if ($sql) {
 				$result = array();
-				$count = 0;
-				
+				$count = 0;				
 				while ($row = mysql_fetch_array($sql)) {
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['id'] = $row['id'];

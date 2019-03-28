@@ -264,10 +264,15 @@
 					$result['subscription'] = $row['subscription'];
 					$result['subscription_type'] = $subscriptions->getOneField($row['subscription_type']);
 					$result['subscription_url'] = URL."mobile_subscription?id=".$row['ref'];
+					$result['subscription_type_name'] = $subscriptions->getOneField($row['subscription_type'], "ref", "title");
+					$result['subscription_url'] = URL."mobile_subscription?id=".$row['ref'];
+					$result['last_subscription'] = $row['last_subscription'];
 					$result['modify_time'] = $row['modify_time'];
 					$result['status'] = $row['status'];
 					$result['last_login'] = $row['last_login'];
 					$result['loginTime'] = time();
+
+
 					return $result;
 				}
 			} else {
