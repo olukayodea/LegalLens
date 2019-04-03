@@ -4,6 +4,8 @@
 		$common->sendContact($_POST);
 		header("location: ?done");
 	}
+	
+	$random = rand(1000, 9999);
 ?>
 <!DOCTYPE html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -17,6 +19,7 @@
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
 <script src="SpryAssets/SpryValidationTextarea.js" type="text/javascript"></script>
+<script src="SpryAssets/SpryValidationConfirm.js" type="text/javascript"></script>
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({
     google_ad_client: "ca-pub-4142286148495329",
@@ -33,6 +36,7 @@
         <?php $pages->head(); ?>
         <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css">
         <link href="SpryAssets/SpryValidationTextarea.css" rel="stylesheet" type="text/css">
+        <link href="SpryAssets/SpryValidationConfirm.css" rel="stylesheet" type="text/css">
 </head>
 
         <body>
@@ -85,7 +89,7 @@
                                                         <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid format.</span></span></div>
 
                                                         <div class="span2">
-                                                                <label for="reason">Subject </label>
+                                                                <label for="reason">Subject <span>*</span></label>
                                                         </div>
                                                         <div class="span6"><span id="sprytextfield3">
                                                           <input type="text" name="reason" id="reason" class="input-xlarge" value="">
@@ -97,6 +101,15 @@
                                                         <div class="span6"><span id="sprytextarea1">
                                                           <textarea name="message" id="message" class="required span6" rows="6" title="* Please enter your message"></textarea>
                                                         <span class="textareaRequiredMsg">A value is required.</span></span></div>
+
+                                                        <div class="span2">
+                                                                <label for="message">Enter this number here <?php echo $random; ?> <span>*</span> </label>
+                                                        </div>
+                                                  <div class="span6"><span id="spryconfirm1">
+                                                    <input type="text" name="cap" id="cap" class="required input-xlarge" value="" title="* Please provide an answer">
+                                                    <span class="confirmRequiredMsg">A value is required.</span><span class="confirmInvalidMsg">The values don't match.</span></span>
+                                                    <input type="hidden" name="cap2" id="cap2" value="<?php echo $random; ?>"">
+                                                        </div>
 
                                                         <div class="span6 offset2 bm30">
                                                                 <input type="submit" name="submit" value="Send Message" class="btn btn-inverse">
@@ -154,10 +167,11 @@ var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
 var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "email");
 var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3");
 var sprytextarea1 = new Spry.Widget.ValidationTextarea("sprytextarea1");
+var spryconfirm1 = new Spry.Widget.ValidationConfirm("spryconfirm1", "cap2");
         </script>
           <script src="https://www.google.com/recaptcha/api.js?render=6LcWZo8UAAAAABUYrbZ_lqFVn_qvvjcwTP2BWUaF"></script>
   <script>
-  grecaptcha.ready(function() {
+grecaptcha.ready(function() {
       grecaptcha.execute('6LcWZo8UAAAAABUYrbZ_lqFVn_qvvjcwTP2BWUaF', {action: 'homepage'}).then(function(token) {
          ...
       });

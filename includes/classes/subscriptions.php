@@ -242,8 +242,8 @@
 					unset($array['last_modified_by']);
 					unset($array['order_status']);
 					unset($array['ref']);
-					//$create = $orders->create($array);
-					$create = "199_198";
+					$create = $orders->create($array);
+					//$create = "199_198";
 
 					if ($create) {
 						$postData = array();
@@ -256,55 +256,13 @@
 
 						$trannsData = json_decode($transactions->postTransactionAuto($postData), true);
 
-						if (($trannsData['status'] == "success") && ($trannsData['data']['chargeResponseCode'] == "00")) {
-							$result = array();
-						
-							$postdata =  array( 
-							'txref' => $result['data']['txRef'],
-							'SECKEY' => SecKey
-							);
-						
-							$ch = curl_init();
-							curl_setopt($ch, CURLOPT_URL, flVerify);
-							curl_setopt($ch, CURLOPT_POST, 1);
-							curl_setopt($ch, CURLOPT_POSTFIELDS,json_encode($postdata));  //Post Fields
-							curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-						
-							$headers = ['Content-Type: application/json'];
-						
-							curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
-							curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-							curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__)."/cacert.pem");
-						
-							$request = curl_exec ($ch);
-							$err = curl_error($ch);
-						
-							if($err){
-								// there was an error contacting rave
-								die('Curl returned error: ' . $err);
-							}
-						
-							curl_close ($ch);
-						
-							$result = json_decode($request, true);
-						
-							if('successful' == $result['data']['status'] && '00' == $result['data']['chargecode']){								
-								$orders->updateOne("order_status", "COMPLETE", $splitOrderData[0]);
-								$transactions->updateOne("transaction_status", "PAID", $splitOrderData[1]);
-								$orders->orderNotification($splitOrderData[0]);
-								$orders->updateSubscrption($splitOrderData[0]);
-								$users->modifyOne("payment_frequency_retry_count", 0, $data[$i]['ref']);
-								$error = false;
-							} else {
-								$users->modifyOne("payment_frequency_retry", time()+(60*60*6), $data[$i]['ref']);
-								$users->modifyOne("payment_frequency_retry_count", $data[$i]['payment_frequency_retry_count']+1, $data[$i]['ref']);
-								$orders->updateOne("order_status", "CANCELLED", $splitOrderData[0]);
-								$orders->updateOne("payment_status", "CANCELLED", $splitOrderData[0]);
-								$transactions->updateOne("transaction_status", "CANCELLED", $splitOrderData[1]);
-								$error = true;
-								$message = "The automatic renewal of your subscription was not successful due to the following reasons: ".$result['data']['status'].", we will try this payment again in 6 hours, if you continue to recieve this message, please log into your account and change your payment method";
-							}
+						if (($trannsData['status'] == "success") && ($trannsData['data']['chargeResponseCode'] == "00")) {						
+							$orders->updateOne("order_status", "COMPLETE", $splitOrderData[0]);
+							$transactions->updateOne("transaction_status", "PAID", $splitOrderData[1]);
+							$orders->orderNotification($splitOrderData[0]);
+							$orders->updateSubscrption($splitOrderData[0]);
+							$users->modifyOne("payment_frequency_retry_count", 0, $data[$i]['ref']);
+							$error = false;
 						} else {
 							$users->modifyOne("payment_frequency_retry", time()+(60*60*6), $data[$i]['ref']);
 							$users->modifyOne("payment_frequency_retry_count", $data[$i]['payment_frequency_retry_count']+1, $data[$i]['ref']);
