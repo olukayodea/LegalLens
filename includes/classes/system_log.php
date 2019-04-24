@@ -11,6 +11,7 @@
 			global $db;
 			try {
 				$sql = $db->prepare("INSERT INTO `system_log` (`object`,`object_id`,`owner`,`owner_id`,`desc`,`create_time`) VALUES (:object,:object_id,:owner,:owner_id,:desc,:create_time)");
+				
 				$sql->execute(array(
 							':object' => $object, 
 							':object_id' => $object_id, 
@@ -43,9 +44,9 @@
 		}
 		
 		function purge() {
-			$time = time()-(60*60*24*180);
+			$time = time()-(60*60*24*90);
 
-			global $db;
+			global $db; 
 			try {
 				$sql = $db->query("DELETE FROM `system_log` WHERE `create_time` < '".$time."'");
 			} catch(PDOException $ex) {
@@ -118,4 +119,12 @@
 			return $data[$ref];
 		}
 	}
+function calculate() {
+	$bandwidth = "45"; //the bandwidth
+	$time = 15*60; //the time for transfer in seconds
+
+	$data = $bandwidth*$time;
+	return $data;
+}
+calculate();
 ?>

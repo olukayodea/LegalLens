@@ -34,7 +34,6 @@
 			header("location: ?reset&msg=".urlencode("We are sorry, no trace of this account was found in our records"));
 		}
 	} else if (isset($_POST['Login'])) {
-		//print_r($_POST);
 		$login = $admin->login($_POST);
 		
 		if ($login == 0) {

@@ -65,12 +65,37 @@
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
        <h3 style="" align="center"><?php echo $data['title']; ?></h3>
-       <?php for ($i = 0; $i < count($list); $i++) { ?>
+
+    <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+       <?php for ($i = 0; $i < count($list); $i++) {
+             if (($i+1 % 10) == false) { ?>
+                 <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <br>
+             <?php } ?>
        <p><?php echo nl2br($common->truncate($list[$i]['section_content'], 500)); ?><br>
        <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $id; ?>&read=<?php echo $list[$i]['ref']; ?>">Read More</a><br>
        <cite><?php echo $list[$i]['citation']; ?></cite></p>
        <?php } ?>
        
+    <ins class="adsbygoogle"
+    style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 	 </div>
 
    </div>

@@ -22,8 +22,8 @@
 	$list = $sections->getOne($read); 
 	$subList = $sections->sortAll($id, "document", "status", "active");
 	$common->updateCounter($id, $read, "document");
-	$prev = $sections->gettPrevNext($read, "-");
-  $next = $sections->gettPrevNext($read, "+");
+	$prev = $sections->gettPrevNext($id, $read, "-");
+  $next = $sections->gettPrevNext($id, $read, "+");
   
 ?>
 <!DOCTYPE html>
@@ -124,7 +124,17 @@ $link .= $_SERVER['REQUEST_URI'];
        <p><?php echo nl2br(html_entity_decode($list['section_content'])); ?></p>
        <?php if (count($subList) > 0) { ?>
            <h3 style="" align="center">Other Sections in This Document</h3>
-           <?php for ($i = 0; $i < count($subList); $i++) { ?>
+           <?php for ($i = 0; $i < count($subList); $i++) {
+             if (($i+1 % 10) == false) { ?>          
+              <ins class="adsbygoogle"
+              style="display:inline-block;width:728px;height:90px"
+              data-ad-client="ca-pub-4142286148495329"
+              data-ad-slot="9218590698"></ins>
+              <script>
+              (adsbygoogle = window.adsbygoogle || []).push({});
+              </script>
+              <br>
+             <?php } ?>
            <a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $subList[$i]['ref']; ?>"><strong><?php echo $subList[$i]['section_no']; ?></strong></a><br>
            <?php } ?>
        <?php } ?>

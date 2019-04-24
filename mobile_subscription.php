@@ -217,7 +217,7 @@
             <tbody>
                 <tr>
                 <td width="25%">Card Number</td>
-                <td><input type="text" name="cardno" id="cardno" required placeholder="XXXX XXXX XXXX XXXX" onKeyUp="displayCardType(this.value)"><span id="cardLogo"></span></td>
+                <td><input type="text" name="cardno" id="cardno" placeholder="XXXX XXXX XXXX XXXX" onKeyUp="displayCardType(this.value)"><span id="cardLogo"></span></td>
                 </tr>
                 <tr>
                 <td width="25%">Card Expiry (MM/YY)</td>
@@ -253,11 +253,11 @@
             </tbody>
             </table>		
             </div>
+
             <table width=300 class="table table-hover">
             <thead>
                 <tr>
             <th colspan=2>Order Summary</th>
-            
                 </tr>
             </thead>
             <tbody>
@@ -323,13 +323,21 @@
             <?php } ?>
             </tbody>
             </table>
-            <input name="total" id="total" type="hidden" value="">
+            <input name="total" id="total" type="hidden" value="0">
             <input name="order_owner" id="order_owner" type="hidden" value="<?php echo $ref; ?>">
     </form>
 	 </div>
 
    </div>
 </div>
+
+<ins class="adsbygoogle"
+style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
                   </div> <!--end row -->      
 			</div><!-- end container-->
                 </div>

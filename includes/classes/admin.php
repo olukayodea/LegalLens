@@ -113,6 +113,7 @@
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
+
 			if ($sql->rowCount() == 1) {
 				$row = $sql->fetch(PDO::FETCH_ASSOC);
 				$status = $row['status'];
@@ -521,7 +522,6 @@
 			$title = $this->mysql_prep($array['title']);
 			$id = $this->mysql_prep($array['id']);
 			$pages = implode(",", $array['pages']);
-			$country = implode(",", $array['country']);
 			$createTime = $modifyTime = time();
 			$creator = $lastModified = intval($_SESSION['admin']['id']);
 			
@@ -533,7 +533,6 @@
 							':modify' => intval($array['modify']), 
 							':mainPage' => $array['mainPage'], 
 							':pages' => $pages, 
-							':country' => $country,
 							':createTime' => $createTime, 
 							':modifyTime' => $modifyTime, 
 							':creator' => $creator, 

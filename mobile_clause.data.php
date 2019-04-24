@@ -76,6 +76,13 @@
        <p><?php if ($list[$i]['section_no'] != "") { ?>
        <strong><?php echo $list[$i]['section_no']; ?></strong><br>
        <?php } ?>
+<ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
        <?php echo nl2br($list[$i]['section_content']); ?></p>
        <?php if ($list[$i]['file'] != "") {
        if ($view != "Clauses") { ?>
@@ -89,6 +96,13 @@
 
    </div>
 </div>
+<ins class="adsbygoogle"
+style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
                   </div> <!--end row -->      
 			</div><!-- end container-->
                 </div>

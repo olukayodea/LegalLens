@@ -77,7 +77,17 @@
        <h4><strong>Also in <?php echo $data['title']; ?></strong></h4>
        <?php } ?>
         <div id="easyPaginate">
-		   <?php for ($i = 0; $i < count($list); $i++) { ?>
+		   <?php for ($i = 0; $i < count($list); $i++) {
+             if (($i+1 % 10) == false) { ?>
+                 <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <br>
+             <?php } ?>
                <p><?php if ($list[$i]['section_no'] != "") { ?>
                <strong><?php echo $list[$i]['section_no']; ?></strong><br>
                <?php } ?>

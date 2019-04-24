@@ -85,6 +85,13 @@
     <?php } ?>
         
 </article>
+<ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 <div>
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
@@ -205,6 +212,13 @@
 
    </div>
 </div>
+<ins class="adsbygoogle"
+style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
                   </div> <!--end row -->      
 			</div><!-- end container-->
                 </div>

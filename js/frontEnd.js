@@ -14,7 +14,6 @@ function fetchList(val) {
 				opt.value = myJson[i][0];
 				fragment.appendChild(opt);
 			}
-			
 			sel.appendChild(fragment);
 		})
 		.fail(function(data) {
@@ -35,7 +34,7 @@ function selectPackage(val) {
 			document.getElementById('num_user').focus();
 		} else {
 			document.getElementById('num_user').removeAttribute("style");
-			getbill(val, users)
+			getbill(val, users);
 		}
 	}
 }
@@ -50,7 +49,7 @@ function enterUsers(val) {
 			document.getElementById('package').focus();
 		} else {
 			document.getElementById('package').removeAttribute("style");
-			getbill(package, val)
+			getbill(package, val);
 		}
 	}
 }
@@ -65,14 +64,17 @@ function getbill(val, users) {
 			document.getElementById('d_disc').innerHTML = formatNumber(myJson[2])+"%";
 			document.getElementById('n_total').innerHTML = "&#8358; "+formatNumber(myJson[3]);
 			document.getElementById('total').value = myJson[3];
+
 			if (myJson[3] < 1) {
 				document.getElementById('payment_type').setAttribute("disabled", "disabled");
 				document.getElementById('payment_frequency').setAttribute("disabled", "disabled");
+				document.getElementById("showCard").style.display = "none";
 			} else {
 				document.getElementById('payment_type').removeAttribute("disabled");
 				document.getElementById('payment_frequency').removeAttribute("disabled");
 				document.getElementById("showCard").style.display = "none";
 			}
+			openCard(document.getElementById('payment_frequency').value, myJson[3]);
 		} else {
 			alert("An error occured, please try again later");
 		}
@@ -84,29 +86,28 @@ function getbill(val, users) {
 function getPayment(val) {
 	if (val == "Online") {
 		document.getElementById('payment_frequency').removeAttribute("disabled");
-		openCard(document.getElementById('payment_frequency').value);
+		openCard(document.getElementById('payment_frequency').value, document.getElementById('total').value);
 	} else {
 		document.getElementById('payment_frequency').setAttribute("disabled", "disabled");
+		openCard(document.getElementById('payment_frequency').value, document.getElementById('total').value);
 		document.getElementById("showCard").style.display = "none";
 	}
 }
 
-function openCard(val) {
-	if (val == "Renew") {
+function openCard(val, total=document.getElementById('total').value) {
+	if ((val == "Renew") && (total > 0)) {
 		document.getElementById("showCard").style.display = "block";
-		document.getElementById("cardno").setAttribute("required");
-		document.getElementById("mm").setAttribute("required");
-		document.getElementById("yy").setAttribute("required");
-		document.getElementById("billingaddress").setAttribute("required");
-		document.getElementById("billingcity").setAttribute("required");
-		document.getElementById("billingstate").setAttribute("required");
-		document.getElementById("billingcountry").setAttribute("required");
+		document.getElementById("cardno").setAttribute("required", "required");
+		document.getElementById("mm").setAttribute("required", "required");
+		document.getElementById("yy").setAttribute("required", "required");
+		document.getElementById("billingcity").setAttribute("required", "required");
+		document.getElementById("billingstate").setAttribute("required", "required");
+		document.getElementById("billingcountry").setAttribute("required", "required");
 	} else {
 		document.getElementById("showCard").style.display = "none";
 		document.getElementById("cardno").removeAttribute("required");
 		document.getElementById("mm").removeAttribute("required");
 		document.getElementById("yy").removeAttribute("required");
-		document.getElementById("billingaddress").removeAttribute("required");
 		document.getElementById("billingcity").removeAttribute("required");
 		document.getElementById("billingstate").removeAttribute("required");
 		document.getElementById("billingcountry").removeAttribute("required");

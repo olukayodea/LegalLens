@@ -276,7 +276,7 @@
 		}
 		
 		function listLink($id) {
-			$result = "";
+			$result = array();
 			$count = 0;
 			$one = $this->getOne($id);
 			$result[$count]['ref'] = $one['ref'];

@@ -34,7 +34,7 @@
 			
 			try {
 				$sql = $db->prepare("INSERT INTO `sections` (".$firstpart."`document`, `court`, `section_content`, `tags`, `section_no`, `status`, `create_time`, `modify_time`) 
-				VALUES (".$secondPArt.":document, :section_no, :section_content, :tags, :court, :status, :create_time, :modify_time)
+				VALUES (".$secondPArt.":document, :court, :section_content, :tags, :section_no, :status, :create_time, :modify_time)
 					ON DUPLICATE KEY UPDATE 
 						`section_no` = :section_no,
 						`section_content` = :section_content,
@@ -276,19 +276,22 @@
 			return $data[$ref];
 		}
 		
-		function gettPrevNext($id, $dir="+") {
+		function gettPrevNext($id, $read, $dir="+") {
 			if ($dir == "+") {
 				$sign = ">";
+				$dir = "ASC";
 			} else if ($dir == "-") {
 				$sign = "<";
+				$dir = "DESC";
 			}
 
 			global $db;
 			try {
-				$sql = $db->prepare("SELECT `ref` FROM `sections` WHERE `ref` ".$sign." '".$id."' LIMIT 1");
+				$sql = $db->prepare("SELECT `ref` FROM `sections` WHERE `document` = :id AND `ref` ".$sign." :read ORDER BY `ref` ".$dir." LIMIT 1");
 				$sql->execute(
 					array(
-					':id' => $id)
+						':id' => $id,
+						':read' => $read)
 				);
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 

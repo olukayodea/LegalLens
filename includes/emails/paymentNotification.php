@@ -102,13 +102,17 @@
             <img src="<?php echo URL; ?>images/isw_logo_new_combined.png" alt="Paypal">
             <?php } else { ?>
             <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">Other Channels.</p>
-            <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">This invoice has not been paid. You will not be able to access your account untill you settle this invoice.</p>
-            <p>Alternatively, you can complete your subscription by making payment to our account provided below and contacting Legallens officials and send the name of payer and transaction referenced to us through our live chat to activate your subscription.</p>
-                                      <p>Account details:<br>
-                                      Name:&nbsp;&nbsp;<strong>Pearlhouse Legal Lens Limited</strong><br>
-                                      Bank:&nbsp;&nbsp;<strong>United Bank For Africa</strong><br>
-                                    Number:&nbsp;&nbsp;<strong>1019666896</strong></p></strong></p>
-            <?php } ?>
+            <?php if ($subscriptions->getOneField($data['order_subscription'], "ref", "amount") < 1) { ?>
+              <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;"><strong>You can now access the library throughout the period covered by the subscription.</strong></p>
+            <?php } else { ?>
+              <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">This invoice has not been paid. You will not be able to access your account untill you settle this invoice.</p>
+              <p>Alternatively, you can complete your subscription by making payment to our account provided below and contacting Legallens officials and send the name of payer and transaction referenced to us through our live chat to activate your subscription.</p>
+              <p>Account details:<br>
+              Name:&nbsp;&nbsp;<strong>Pearlhouse Legal Lens Limited</strong><br>
+              Bank:&nbsp;&nbsp;<strong>United Bank For Africa</strong><br>
+              Number:&nbsp;&nbsp;<strong>1019666896</strong></p></strong></p>
+            <?php }
+            } ?>
           </div><!-- /.col -->
           <div class="col-xs-6">
             <div class="table-responsive">

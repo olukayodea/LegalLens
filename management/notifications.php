@@ -10,7 +10,9 @@
 		if ($type == "forum_topic") {
 			header("location: forum.topic?editAdmin&editRef=".$type_id);
 		} else if ($type == "forum") {
-			header("location: forum.post?editAdmin&editRef=".$type_id);
+      global $forum_posts;
+      $post_ref = $forum_posts->getOneField($type_id, "post_id", "post_topic");
+			header("location: forum.post?id=".$post_ref."&editRef=".$type_id);
 		} else if ($type == "orders") {
 			header("location: order.view?ref=".$type_id);
 		} else if ($type == "help") {

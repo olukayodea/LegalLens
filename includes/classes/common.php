@@ -312,10 +312,14 @@
 			return $parsedMessage;
 		}
 		
-		function updateCounter($id, $section, $type) {
+		function updateCounter($id, $section, $type, $mobile = false) {
 			$id = $this->mysql_prep($id);
 			$type = $this->mysql_prep($type);
 			$section = $this->mysql_prep($section);
+
+			if ($mobile == false) {
+				$mobile = $_SESSION['users']['ref'];
+			}
 			global $db;
 			try {
 				$sql = $db->prepare("INSERT INTO `counter_log` (`id`, `type`,`section`,`user_id`, `date_time`) VALUES (:id, :type, :section, :user_id, :date_time)");
@@ -324,7 +328,7 @@
 					':id' => $id,
 					':type' => $type,
 					':section' => $section,
-					':user_id' => $_SESSION['users']['ref'],
+					':user_id' => intval($mobile),
 					':date_time' => time())
 				);
 			} catch(PDOException $ex) {
@@ -349,11 +353,12 @@
 		function sendContact($array) {
 			$name = $this->get_prep($array['name']);
 			$reason = $this->get_prep($array['reason']);
+			$email = $this->get_prep($array['email']);
 			$message = $this->get_prep($array['message']);
 			
 			$messageToClient = "<p>You got the following message from<br />";
 			$messageToClient .= "Name: <strong>".$name."</strong><br>";
-			$messageToClient .= "Email: <strong>".$name."</strong><br>";
+			$messageToClient .= "Email: <strong>".$email."</strong><br>";
 			$messageToClient .= "Time: <strong>".date('l jS \of F Y h:i:s A')."</strong><br>";
 			$messageToClient .= "Subject: <strong>".$reason."</strong><br>";
 			$messageToClient .= "Message: <strong>".$message."</strong>";

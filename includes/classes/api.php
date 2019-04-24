@@ -194,6 +194,11 @@
 					case "category":
 						$categories = new categories;
 						$list_array = array();
+						$list_array['parent'] = 0;
+						$list_array['title'] = "Quick Find";
+						$list_array['url'] = URL."mobilehome";
+						$list_array['child'] = "";
+						$result[] = $list_array;
 						$list = $categories->sortAll("0", "parent_id", "status", "active");
 						for ($i = 0; $i < count($list); $i++) {
 							$list_array['parent'] = 0;

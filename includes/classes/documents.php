@@ -76,7 +76,6 @@
 		
 		function remove($id) {
 			$id = $this->mysql_prep($id);
-			$modDate = time();			
 
 			global $db;
 			try {

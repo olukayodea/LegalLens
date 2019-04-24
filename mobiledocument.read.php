@@ -3,7 +3,7 @@
 	include_once("includes/functions.php");
   include_once("includes/mobile_session.php");
 	//include_once("includes/session.php");
-	
+  
 	if (isset($_REQUEST['id'])) {
 		$id = $common->get_prep($_REQUEST['id']);
 	} else {
@@ -21,10 +21,10 @@
 	
 	$data = $documents->getOne($id);
 	$list = $sections->getOne($read);
-	$subList = $sections->sortAll($read, "document", "status", "active");
-	$common->updateCounter($id, $read, "document");
-	$prev = $sections->gettPrevNext($read, "-");
-	$next = $sections->gettPrevNext($read, "+");
+  $subList = $sections->sortAll($id, "document", "status", "active");
+	$common->updateCounter($id, $read, "document", $ref);
+	$prev = $sections->gettPrevNext($id, $read, "-");
+  $next = $sections->gettPrevNext($id, $read, "+");
 ?>
 <!doctype html>
         <!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en-US"> <![endif]-->
@@ -75,6 +75,7 @@
        <?php if ((isset($s)) && ($s != "")) { ?>
        <p align="left"><a href="mobilehome?q=<?php echo $s; ?>" style="text-decoration:underline">Back to Search</a></p>
        <?php } ?>
+
        <table width="100%" border="0">
          <tr>
            <td align="left"><a href="<?php echo URL."mobiledocument.view"."?id=".$id."&view=Document&jump=0"; ?>" style="text-decoration:underline">Section List</a></td>
@@ -85,17 +86,44 @@
            <td align="right"<?php if (intval($next) > 0) { ?>><a href="<?php echo URL."mobiledocument.read"."?id=".$id."&read=".$next; ?>" style="text-decoration:underline">Next Section &gt; &gt;</a><?php } ?></td>
          </tr>
        </table>
+
+    <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 <h3 style="" align="center"><?php echo $data['title']; ?></h3>
-       <p align="center"><?php echo $list['section_no']; ?></p>
-       <p><?php echo nl2br($list['section_content']); ?></p>
+       <p align="center"><strong><?php echo $list['section_no']; ?></strong></p>
+       <p><?php echo nl2br(html_entity_decode($list['section_content'])); ?></p>
 
        <?php if (count($subList) > 0) { ?>
            <h3 style="" align="center">Other Sections in This Document</h3>
-           <?php for ($i = 0; $i < count($subList); $i++) { ?>
+           <?php for ($i = 0; $i < count($subList); $i++) {
+             if (($i+1 % 10) == false) { ?>
+             
+                 <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <br>
+             <?php } ?>
+            
            <a href="<?php echo URL; ?>mobiledocument.read?id=<?php echo $data['ref']; ?>&read=<?php echo $subList[$i]['ref']; ?>"><strong><?php echo $subList[$i]['section_no']; ?></strong></a><br>
            <?php } ?>
        <?php } ?>
        
+    <ins class="adsbygoogle"
+    style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 	 </div>
 
    </div>
@@ -108,7 +136,7 @@
 
             
 
-              //  <a href="#top" id="scroll-top"></a>
+              <a href="#top" id="scroll-top"></a>
 
                 <!-- script -->
                <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->

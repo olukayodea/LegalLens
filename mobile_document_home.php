@@ -39,13 +39,6 @@
     enable_page_level_ads: true
   });
 </script>
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-4142286148495329",
-    enable_page_level_ads: true
-  });
-</script>
                 <!-- META TAGS -->
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,11 +80,20 @@ window.onload = function() {
 <div style="border:1px solid #ccc; padding:10px">
 <div style="margin-top:30px">
        <h4 style="" align="center">Quick Find </h4>
-		<form id="search-form2" class="search-form2 clearfix" method="post" action="home" autocomplete="off">
+		<form id="search-form2" class="search-form2 clearfix" method="post" action="mobilehome" autocomplete="off">
 		        <input class="search-term2 required" type="text" id="s" name="s" placeholder="Enter matter of interest" title="* Enter matter of interest" onBlur="saveSearch(this.value)" value="<?php echo $search_data; ?>" required autofocus />
 		        <input class="search-btn" type="submit" value="Go" /><br>
 		        <span style="margin-left:-30px;margin-top:10px;">
-		        </span>
+            </span>
+            
+
+<ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
                 
             <?php for ($i = 0; $i < count($listHidden); $i++) { ?>
             <input type="hidden" name="parameter[]" value="<?php echo $listHidden[$i]['ref']; ?>" />
@@ -105,7 +107,7 @@ window.onload = function() {
 		<?php if (isset($_REQUEST['s'])) { ?>
         <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
         <?php } ?>
-            <?php for ($i = 0; $i < count($list); $i++) {?>
+            <?php for ($i = 0; $i < count($list); $i++) { ?>
                 <span>
                     <strong>
                     <a href="<?php echo URL; ?>mobile_document?sort=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a>
@@ -146,7 +148,7 @@ window.onload = function() {
       		  delay: 0,
               source: "includes/scripts/auto_complete_doc.php?sort=<?php echo $id; ?>&type=Law",
 				select: function( event, ui ) {
-					window.location='document.view?id='+ui.item.code+"&view="+ui.item.type;
+					window.location='mobiledocument.view?id='+ui.item.code+"&view="+ui.item.type;
 				}
             });
         });

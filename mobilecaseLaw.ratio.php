@@ -70,10 +70,30 @@
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
      <h3 style="" align="center"><?php echo ucfirst(strtolower($id)); ?></h3>
-       <?php for ($i = 0; $i < count($list); $i++) { ?>
+       <?php for ($i = 0; $i < count($list); $i++) {
+             if (($i+1 % 10) == false) { ?>
+                 <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <br>
+             <?php } ?>
         <h4><?php echo $i+1; ?>&nbsp;&nbsp;&nbsp;<strong><a href="<?php echo URL; ?>mobilecaselaw.view?id=<?php echo $list[$i]['ref']; ?>"><?php echo $list[$i]['title']; ?></a></strong></h4>
+
         <?php $listCase = $caselaw_sections->sortAll($list[$i]['ref'], "caselaw", "status", "active");
-                for ($j = 0; $j < count($listCase); $j++) { ?>
+                for ($j = 0; $j < count($listCase); $j++) {
+                  if ($j % 10) { ?>
+                      <ins class="adsbygoogle"
+               style="display:inline-block;width:728px;height:90px"
+               data-ad-client="ca-pub-4142286148495329"
+               data-ad-slot="9218590698"></ins>
+         <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+         </script>
+                  <?php } ?>
                 <span style="color: blue;"><?php echo nl2br($common->truncateLine($listCase[$j]['section_content'])); ?><span>
                <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $list[$i]['ref']; ?>&read=<?php echo $listCase[$j]['ref']; ?>">Read More</a>
                 <br>
@@ -82,6 +102,13 @@
        <?php } ?>
        <br><br>
        
+    <ins class="adsbygoogle"
+    style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 	 </div>
 
    </div>

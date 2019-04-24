@@ -91,6 +91,14 @@
 		        </span>
 		        <div id="search-error-container2"></div>
 		</form>
+
+<ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
         <hr>
         <h4><?php echo $tag; ?></h4>
 		<?php if (isset($_REQUEST['s'])) { ?>
@@ -116,6 +124,13 @@
             <?php } ?>
         </div>
        
+<ins class="adsbygoogle"
+style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 	 </div>
 
    </div>
@@ -155,7 +170,7 @@
       		  delay: 0,
               source: "includes/scripts/auto_complete_reg.php?type=<?php echo $id; ?>",
 				select: function( event, ui ) {
-					window.location='regulations.view?id='+ui.item.code;
+					window.location='nobile_regulations.view?id='+ui.item.code;
 				}
             });
         });

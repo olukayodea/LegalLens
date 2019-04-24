@@ -9,7 +9,7 @@
         <!--[if IE 8]>    <html class="lt-ie9" lang="en-US"> <![endif]-->
         <!--[if gt IE 8]><!--> <html lang="en-US"> <!--<![endif]-->
         
-<!-- Mirrored from inspirythemes.biz/html-templates/knowledgebase-html/faq.html by HTTrack Website Copier/3.x [XR&CO'2013], Sun, 27 Mar 2016 11:14:25 GMT -->
+
 <head>
     <meta charset="utf-8">
                 <!-- META TAGS -->
@@ -55,7 +55,7 @@
                                                         <article class="faq-item<?php if ($i == 0) { ?> active<?php } ?>">
                                                                 <span class="faq-icon"></span>
                                                                 <h3 class="faq-question">
-                                                                        <a href="#"><?php echo $list[$i]['title']; ?>?</a>
+                                                                        <a href="#"><?php echo $list[$i]['title']; ?></a>
                                                                 </h3>
                                                                 <div class="faq-answer">
                                                                         <p><?php echo nl2br($list[$i]['content']); ?></p>
@@ -112,18 +112,14 @@
                 <a href="#top" id="scroll-top"></a>
 
                 <!-- script -->
-                <script type='text/javascript' src='js/jquery.easing.1.3.js'></script>
-                <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhoto.js'></script>
                 <script type='text/javascript' src='js/jflickrfeed.js'></script>
-                <script type='text/javascript' src='js/jquery.liveSearch.js'></script>
                 <script type='text/javascript' src='js/jquery.form.js'></script>
                 <script type='text/javascript' src='js/jquery.validate.min.js'></script>
                 <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
-                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
                 <script type='text/javascript' src='js/custom.js'></script>
-				<script type='text/javascript' src="js/navAccordion.min.js"></script>
+                <script type='text/javascript' src="js/navAccordion.min.js"></script>
 
         </body>
 
-<!-- Mirrored from inspirythemes.biz/html-templates/knowledgebase-html/faq.html by HTTrack Website Copier/3.x [XR&CO'2013], Sun, 27 Mar 2016 11:14:25 GMT -->
+
 </html>

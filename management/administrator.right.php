@@ -141,6 +141,7 @@
                         <optgroup label="Documents">
                           <option value="documents">Documents</option>
                           <option value="documents.sections">Documents Sections</option>
+                          <option value="documents.view">Documents View</option>
                         </optgroup>
                         <optgroup label="Forum">
                           <option value="forum.category">Categories</option>
@@ -218,6 +219,7 @@
                         <optgroup label="Documents">
                           <option value="documents">Documents</option>
                           <option value="documents.sections">Documents Sections</option>
+                          <option value="documents.view">Documents View</option>
                         </optgroup>
                         <optgroup label="Forum">
                           <option value="forum.category">Categories</option>

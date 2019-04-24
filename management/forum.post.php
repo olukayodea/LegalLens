@@ -18,16 +18,16 @@
 	if (isset($_GET['deleteAdmin'])) {
 		$edit = $forum_posts->remove($common->get_prep($_GET['del']));
 		if ($edit) {
-			header("location: ?done");
+			header("location: ?done&id=".$id);
 		} else {
-			header("location: ?error");
+			header("location: ?error&id=".$id);
 		}
 	} else if (isset($_GET['approve'])) {
 		$edit = $forum_posts->modifyOne("status", "active", $common->get_prep($_GET['del']));
 		if ($edit) {
-			header("location: ?done");
+			header("location: ?done&id=".$id);
 		} else {
-			header("location: ?error");
+			header("location: ?error&id=".$id);
 		}
 	}
 	
@@ -96,8 +96,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
                 <!-- /.form-group -->
                 <div class="form-group">
                     <label for="id" class="form-label">
-                    Display Status<em>*</em>
-                  <p class="help-block">Toggle display status on and off on the home screen</p>
+                    Forum Topics<em>*</em>
+                  <p class="help-block">Select a topic to list all posts under it</p>
                     </label>
                     <select name="id" id="id" class="form-control select2" required style="width: 100%;" onChange="MM_jumpMenu('parent',this,0)">
                     <option value="#">Select One</option>
@@ -109,8 +109,21 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
                 <!-- /.box-body -->
               </form>
             </div><!-- /.box -->
-              
-              <div class="col-xs-12">
+            </div>
+
+            <?php if (isset($_REQUEST['editRef'])) { ?>
+              <div class="box">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Approve Post in <?php echo $tag; ?></h3>
+                  </div><!-- /.box-header -->
+                  <div class="box-body">
+                    <?php echo html_entity_decode($forum_posts->getOneField($_REQUEST['editRef'])); ?>
+                </div><!-- /.box -->
+                  <div class="box-footer">
+                  <a href="?approve&id=<?php echo $id; ?>&del=<?php echo $_REQUEST['editRef']; ?>" onClick="return confirm('this action will mke this post available to other users?')">Approve</a> | <a href="?deleteAdmin&id=<?php echo $id; ?>&del=<?php echo $_REQUEST['editRef']; ?>" onClick="return confirm('this action will remove this section. are you sure you want to continue ?')">delete</a>
+                </div><!-- /.box -->
+              </div>
+            <?php } ?>
               <div class="box">
                 <div class="box-header">
                   <h3 class="box-title">Showing All Post <?php echo $tag; ?></h3>
@@ -133,14 +146,14 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 						$sn++; ?>
                       <tr>
                         <td><?php echo $sn; ?></td>
-                        <td><?php echo $list[$i]['post_content']; ?></td>
+                        <td><?php echo html_entity_decode($list[$i]['post_content']); ?></td>
                         <td><?php echo $forum_topics->getOneField($list[$i]['post_topic']); ?></td>
                         <td><?php echo trim($users->getOneField($list[$i]['post_by'], "ref", "last_name")." ".$users->getOneField($list[$i]['post_by'], "ref", "other_names")); ?></td>
                         <td><?php echo $list[$i]['status']; ?></td>
                         <td><?php echo $common->get_time_stamp($list[$i]['post_date']); ?></td>
                         <td>
                         <?php if ($list[$i]['status'] == "inactive") { ?>
-                        <a href="?approve&del=<?php echo $list[$i]['post_id']; ?>" onClick="return confirm('this action will mke this post available to other users?')">Approve</a> | <?php } ?><a href="?deleteAdmin&del=<?php echo $list[$i]['post_id']; ?>" onClick="return confirm('this action will remove this section. are you sure you want to continue ?')">delete</a></td>
+                        <a href="?approve&id=<?php echo $id; ?>&del=<?php echo $list[$i]['post_id']; ?>" onClick="return confirm('this action will mke this post available to other users?')">Approve</a> | <?php } ?><a href="?deleteAdmin&id=<?php echo $id; ?>&del=<?php echo $list[$i]['post_id']; ?>" onClick="return confirm('this action will remove this section. are you sure you want to continue ?')">delete</a></td>
                       </tr>
                       <?php }
 						unset($i); 

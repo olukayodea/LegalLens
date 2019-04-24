@@ -3,9 +3,9 @@
 	$product_id = 6224;
 	$key = $product_key+$product_id;
 	$hash = hash("sha256", $key);
-	$u = "http://127.0.0.1/legallens/";
+	//$u = "http://127.0.0.1/legallens/";
 	//$u = "http://dev.legallens.net/";
-	//$u = "http://legallens.com.ng/";
+	$u = "https://legallens.com.ng/";
 	
 	/*//Login
 	//JSON Example
@@ -35,7 +35,7 @@
 
 	$URL = $u."api/".$hash."/users/register";*/
 	
-	//Change Password
+/*	//Change Password
 	//JSON Example
 	$array['product_key'] = $product_key;
 	$array['product_id'] = $product_id;
@@ -44,8 +44,7 @@
 	$xml_data = json_encode($array);
 	$type = "text/json";
 
-	$URL = $u."api/".$hash."/users/changePassword"; 
-
+	$URL = $u."api/".$hash."/users/changePassword"; */
 /*	//Reset Password
 	//JSON Example
 	$array['product_key'] = $product_key;
@@ -78,7 +77,7 @@
 	$URL = $u."api/".$hash."/users/updatedetails"; */
 	
 	
-/*	//get details
+	//get details
 	//JSON Example
 	$array['product_key'] = $product_key;
 	$array['product_id'] = $product_id;
@@ -86,7 +85,7 @@
 	$array['user'] = 2;
 	$xml_data = json_encode($array);
 
-	$URL = $u."api/".$hash."/users/getDetails";  */
+	$URL = $u."api/".$hash."/users/getDetails";
 	
 		//quick find
 	/*//JSON Example

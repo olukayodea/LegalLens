@@ -6,7 +6,7 @@
     
 	if (isset($_REQUEST['sort'])) {
     $id = $common->get_prep($_REQUEST['sort']);
-    header("location: caseLaw?sort=".urlencode($_REQUEST['sort']));
+    header("location: mobileCaseLaw?sort=".urlencode($_REQUEST['sort']));
 } else {
     $id = false;
     $tag = "All Areas of Law";
@@ -75,13 +75,30 @@ $list = $caselaw->listCourt()
 		        </span>
 		        <div id="search-error-container2"></div>
 		</form>
+<ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
         <hr>
         <h4><?php echo $tag; ?></h4>
         <?php if (isset($_REQUEST['s'])) { ?>
         <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
         <?php } ?>
         <div id="easyPaginate">
-            <?php for ($i = 0; $i < count($list); $i++) {?>
+            <?php for ($i = 0; $i < count($list); $i++) {
+             if (($i+1 % 10) == false) { ?>
+                 <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <br>
+             <?php } ?>
                 <span>
                     <strong>
                     <a href="<?php echo URL; ?>mobile_caseLaw?sort=<?php echo urlencode($list[$i]['title']); ?>"><?php echo $list[$i]['title']; ?></a>
@@ -90,6 +107,13 @@ $list = $caselaw->listCourt()
             <?php } ?>
         </div>
        
+<ins class="adsbygoogle"
+style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 	 </div>
 
    </div>

@@ -139,13 +139,7 @@
     enable_page_level_ads: true
   });
 </script>
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-4142286148495329",
-    enable_page_level_ads: true
-  });
-</script>
+
                 <!-- META TAGS -->
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -187,7 +181,7 @@ window.onload = function() {
 <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
        <h4 style="" align="center">Quick Find </h4>
-		<form id="search-form2" class="search-form2 clearfix" method="post" action="home" autocomplete="off">
+		<form id="search-form2" class="search-form2 clearfix" method="post" action="mobilehome" autocomplete="off">
       <input class="search-term2 required" type="text" id="s" name="s" placeholder="Enter matter of interest" title="* Enter matter of interest" onBlur="saveSearch(this.value)" value="<?php echo $search_data; ?>" required autofocus />
       <input class="search-btn" type="submit" value="Go" /><br>
           
@@ -206,6 +200,16 @@ window.onload = function() {
       <div id="search-error-container2"></div>
 		</form>
    </div>
+
+   <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <!-- forum -->
+    <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
    <div id="search_result">
      <?php if ($result == true) { ?>
        <h4 style="" align="center">Search Result</h4>
@@ -239,11 +243,11 @@ window.onload = function() {
                        <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
                        <td><p>
-                  <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
+                  <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
                    <cite><strong><?php echo $case_law[$i]['citation']; ?></strong></cite><br>
                    <strong style="color:#00F"><?php echo $common->getLine($case_law[$i]['section_content']); ?></strong><br></a>
                    <?php echo nl2br($common->truncate($case_law[$i]['section_content'], 250)); ?><br>
-                   <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">read more</a></p>
+                   <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">read more</a></p>
                        </td>
                           </tr>
                       <?php } ?>
@@ -278,7 +282,7 @@ window.onload = function() {
 						  $count++ ?>
                        <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
-                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>document.read?id=<?php echo $doc[$key][$i]['ref']; ?>&read=<?php echo $doc[$key][$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $doc[$key][$i]['title']; ?></a></strong><br>
+                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>mobiledocument.read?id=<?php echo $doc[$key][$i]['ref']; ?>&read=<?php echo $doc[$key][$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $doc[$key][$i]['title']; ?></a></strong><br>
                   <strong style="color:#00F"><?php echo nl2br($common->getLine($doc[$key][$i]['section_no'])); ?></strong><br>
                    <?php 
                        echo nl2br($common->truncate($doc[$key][$i]['section_content'], 150));
@@ -315,7 +319,7 @@ window.onload = function() {
 						  $count++ ?>
                           <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
-                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>regulations.view?id=<?php echo $reg[$i]['ref']; ?>&read=<?php echo $reg[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $reg[$i]['title']; ?></a></strong><br>
+                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>mobileregulations.view?id=<?php echo $reg[$i]['ref']; ?>&read=<?php echo $reg[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $reg[$i]['title']; ?></a></strong><br>
                        
                    <?php 
                    if ($reg[$i]['section_no'] == "") {
@@ -380,6 +384,14 @@ window.onload = function() {
 </div>
 </div>
 </div>
+
+<ins class="adsbygoogle"
+          style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
                 
                 <a href="#top" id="scroll-top"></a>
                <!-- <a href="#top" id="scroll-top"></a> -->

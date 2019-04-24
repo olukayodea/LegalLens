@@ -1,10 +1,9 @@
 <?php
     include_once("functions.php");
-
-    if (isset($_COOKIE['ref'])) {
-        $ref = $_COOKIE['id'];
-    } else if (isset($_REQUEST['id'])) {
+    if (isset($_REQUEST['id'])) {
         $ref = $_REQUEST['id'];
+    } else if (isset($_COOKIE['ref'])) {
+        $ref = $_COOKIE['id'];
     }
 
     setcookie("ref", $ref, time()+(60*60*24*365), "/");

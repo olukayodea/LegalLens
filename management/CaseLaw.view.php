@@ -223,10 +223,10 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
                 <div class="box-body">
                 <div align="right">
                   <form name="form1" method="post" action="CaseLaw.view.excel">
-                    <input type="text" name="to" id="to" value="<?php echo $to; ?>">
-                    <input type="text" name="from" id="from" value="<?php echo $from; ?>">
-                    <input type="text" name="id" id="id" value="<?php echo $id; ?>">
-                    <input type="text" name="type" id="type" value="case">
+                    <input type="hidden" name="to" id="to" value="<?php echo $to; ?>">
+                    <input type="hidden" name="from" id="from" value="<?php echo $from; ?>">
+                    <input type="hidden" name="id" id="id" value="<?php echo $id; ?>">
+                    <input type="hidden" name="type" id="type" value="case">
                     <input type="submit" name="button2" id="button2" value="Donload">
                   </form>
                 </div>

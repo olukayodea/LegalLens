@@ -1,7 +1,6 @@
 <?php
 	class drafting extends common {
 		function add($array) {
-			$categories = new categories;
 			$title = htmlentities(ucfirst(strtolower($this->mysql_prep($array['title']))));
 			$type = $this->mysql_prep($array['type']);
 			$owner = $this->mysql_prep($array['owner']);

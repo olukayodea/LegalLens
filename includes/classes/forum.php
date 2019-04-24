@@ -271,7 +271,6 @@
 				$sql->execute(
 					array(
 					':value' => $value,
-					':modifyTime' => time(),
 					':id' => $id)
 				);
 			} catch(PDOException $ex) {

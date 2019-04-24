@@ -401,14 +401,14 @@
 
 			global $db;
 			try {
-				$sql = $db->query("SELECT * FROM `counter_log` WHERE `type` = 'regulations' AND `id` IN (SELECT `ref` FROM `regulations` WHERE.`owner` = '".$id."')".$ad);
+				$sql = $db->query("SELECT * FROM `counter_log` WHERE `type` = 'regulations' AND `id` IN (SELECT `ref` FROM `regulations` WHERE `ref` = '".$id."')".$ad);
 			} catch(PDOException $ex) {
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			if ($sql) {
 				$result = array();
-				$count = 0;				
-				while ($row = mysql_fetch_array($sql)) {
+				$count = 0;			
+				foreach($sql->fetchAll(PDO::FETCH_ASSOC) as $row) {	
 					$result[$count]['ref'] = $row['ref'];
 					$result[$count]['id'] = $row['id'];
 					$result[$count]['user_id'] = $row['user_id'];

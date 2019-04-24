@@ -68,6 +68,13 @@
     <input class="search-btn" type="submit" value="Search" />
     <div id="search-error-container2"></div>
 </form>
+<ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 <hr>
 <?php if (isset($_REQUEST['s'])) { ?>
 <h4><?php echo $tag; ?></h4>
@@ -87,6 +94,13 @@
 
    </div>
 </div>
+<ins class="adsbygoogle"
+style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
                   </div> <!--end row -->      
 			</div><!-- end container-->
                 </div>

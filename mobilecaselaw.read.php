@@ -74,13 +74,22 @@
 <div>
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
+
+    <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
        <?php if ((isset($s)) && ($s != "")) { ?>
        <p align="left"><a href="mobilehome?q=<?php echo $s; ?>" style="text-decoration:underline">Back to Search</a></p>
        <?php } ?>
        <h3 style="" align="center"><?php echo $data['title']; ?></h3>
        <p class="decorate"><?php echo nl2br($text_data); ?><br><br>
        <cite><?php echo $list['citation']; ?></cite>
-		<?php if ($data['file'] != "") { ?>
+    <?php if ($data['file'] != "") { ?>
+      
 		<div id="page" style="width:100%">
 
 			<div class="btn-group">	
@@ -100,13 +109,37 @@
 		</div>
         <?php } ?>
 
+        <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
         <h3 style="" align="center">Other Ratios in <?php echo $data['title']; ?></h3>
-       <?php for ($i = 0; $i < count($listOthers); $i++) { ?>
+       <?php for ($i = 0; $i < count($listOthers); $i++) {
+             if (($i+1 % 10) == false) { ?>
+                 <ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <br>
+             <?php } ?>
         <?php echo nl2br($common->truncateLine($listOthers[$i]['section_content'])); ?><br>
        <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $id; ?>&read=<?php echo $listOthers[$i]['ref']; ?>">Read More</a><br>
        <cite><strong><?php echo $listOthers[$i]['citation']; ?></strong></cite><br><br>
        <?php } ?>
        
+    <ins class="adsbygoogle"
+    style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 	 </div>
 
    </div>

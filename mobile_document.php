@@ -83,7 +83,15 @@
 		        <span style="margin-left:-30px;margin-top:10px;">
 		        </span>
 		        <div id="search-error-container2"></div>
-		</form>
+    </form>
+    
+<ins class="adsbygoogle"
+          style="display:inline-block;width:728px;height:90px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
         <hr>
         <h4><?php echo $tag; ?></h4>
 		<?php if (isset($_REQUEST['s'])) { ?>
@@ -93,8 +101,7 @@
         <div id="easyPaginate">
           <?php foreach ($list as $key => $value) { ?>
               <h4><?php echo $key; ?></h4>
-              <?php for ($i = 0; $i < count($list[$key]); $i++) {
-              $section_list = $sections->sortAll($list[$key][$i]['ref'], "document", "status", "active"); ?>
+              <?php for ($i = 0; $i < count($list[$key]); $i++) { ?>
               <span>
               <strong>
               <a href="<?php echo URL; ?>mobiledocument.view?view=Document&id=<?php echo $list[$key][$i]['ref']; ?>&jump=<?php echo intval($list[$key][$i]['section_ref']); ?>"><?php echo $list[$key][$i]['title']; ?></a></strong><br>
@@ -107,6 +114,13 @@
 
    </div>
 </div>
+<ins class="adsbygoogle"
+style="display:inline-block;width:250px;height:250px"
+          data-ad-client="ca-pub-4142286148495329"
+          data-ad-slot="9218590698"></ins>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
                   </div> <!--end row -->      
 			</div><!-- end container-->
                 </div>
@@ -137,7 +151,7 @@
       		  delay: 0,
               source: "includes/scripts/auto_complete_doc.php?sort=<?php echo $id; ?>&type=Law",
 				select: function( event, ui ) {
-					window.location='document.view?id='+ui.item.code+"&view="+ui.item.type;
+					window.location='mobiledocument.view?id='+ui.item.code+"&view="+ui.item.type;
 				}
             });
         });

@@ -68,7 +68,7 @@
 		}
 		
 		function purge() {
-			$time = time()-(60*60*24*180);
+			$time = time()-(60*60*24*90);
 
 			global $db;
 			try {

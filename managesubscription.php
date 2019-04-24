@@ -45,7 +45,12 @@
     $sub_Renw = "No Auto-renew";
     $sub_type = "Not Applicable";
   } else {
-    $expiryDate = $subscription-(60*60*24*3);
+    $sub_time = $subscription-(60*60*24*3);
+    if (time() > $sub_time ) {
+      $expiryDate = $subscription;
+    } else {
+      $expiryDate = $sub_time;
+    }
     $sub_Renw = "Automatic Renewal";
     $sub_type = "Auto renew on ".date('l jS \of F Y h:i:s A', $expiryDate);
   }
@@ -278,7 +283,8 @@
                                  </tr>
                                  <tr>
                                    <td>&nbsp;</td>
-                                   <td><input type="submit" name="submit" value="Subscribe" class="btn btn-inverse"></td>
+                                   <td><input type="submit" name="submit" value="Subscribe" class="btn btn-inverse">
+                                   <input name="total" id="total" type="hidden" value="0"></td>
                                  </tr>
                                  
                               <?php } else if ((time()+(60*60*24*3)) > $subscription) { ?>
@@ -287,6 +293,15 @@
                                 <td><a href="<?php echo URL; ?>managesubscription?renew">Renew Subscription</a></td>
                                 
                                   </tr>
+                                <?php if ($userData['payment_frequency'] == "Renew") { ?>
+                                  <tr>
+                                <td width="25%">Auto Rewew</td>
+                                <td><?php echo $sub_type; ?>
+                                <br>
+                                <a href="managesubscription?cancel" onClick="return confirm('Your subscription will not <?php echo $sub_type; ?> after this action. are you sure you want to continue ?')"> cancel auto renew</a></td>
+                                
+                                  </tr>
+                                <?php } ?>
                               <?php } else { ?>
                                   <tr>
                                 <td width="25%">Subscription Type</td>
@@ -322,7 +337,6 @@
                               <?php } ?>
                                 </tbody>
                               </table>
-                              <input name="total" id="total" type="hidden" value="">
                               <input name="order_owner" id="order_owner" type="hidden" value="<?php echo $ref; ?>">
                         </form>
                           </div>

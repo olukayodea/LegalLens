@@ -269,7 +269,7 @@
 							$orders->updateOne("order_status", "CANCELLED", $splitOrderData[0]);
 							$orders->updateOne("payment_status", "CANCELLED", $splitOrderData[0]);
 							$transactions->updateOne("transaction_status", "CANCELLED", $splitOrderData[1]);
-							$message = "The automatic renewal of your subscription was not successful due to the following reasons: ".$result['data']['status'].", we will try this payment again in 6 hours, if you continue to recieve this message, please log into your account and change your payment method";
+							$message = "The automatic renewal of your subscription was not successful due to the following reasons: ".$trannsData['data']['status'].", we will try this payment again in 6 hours, if you continue to recieve this message, please log into your account and change your payment method";
 							$error = true;
 						}
 
