@@ -74,11 +74,11 @@ body,td,th {
     <td>
     <p class="text">Dear <?php echo $last_name; ?>, </p>
     <p class="text">LegalLens</p>
-    <p class="text">Please save this email for future use. Your account enables you to login to the system, and also stores any reward points you may have earned. Your details are now saved as below:</p>
+    <p class="text">Please save this email for future use. Your account enables you to login to the system. Your details are now saved as below:</p>
     <p class="text"><strong>Login Details</strong><hr>
     <p class="text">Email: <?php echo $email; ?><br>
     Password: <?php echo $common->hashPass($password); ?><br></p>
-    <p class="text">Your saved details (You can change these anytime during the checkout) <hr>
+    <p class="text">Your saved details (You can change these anytime) <hr>
     <p class="text"><strong>Contact Information</strong><br>
     Full Names: <?php echo $last_name; ?> <?php echo $other_names; ?><br>
     Email: <?php echo $email; ?><br>
@@ -88,7 +88,7 @@ body,td,th {
   <span class="text">LegalLens.com.ng</span><span class="text"></span></p>
       <p class="text">This email is intended for <?php echo $last_name; ?> <?php echo $other_names; ?>, please do not reply directly to this email. This email was sent from a notification-only address that cannot accept incoming email.</p>
 <p class="text"><strong>Protect Your Password</strong><br>
-Be alert to emails that request account information or urgent action.  Be cautious of websites with irregular addresses or those that offer   unofficial payments to LegalLens Administrator or other privates accounts.<br>
+Be alert to emails that request account information or urgent action.  Be cautious of websites with irregular addresses or those that offer   unofficial payments to LegalLens Administrator or other private accounts.<br>
 </p></td>
   </tr>
   <tr>

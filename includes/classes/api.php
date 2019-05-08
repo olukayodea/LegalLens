@@ -95,7 +95,7 @@
 								$return['header']['code'] = "200";
 								$return['header']['completedTime'] = date('l jS \of F Y h:i:s A');
 								break;
-							case "getdetails":
+								case "getdetails":
 								if ($usersControl->checkLogin($app_id) == true) {
 									$subscriptions = new subscriptions;
 									$array_data['ref'] = $app_data['user'];
@@ -122,6 +122,29 @@
 									$return['header']['status'] = "ERROR";
 									$return['header']['code'] = "100";
 									$return['header']['error'] = "user not logged in";
+								}
+								break;
+							case "checksub":
+								$subscriptions = new subscriptions;
+								$array_data['ref'] = $app_data['user'];
+								$getDetails = $users->listOne($array_data['ref']);
+								if ($getDetails) {
+									$return['header']['status'] = 'DONE';
+									$return['header']['code'] = "200";
+									$return['header']['completedTime'] = date('l jS \of F Y h:i:s A');
+									unset($getDetails['subscription_group']);
+									unset($getDetails['subscription_group_onwer']);
+									unset($getDetails['subscription_order']);
+									unset($getDetails['subscription_type_name']);
+									$getDetails['subscription_type_name'] = $subscriptions->getOneField($getDetails['subscription_type'], "ref", "title");
+									$getDetails['subscription_url'] = URL."mobile_subscription?id=".$array_data['ref'];
+
+									$getDetails['current_time'] = time();
+									$return['body']['userData'] = $getDetails;
+								} else {
+									$return['header']['status'] = "ERROR";
+									$return['header']['code'] = "116";
+									$return['header']['error'] = "cannot get details";
 								}
 								break;
 							case "updatedetails":
