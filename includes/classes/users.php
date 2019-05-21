@@ -254,6 +254,7 @@
 					return 1;
 				} else {
 					$this->addLog($row['ref']);
+					setcookie("ref", $row['ref'], time()+(60*60*24*365), "/");
 					$subscriptions = new subscriptions;
 					$result['ref'] = $row['ref'];
 					$result['email'] = $row['email'];
@@ -271,8 +272,6 @@
 					$result['status'] = $row['status'];
 					$result['last_login'] = $row['last_login'];
 					$result['loginTime'] = time();
-
-
 					return $result;
 				}
 			} else {
@@ -290,6 +289,8 @@
 			$usersControl->logout();
 			unset($_COOKIE['hash']);
 			setcookie("hash", "", time()-42000);
+			unset($_COOKIE['ref']);
+			setcookie("ref", "", time()-42000);
 			session_destroy();
 		}
 		
@@ -300,6 +301,8 @@
 				setcookie(session_name(), '', time()-42000, '/');
 			}
 			setcookie("login_check", "", time()-42000);
+			unset($_COOKIE['ref']);
+			setcookie("ref", "", time()-42000);
 			$usersControl->logout("hash", $hash);
 			session_destroy();
 		}

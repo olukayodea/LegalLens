@@ -210,12 +210,70 @@ window.onload = function() {
     <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
+<?php if ($result == true) { ?>
+<a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-filter" aria-hidden="true"></i>Filter Search Result</a>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+  <?php for ($i = 0; $i < count($listCat); $i++) { ?>
+      <label><input type="checkbox" name="filter[]" id="filter_<?php echo $i; ?>" class="filter_<?php echo $listCat[$i]['ref'] ; ?>" data-main="yes" value="<?php echo $listCat[$i]['ref']; ?>">&nbsp;<?php echo ucfirst(strtolower($listCat[$i]['title'])); ?></label>
+      <?php echo $categories->gettreeCheckBox($listCat[$i]['ref']); ?>
+    <?php } ?>
+    <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    <i class="fa fa-window-close" aria-hidden="true"></i>Close Filter</a>
+    <script language="javascript">
+        $("input[type='checkbox']").each(function(){
+          
+          $(this).click(function(){
+            $('#search_result').html("<br><br>Getting result list");
+            var c = $(this).attr("class");
+            var m =  $(this).attr("data-main");
+            if (m == "yes") {
+              if($(this).is(":checked")){
+                $("."+c).attr("checked",true);
+              }else{
+                $("."+c).attr("checked",false);
+              }
+            }
+            var s = $('#s').val();
+            if ($('#dic').is(':checked')) {
+              var dic = 1;
+            } else {
+              var dic = 0;
+            }
+            if ($('#reg_circular').is(':checked')) {
+              var reg_circular = 1;
+            } else {
+              var reg_circular = 0;
+            }
+            if ($('#case_law').is(':checked')) {
+              var case_law = 1;
+            } else {
+              var case_law = 0;
+            }
+            
+            var other_data = "search_"+s+":dic_"+dic+":reg_"+reg_circular+":case_"+case_law
+
+            var checked = []
+            $("input[name='filter[]']:checked").each(function ()
+            {
+                checked.push(parseInt($(this).val()));
+            });
+
+            $.post( "home_search.php", { parameter: checked, other_data: other_data })
+            .done(function( data ) {
+              $('#search_result').html(data);
+            });
+          })
+        })
+      </script>
+  </div>
+</div>
+<?php } ?>
    <div id="search_result">
      <?php if ($result == true) { ?>
        <h4 style="" align="center">Search Result</h4>
        <p>Your search for "<?php echo $search_data; ?>" brought <?php echo number_format($total); ?> results in <?php echo number_format($timeConsumed, 3)." seconds"; ?>,<br>
-       <a href="Javascript:void(0)" onClick="saveResult()"><i class="fa fa-floppy-o" aria-hidden="true"></i>
- click here to save search result</a>
+       <a href="Javascript:void(0)" onClick="saveResult()"><i class="fa fa-floppy-o" aria-hidden="true"></i>click here to save search result</a><br><br>
         <ul class="nav nav-tabs">
             <li <?php if ((!isset($_GET['tab'])) || ($_GET['tab'] == 'case_law')) { ?>class="active"<?php } ?>><a href="#1" data-toggle="tab">Case Law (<?php echo number_format($case_law_count); ?>)</a></li>
             <?php foreach ($doc as $key => $value) { ?>
@@ -379,20 +437,22 @@ window.onload = function() {
                 <?php } ?>
             </div>
         </div>
+
+      <ins class="adsbygoogle"
+        style="display:inline-block;width:250px;height:250px"
+        data-ad-client="ca-pub-4142286148495329"
+        data-ad-slot="9218590698"></ins>
+      <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
     <?php } ?>
    </div>
 </div>
 </div>
 </div>
 
-<ins class="adsbygoogle"
-          style="display:inline-block;width:250px;height:250px"
-          data-ad-client="ca-pub-4142286148495329"
-          data-ad-slot="9218590698"></ins>
-    <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-                
+              
+    
                 <a href="#top" id="scroll-top"></a>
                <!-- <a href="#top" id="scroll-top"></a> -->
 
@@ -445,9 +505,9 @@ window.onload = function() {
 							alert("You cannot save this page");
 						}
 					}
+
+          
 				</script>
         </body>
-
-
 </html>
 

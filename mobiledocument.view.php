@@ -86,6 +86,7 @@
     (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
              <?php } ?>
+             <h4><a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $list[$i]['ref']; ?>"><?php echo nl2br(($list[$i]['section_no'])); ?></a></h4>
        <p><?php echo nl2br($common->truncate($list[$i]['section_content'], 500)); ?><br>
        <a href="<?php echo URL; ?>mobiledocument.read?id=<?php echo $data['ref']; ?>&read=<?php echo $list[$i]['ref']; ?>">Read More</a></p>
        <?php } ?>

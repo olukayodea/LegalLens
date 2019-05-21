@@ -248,7 +248,7 @@
                                    <td><input type="text" name="billingstate" id="billingstate" placeholder="State"></td>
                                  </tr>
                                   <tr>
-                                   <td width="25%">Billing State</td>
+                                   <td width="25%">Billing Country</td>
                                    <td><input type="text" name="billingcountry" id="billingcountry" placeholder="Country"></td>
                                  </tr>
                                   <tr>

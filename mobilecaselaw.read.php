@@ -24,7 +24,7 @@
 	$list = $caselaw_sections->getOne($read);
 	$common->updateCounter($id, $read, "caseLaw");
 	
-	$text_data = $caselaw_sections->turnClickable($read);
+	$text_data = $caselaw_sections->turnClickableMobile($read);
   $listOthers = $caselaw_sections->sortAll($data['ref'], "caselaw", "status", "active");
 ?>
 <!doctype html>
@@ -129,7 +129,7 @@
     <br>
              <?php } ?>
         <?php echo nl2br($common->truncateLine($listOthers[$i]['section_content'])); ?><br>
-       <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $id; ?>&read=<?php echo $listOthers[$i]['ref']; ?>">Read More</a><br>
+       <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $id; ?>&read=<?php echo $listOthers[$i]['ref']; ?>">Read More</a><br>
        <cite><strong><?php echo $listOthers[$i]['citation']; ?></strong></cite><br><br>
        <?php } ?>
        

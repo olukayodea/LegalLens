@@ -25,6 +25,10 @@
 			$_POST['mobile'] = false;
 			$url = "";
 		}
+
+		if (!isset($_POST['payment_frequency'])) {
+			$_POST['payment_frequency'] = "Single";
+		}
 			
 		$array['order_owner'] = $_POST['order_owner'];
 		$array['order_subscription'] = $_POST['package'];
@@ -35,6 +39,7 @@
 		$array['payment_frequency'] = $_POST['payment_frequency'];
 		$array['order_amount_discount'] = $discount;
 		$array['order_amount_gross'] = $amount;
+		$array['Amount'] = $amount;
 		if ($amount < 1) {
 			$array['payment_type'] = "Free";
 			$array['transaction_channel'] = "Free";

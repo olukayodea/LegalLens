@@ -1,8 +1,9 @@
 <?php
 	$redirect = "confirmation";
 	include_once("includes/functions.php");
-	include_once("includes/session.php");
-	if (isset($_REQUEST['id'])) {
+  include_once("includes/session.php");
+
+  if (isset($_REQUEST['id'])) {
 		$id = $common->mysql_prep($_REQUEST['id']);
     $token = $common->mysql_prep($_REQUEST['token']);
     
@@ -124,7 +125,7 @@
                         Payment Status: <strong><?php echo $data['payment_status']; ?></strong><br />
                         Transaction Status Description: <strong><?php echo $urlData['ResponseDescription']; ?></strong></p>
                         <?php } else if ($urlData['Amount'] < 1) { ?>
-                          <p><strong>Pyment is not needed for this order</strong></p>
+                          <p><strong>Payment is not needed for this order</strong></p>
                         <?php } else { ?>
                         <p><strong>Pyment has not been confirmed for this order</strong></p>
                         <?php } ?>
