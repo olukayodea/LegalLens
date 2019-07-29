@@ -6,7 +6,7 @@
 	
 	if (isset($_REQUEST['sort'])) {
 		$id = $common->get_prep($_REQUEST['sort']);
-		$tag = "Documents Categories in ".$categories->getOneField($id);
+		$tag = "Document Categories in ".$categories->getOneField($id);
 		$tag2 = " in ".$id;
 	} else {
 		$id = false;

@@ -69,7 +69,7 @@
 <div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
-       <h3 style="" align="center"><?php echo $data['title']; ?></h3>
+       <h3 style="" align="center"><?php echo htmlspecialchars_decode($data['title']); ?></h3>
        <?php for ($i = 0; $i < count($list); $i++) { ?>
        <?php echo nl2br($list[$i]['section_content']); ?></p>
        <?php } ?>

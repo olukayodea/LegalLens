@@ -60,7 +60,7 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
           <h1>
-            <?php echo $data['title']; ?>
+            <?php echo htmlspecialchars_decode($data['title']); ?>
             <small>View Document</small>
           </h1>
           <ol class="breadcrumb">
@@ -95,7 +95,7 @@
               <div class="form-group">
                   <label for="status" class="form-label">
                   Document Title
-                <p class="help-block"><?php echo $data['title']; ?></p>
+                <p class="help-block"><?php echo htmlspecialchars_decode($data['title']); ?></p>
                 <?php if ($data['type'] != "Books") { ?>
                   Document Category
                 <p class="help-block"><?php echo $data['category_name']; ?></p>

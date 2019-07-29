@@ -60,7 +60,7 @@
 				$array['TransactionDate'] = date('l jS \of F Y h:i:s A', $data['create_time']);
 				$response = json_encode($array);
 				$token = base64_encode($response);
-				header("location: ".$mobile."confirmation?id=".$data['ref']."&token=".$token);
+				header("location: ".$mobile."confirmation?user_id=".$$_POST['order_owner']."&id=".$data['ref']."&token=".$token);
 			} elseif ($array['payment_frequency'] == "Renew") {
 				global $transactions;
 				$_POST['order_owner'] = $data['order_owner'];
@@ -95,24 +95,24 @@
 					}
 				} else if (($result['status'] == "success") && ($result['data']['chargeResponseCode'] == "02")) {
 					if ($result['data']['authModelUsed'] == "PIN") {
-						header("location: flPin?otp&flwRef=".$result['data']['flwRef']."&data=".base64_encode(json_encode($_POST))."&msg=".$result['data']['chargeResponseMessage'].$url);
+						header("location: flPin?otp&flwRef=".$result['data']['flwRef']."&user_id=".$$_POST['order_owner']."&data=".base64_encode(json_encode($_POST))."&msg=".$result['data']['chargeResponseMessage'].$url);
 					} else if ($result['data']['authModelUsed'] == "VBVSECURECODE") {
-						header("location: ".$result['data']['authurl']);
+						header("location: ".$result['data']['authurl']."&user_id=".$$_POST['order_owner']);
 					}  else if ($result['data']['authModelUsed'] == "ACCESS_OTP") {
-						header("location: ".$result['data']['authurl']);
+						header("location: ".$result['data']['authurl']."&user_id=".$$_POST['order_owner']);
 					} 
 				} else if (($result['status'] == "success") && ($result['data']['chargeResponseCode'] == "00")) {
-					header("location: flConfirm?txRef=".$result['data']['txRef'].$url);
+					header("location: flConfirm?txRef=".$result['data']['txRef'].$url."$user_id=".$$_POST['order_owner']);
 				} else {
 					$orders->updateOne("order_status", "CANCELLED", $res[0]);
 					$orders->updateOne("payment_status", "CANCELLED", $res[0]);
 					$transactions->updateOne("transaction_status", "CANCELLED", $res[1]);
-					header("location: ".$subscriptions_url."?error=".$result['message']);
+					header("location: ".$subscriptions_url."?user_id=".$$_POST['order_owner']."&error=".$result['message']);
 				}
 			} elseif ($data['payment_type'] == "Online") {
 				//for online Payment
 				//$transData = $transactions->getOne($add, "order_id");
-				header("location: ".$preview."?id=".$res[1]);
+				header("location: ".$preview."?id=".$res[1]."user_id=".$$_POST['order_owner']);
 				
 				//for simulation
 				
@@ -132,10 +132,10 @@
 				$response = json_encode($array);
 				$token = base64_encode($response);
 				$orders->orderNotification($data['ref']);
-				header("location: ".$mobile."confirmation?id=".$data['ref']."&token=".$token);
+				header("location: ".$mobile."confirmation?id=".$data['ref']."&token=".$token."user_id=".$$_POST['order_owner']);
 			}
 		} else {
-			header("location: ".$subscriptions_url."?error=".urlencode("There was an error processing your order, please try again or contact the customer support if error persists"));
+			header("location: ".$subscriptions_url."?user_id=".$$_POST['order_owner']."&error=".urlencode("There was an error processing your order, please try again or contact the customer support if error persists"));
 		}
 	} else {
 		header("location: ".$home);

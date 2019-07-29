@@ -100,17 +100,7 @@
         <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
         <?php } ?>
         <p><a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=a">A</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=b">B</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=c">C</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=d">D</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=e">E</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=f">F</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=g">G</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=h">H</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=i">I</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=j">J</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=k">K</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=l">L</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=m">M</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=n">N</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=o">O</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=p">P</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=q">Q</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=r">R</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=s">S</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=t">T</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=u">U</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=v">V</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=w">W</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=x">X</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=y">Y</a> | <a href="<?php echo URL.$redirect."?sort=".urlencode($id); ?>&q=z">Z</a></p>
-        <?php for ($i = 0; $i < count($list); $i++) {
-             if (($i+1 % 10) == false) { ?>
-                 <ins class="adsbygoogle"
-          style="display:inline-block;width:728px;height:90px"
-          data-ad-client="ca-pub-4142286148495329"
-          data-ad-slot="9218590698"></ins>
-    <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-		</script>
-		<br>
-             <?php } ?>
+        <?php for ($i = 0; $i < count($list); $i++) { ?>
         <strong><a href="<?php echo URL; ?>mobilecaseLaw.ratio?id=<?php echo $list[$i]['areas']; ?>"><?php echo ucfirst(strtolower($list[$i]['areas'])); ?></a></strong><br>
 			<?php } ?>
 

@@ -97,7 +97,7 @@
 
                                             <h1 class="post-title">
                                                 <?php if ($oneResult == true) { ?>
-                                                <a href="#"><?php echo $data['title']; ?></a>
+                                                <a href="#"><?php echo htmlspecialchars_decode($data['title']); ?></a>
 												<?php } else { ?>
                                                 <a href="#">Help and Support</a>
                                                 <?php } ?>

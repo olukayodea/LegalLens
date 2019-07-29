@@ -46,7 +46,7 @@
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title><?php echo $data['title']; ?></title>
+                <title><?php echo htmlspecialchars_decode(htmlspecialchars_decode($data['title'])); ?></title>
     <?php $pages->head(); ?>
                 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
                 <!--[if lt IE 9]>
@@ -76,16 +76,7 @@
     <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
-       <?php for ($i = 0; $i < count($list); $i++) {
-             if (($i+1 % 10) == false) { ?>
-                 <ins class="adsbygoogle"
-          style="display:inline-block;width:728px;height:90px"
-          data-ad-client="ca-pub-4142286148495329"
-          data-ad-slot="9218590698"></ins>
-    <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-             <?php } ?>
+       <?php for ($i = 0; $i < count($list); $i++) { ?>
              <h4><a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $list[$i]['ref']; ?>"><?php echo nl2br(($list[$i]['section_no'])); ?></a></h4>
        <p><?php echo nl2br($common->truncate($list[$i]['section_content'], 500)); ?><br>
        <a href="<?php echo URL; ?>mobiledocument.read?id=<?php echo $data['ref']; ?>&read=<?php echo $list[$i]['ref']; ?>">Read More</a></p>

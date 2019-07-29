@@ -107,14 +107,14 @@ $link .= $_SERVER['REQUEST_URI'];
        <?php if ((isset($s)) && ($s != "")) { ?>
        <p align="left"><a href="home?q=<?php echo $s; ?>" style="text-decoration:underline">Back to Search</a></p>
        <?php } ?>
-       <h3 style="" align="center"><?php echo $data['title']; ?></h3>
+       <h3 style="" align="center"><?php echo htmlspecialchars_decode($data['title']); ?></h3>
        <p><?php if ($list_one['section_no'] != "") { ?>
        <strong><?php echo $list_one['section_no']; ?></strong><br>
        <?php } ?>
        <?php echo nl2br($list_one['section_content']); ?></p>
       <?php if ($read == true) { ?>
        <hr>
-       <h4><strong>Also in <?php echo $data['title']; ?></strong></h4>
+       <h4><strong>Also in <?php echo htmlspecialchars_decode($data['title']); ?></strong></h4>
        <?php } ?>
         <div id="easyPaginate">
 		   <?php for ($i = 0; $i < count($list); $i++) { ?>

@@ -6,11 +6,12 @@
 		$id = $common->mysql_prep($_REQUEST['id']);
     $token = $common->mysql_prep($_REQUEST['token']);
     
+    
 	} else {
 		header("location: mobilehome?error=".urlencode("There was an error processing your order, please try again"));
 	}
 	
-	$data = $orders->getOne($id);
+    $data = $orders->getOne($id);
   $userData = $users->listOne($data['order_owner']);
 
   $subscription = trim($userData['subscription']);
@@ -79,7 +80,7 @@
     <?php if (isset($_GET['error'])) { ?>
     <p class="error">Y<?php echo $_GET['error']; ?></p>
     <?php } ?>
-    <p>Hi <?php echo $last_name." ".$other_names; ?>, please review your current subscription data below</p>
+    <p>Hi <?php echo $userData['last_name']." ".$userData['other_names']; ?>, please review your current subscription data below</p>
     <?php if (isset($_GET['renew'])) { ?>
     <p class="error">You were redirected here because either your subscription has expired or you are yet to purchase a valid subscription</p>
     <?php } ?>
@@ -146,22 +147,22 @@
             <tbody>
                 <tr>
             <td width="25%">Surname</td>
-            <td><?php echo $last_name; ?></td>
+            <td><?php echo $userData['last_name']; ?></td>
             
                 </tr>
                 <tr>
             <td width="25%">Firstname</td>
-            <td><?php echo $other_names; ?></td>
+            <td><?php echo $userData['other_names']; ?></td>
             
                 </tr>
                 <tr>
             <td width="25%">Email address</td>
-            <td><?php echo $email; ?></td>
+            <td><?php echo $userData['email']; ?></td>
             
                 </tr>
                 <tr>
             <td width="25%">Mobile number</td>
-            <td><?php echo $phone; ?></td>
+            <td><?php echo $userData['phone']; ?></td>
             
                 </tr>
             </tbody>

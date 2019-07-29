@@ -68,7 +68,7 @@
        <?php if ((isset($s)) && ($s != "")) { ?>
        <p align="left"><a href="mobilehome?q=<?php echo $s; ?>" style="text-decoration:underline">Back to Search</a></p>
        <?php } ?>
-       <h3 style="" align="center"><?php echo $data['title']; ?></h3>
+       <h3 style="" align="center"><?php echo htmlspecialchars_decode($data['title']); ?></h3>
 
 <ins class="adsbygoogle"
           style="display:inline-block;width:728px;height:90px"
@@ -91,19 +91,10 @@
     <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
-       <h4><strong>Also in <?php echo $data['title']; ?></strong></h4>
+       <h4><strong>Also in <?php echo htmlspecialchars_decode($data['title']); ?></strong></h4>
        <?php } ?>
         <div id="easyPaginate">
-		   <?php for ($i = 0; $i < count($list); $i++) {
-             if (($i+1 % 10) == false) { ?>
-                 <ins class="adsbygoogle"
-          style="display:inline-block;width:728px;height:90px"
-          data-ad-client="ca-pub-4142286148495329"
-          data-ad-slot="9218590698"></ins>
-    <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-             <?php } ?>
+		   <?php for ($i = 0; $i < count($list); $i++) { ?>
                <p><?php if ($list[$i]['section_no'] != "") { ?>
                <strong><?php echo $list[$i]['section_no']; ?></strong><br>
                <?php } ?>

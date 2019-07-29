@@ -88,17 +88,7 @@ $list = $caselaw->listCourt()
         <p><?php echo count($list); ?> record(s) found [<a href="<?php echo URL."/".$redirect."?sort=".$id; ?>">show all</a> 	]</p>
         <?php } ?>
         <div id="easyPaginate">
-            <?php for ($i = 0; $i < count($list); $i++) {
-             if (($i+1 % 10) == false) { ?>
-                 <ins class="adsbygoogle"
-          style="display:inline-block;width:728px;height:90px"
-          data-ad-client="ca-pub-4142286148495329"
-          data-ad-slot="9218590698"></ins>
-    <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-    <br>
-             <?php } ?>
+            <?php for ($i = 0; $i < count($list); $i++) { ?>
                 <span>
                     <strong>
                     <a href="<?php echo URL; ?>mobile_caseLaw?sort=<?php echo urlencode($list[$i]['title']); ?>"><?php echo $list[$i]['title']; ?></a>
@@ -106,14 +96,6 @@ $list = $caselaw->listCourt()
                 </span>
             <?php } ?>
         </div>
-       
-<ins class="adsbygoogle"
-style="display:inline-block;width:250px;height:250px"
-          data-ad-client="ca-pub-4142286148495329"
-          data-ad-slot="9218590698"></ins>
-    <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
 	 </div>
 
    </div>

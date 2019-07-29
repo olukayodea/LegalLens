@@ -79,7 +79,7 @@
 <div class="span7">
    <div style="border:1px solid #ccc; padding:10px">
      <div style="margin-top:30px">
-       <h3 style="" align="center"><?php echo $data['title']; ?></h3>
+       <h3 style="" align="center"><?php echo htmlspecialchars_decode($data['title']); ?></h3>
        <?php for ($i = 0; $i < count($list); $i++) { ?>
         <h4><a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $list[$i]['ref']; ?>"><?php echo nl2br(($list[$i]['section_no'])); ?></a></h4>
        <p><?php echo nl2br(($common->truncate($list[$i]['section_content'], 500))); ?><br>

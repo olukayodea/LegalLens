@@ -119,22 +119,12 @@ $link .= $_SERVER['REQUEST_URI'];
            <td align="right"<?php if (intval($next) > 0) { ?>><a href="<?php echo URL."document.read"."?id=".$id."&read=".$next; ?>" style="text-decoration:underline">Next Section &gt; &gt;</a><?php } ?></td>
         </tr>
        </table>
-<h3 style="" align="center"><?php echo $data['title']; ?></h3>
+<h3 style="" align="center"><?php echo htmlspecialchars_decode($data['title']); ?></h3>
        <p align="center"><strong><?php echo $list['section_no']; ?></strong></p>
        <p><?php echo nl2br(html_entity_decode($list['section_content'])); ?></p>
        <?php if (count($subList) > 0) { ?>
            <h3 style="" align="center">Other Sections in This Document</h3>
-           <?php for ($i = 0; $i < count($subList); $i++) {
-             if (($i+1 % 10) == false) { ?>          
-              <ins class="adsbygoogle"
-              style="display:inline-block;width:728px;height:90px"
-              data-ad-client="ca-pub-4142286148495329"
-              data-ad-slot="9218590698"></ins>
-              <script>
-              (adsbygoogle = window.adsbygoogle || []).push({});
-              </script>
-              <br>
-             <?php } ?>
+           <?php for ($i = 0; $i < count($subList); $i++) { ?>
            <a href="<?php echo URL; ?>document.read?id=<?php echo $data['ref']; ?>&read=<?php echo $subList[$i]['ref']; ?>"><strong><?php echo $subList[$i]['section_no']; ?></strong></a><br>
            <?php } ?>
        <?php } ?>

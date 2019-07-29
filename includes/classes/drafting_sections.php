@@ -198,7 +198,6 @@
 				echo "An Error occured! ".$ex->getMessage(); 
 			}
 			
-			$result = array();
 			$row = $sql->fetch(PDO::FETCH_ASSOC);
 				
 			return $this->out_prep($row);

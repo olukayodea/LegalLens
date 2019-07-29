@@ -54,7 +54,7 @@
 
                                                 <article class="type-page hentry clearfix">
                                                         <h1 class="post-title">
-                                                                <a href="#"><?php echo $data['title']; ?></a>
+                                                                <a href="#"><?php echo htmlspecialchars_decode($data['title']); ?></a>
                                                         </h1>
                                                         <hr>
                                                         <p><?php echo $data['content']; ?></p>

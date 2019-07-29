@@ -119,8 +119,8 @@ $link .= $_SERVER['REQUEST_URI'];
        <?php } else { ?>
        <p align="left"><a href="<?php echo URL; ?>caseLaw.ratio?id=<?php echo $data['areas']; ?>" style="text-decoration:underline">Back to <?php echo $data['areas']; ?></a></p>
        <?php } ?>
-       <h3 style="" align="center"><?php echo $data['title']; ?></h3>
-       <p class="decorate"><?php echo nl2br($text_data); ?><br><br>
+       <h3 style="" align="center"><?php echo htmlspecialchars_decode($data['title']); ?></h3>
+       <p class="decorate"><?php echo nl2br(htmlspecialchars_decode($text_data)); ?><br><br>
        <cite><?php echo $list['citation']; ?></cite>
 		<?php if ($data['file'] != "") { ?>
 		<div id="page" style="width:100%">
@@ -142,7 +142,7 @@ $link .= $_SERVER['REQUEST_URI'];
 		</div>
         <?php } ?>
 
-        <h3 style="" align="center">Other Ratios in <?php echo $data['title']; ?></h3>
+        <h3 style="" align="center">Other Ratios in <?php echo htmlspecialchars_decode($data['title']); ?></h3>
        <?php for ($i = 0; $i < count($listOthers); $i++) { ?>
         <?php echo nl2br($common->truncateLine($listOthers[$i]['section_content'])); ?><br>
        <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $id; ?>&read=<?php echo $listOthers[$i]['ref']; ?>">Read More</a><br>
