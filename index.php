@@ -9,7 +9,10 @@
 		
 	$urlParam = $common->getParam($_SERVER['REQUEST_URI']);
 	
-	$er = false; 
+  $er = false; 
+  $last_name = "";
+  $other_names = "";
+  $email = "";
 	if (isset($_REQUEST['msg'])) {
 		$er = $_REQUEST['msg'];
 	}
@@ -66,13 +69,20 @@
 			header("location: ./?error=".urlencode($er));
 		}
   } else if (isset($_POST['registerButton'])) {
-		$add = $users->create($_POST);
-		
-		if ($add) {
-			header("location: home");
-		} else {
-			$er = "there was an error creating this acount, if you are sure you dont have an account already, please try again in a few minutes or contact the administrtor";
-		}
+    if (strtolower($_POST['captcha']) == strtolower($_SESSION['code'])) {
+      $add = $users->create($_POST);
+      
+      if ($add) {
+        header("location: home");
+      } else {
+        $er = "there was an error creating this acount, if you are sure you dont have an account already, please try again in a few minutes or contact the administrtor";
+      }
+    } else {
+      $last_name = $_POST['last_name'];
+      $other_names = $_POST['other_names'];
+      $email = $_POST['email'];
+      $er = "The seciurity code you entered does not match";
+    }
 	}
 	
 	$content = nl2br($page_content->getOneField("home", "title", "content"));
@@ -251,7 +261,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         </tr>
                                         <tr>
                                         	<td><span id="sprytextfield1">
-                                        	  <input type="text" name="last_name" id="last_name" class="input-large span3" value="">
+                                        	  <input type="text" name="last_name" id="last_name" class="input-large span3" value="<?php echo $last_name; ?>">
                                        	    <span class="textfieldRequiredMsg"><br>A value is required.</span></span></td>
                                         </tr>
                                         <tr>
@@ -259,7 +269,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         </tr>
                                         <tr>
                                        	  <td><span id="sprytextfield2">
-                                       	    <input type="text" name="other_names" id="other_names" class="input-large span3" value="">
+                                       	    <input type="text" name="other_names" id="other_names" class="input-large span3" value="<?php echo  $other_names; ?>">
                                    	      <span class="textfieldRequiredMsg"><br>A value is required.</span></span></td>
                                         </tr>
                                         <tr>
@@ -267,7 +277,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         </tr>
                                         <tr>
                                         	<td><span id="sprytextfield3">
-                                        	  <input type="text" name="email" id="email" class="input-large span3" value="">
+                                        	  <input type="text" name="email" id="email" class="input-large span3" value="<?php echo  $email;  ?>">
                                        	    <span class="textfieldRequiredMsg"><br>A value is required.</span></span></td>
                                         </tr>
                                         <tr>
@@ -285,6 +295,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         	<td colspan=2><span id="spryconfirm1">
                                         	  <input type="password" name="confirm" id="confirm" class="input-large span3">
                                        	    <span class="confirmRequiredMsg"><br>A value is required.</span><span class="confirmInvalidMsg"><br>The values don't match.</span></span></td>
+                                        </tr>
+                                        <tr>
+                                        	<td>
+                                          <label for="captcha">
+                                          <img src="<?php echo URL; ?>includes/scripts/captcha" /></label>
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td>
+                                            <span id="sprytextfield0">
+                                              <input type="text" name="captcha" id="captcha" class="input-large span3" required />
+                                              <span class="textfieldRequiredMsg">A value is required.</span>
+                                            </span>
+                                            <br>
+                                            <small id="confirmHelp" class="form-text text-muted">Please enter the text in the image above.</small>
+                                          </td>
                                         </tr>
                                         <tr>
                                         	<td><input type="submit" name="registerButton" value="Register" class="btn btn-inverse"></td>
@@ -452,6 +478,7 @@ var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2");
 var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3");
 var sprypassword1 = new Spry.Widget.ValidationPassword("sprypassword1");
 var spryconfirm1 = new Spry.Widget.ValidationConfirm("spryconfirm1", "password");
+var sprytextfield0 = new Spry.Widget.ValidationTextField("sprytextfield0");
 <?php } ?>
 var sprytextfield4 = new Spry.Widget.ValidationTextField("sprytextfield4");
 var sprypassword2 = new Spry.Widget.ValidationPassword("sprypassword2");

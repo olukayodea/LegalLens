@@ -1,8 +1,20 @@
 <?php
-	include_once("includes/functions.php");
+        include_once("includes/functions.php");
+        $message = "";
+        $name = "";
+        $reason = "";
+        $email = "";
 	if (isset($_POST['submit'])) {
-		$common->sendContact($_POST);
-		header("location: ?done");
+                if (strtolower($_POST['captcha']) == strtolower($_SESSION['code'])) {
+                        $common->sendContact($_POST);
+                        header("location: ?done");
+                } else {
+                        $name = $_POST['name'];
+                        $reason = $_POST['reason'];
+                        $message = $_POST['message'];
+                        $email = $_POST['email'];
+                        $er = "The seciurity code you entered does not match";
+                }
 	}
 	
 	$random = rand(1000, 9999);
@@ -15,23 +27,23 @@
         
 
 <head>
-    <meta charset="utf-8">
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
-<script src="SpryAssets/SpryValidationTextarea.js" type="text/javascript"></script>
-<script src="SpryAssets/SpryValidationConfirm.js" type="text/javascript"></script>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-4142286148495329",
-    enable_page_level_ads: true
-  });
-</script>
-                <!-- META TAGS -->
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+        <script src="SpryAssets/SpryValidationTextarea.js" type="text/javascript"></script>
+        <script src="SpryAssets/SpryValidationConfirm.js" type="text/javascript"></script>
+        <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-4142286148495329",
+        enable_page_level_ads: true
+        });
+        </script>
+        <!-- META TAGS -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title>Contact legallens</title>
-                <meta name="description" content="Get in touch with the Legal Lens team and we'd respond within 24hrs">
+        <title>Contact legallens</title>
+        <meta name="description" content="Get in touch with the Legal Lens team and we'd respond within 24hrs">
 
         <?php $pages->head(); ?>
         <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css">
@@ -78,37 +90,38 @@
                                                                 <label for="name">Your Name <span>*</span> </label>
                                                         </div>
                                                         <div class="span6"><span id="sprytextfield1">
-                                                          <input type="text" name="name" id="name" class="required input-xlarge" value="" title="* Please provide your name">
+                                                          <input type="text" name="name" id="name" class="required input-xlarge" value="" title="* Please provide your name" value="<?php echo $name; ?>">
                                                         <span class="textfieldRequiredMsg">A value is required.</span></span></div>
 
                                                         <div class="span2">
                                                                 <label for="email">Your Email <span>*</span></label>
                                                         </div>
                                                         <div class="span6"><span id="sprytextfield2">
-                                                        <input type="text" name="email" id="email" class="email required input-xlarge" value="" title="* Please provide a valid email address">
+                                                        <input type="text" name="email" id="email" class="email required input-xlarge" value="" title="* Please provide a valid email address" value="<?php echo $email; ?>">
                                                         <span class="textfieldRequiredMsg">A value is required.</span><span class="textfieldInvalidFormatMsg">Invalid format.</span></span></div>
 
                                                         <div class="span2">
                                                                 <label for="reason">Subject <span>*</span></label>
                                                         </div>
                                                         <div class="span6"><span id="sprytextfield3">
-                                                          <input type="text" name="reason" id="reason" class="input-xlarge" value="">
+                                                          <input type="text" name="reason" id="reason" class="input-xlarge" value="<?php echo $reason; ?>">
                                                         <span class="textfieldRequiredMsg">A value is required.</span></span></div>
 
                                                         <div class="span2">
                                                                 <label for="message">Your Message <span>*</span> </label>
                                                         </div>
                                                         <div class="span6"><span id="sprytextarea1">
-                                                          <textarea name="message" id="message" class="required span6" rows="6" title="* Please enter your message"></textarea>
+                                                          <textarea name="message" id="message" class="required span6" rows="6" title="* Please enter your message"><?php echo $message; ?></textarea>
                                                         <span class="textareaRequiredMsg">A value is required.</span></span></div>
 
                                                         <div class="span2">
-                                                                <label for="message">Enter this number here <?php echo $random; ?> <span>*</span> </label>
+                                                                <label for="captcha">
+                                                                        <img src="<?php echo URL; ?>includes/scripts/captcha.php" />
+                                                                </label>
                                                         </div>
                                                   <div class="span6"><span id="spryconfirm1">
-                                                    <input type="text" name="cap" id="cap" class="required input-xlarge" value="" title="* Please provide an answer">
-                                                    <span class="confirmRequiredMsg">A value is required.</span><span class="confirmInvalidMsg">The values don't match.</span></span>
-                                                    <input type="hidden" name="cap2" id="cap2" value="<?php echo $random; ?>"">
+                                                    <input type="text" name="captcha" id="captcha" class="input-large span3" required />
+                                                    <span class="confirmRequiredMsg">A value is required.</span></span>
                                                         </div>
 
                                                         <div class="span6 offset2 bm30">
@@ -167,7 +180,6 @@ var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
 var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "email");
 var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3");
 var sprytextarea1 = new Spry.Widget.ValidationTextarea("sprytextarea1");
-var spryconfirm1 = new Spry.Widget.ValidationConfirm("spryconfirm1", "cap2");
         </script>
           <script src="https://www.google.com/recaptcha/api.js?render=6LcWZo8UAAAAABUYrbZ_lqFVn_qvvjcwTP2BWUaF"></script>
   <script>
