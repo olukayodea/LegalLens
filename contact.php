@@ -4,6 +4,7 @@
         $name = "";
         $reason = "";
         $email = "";
+        $er = false;
 	if (isset($_POST['submit'])) {
                 if (strtolower($_POST['captcha']) == strtolower($_SESSION['code'])) {
                         $common->sendContact($_POST);
@@ -77,11 +78,13 @@
                                                                 <a href="#">Contact</a>
                                                         </h1>
                                                         <hr>
-														<?php if (isset($_REQUEST['done'])) { ?>
+                                                        <?php if ($er == true) { ?>
+                                                        <p class="error"><?php echo $er; ?></p>
+                                                        <?php } ?>					<?php if (isset($_REQUEST['done'])) { ?>
                                                         <p class="success">Message Sent!</p>
                                                         <?php } ?>
                                                         <p>Drop a line and we will get in touch with you </p>
-                                                </article>
+                                                        </article>
 
 
                                                 <form id="contact-form" class="row" action="" method="post">
