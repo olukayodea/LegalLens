@@ -7,6 +7,8 @@
         $ref = $_COOKIE['id'];
     }
 
+    $ref = 1;
+
     $getDetails = $users->listOne($ref);
     $username = trim($getDetails['username']);
     $last_name = trim($getDetails['last_name']);

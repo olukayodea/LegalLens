@@ -71,11 +71,11 @@ $postData = base64_encode(json_encode($post));
                        <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
                        <td><p>
-                  <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
+                  <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">
                    <cite><strong><?php echo $case_law[$i]['citation']; ?></strong></cite><br>
                    <strong style="color:#00F"><?php echo $common->getLine($case_law[$i]['section_content']); ?></strong><br></a>
                    <?php echo nl2br($common->truncate($case_law[$i]['section_content'], 250)); ?><br>
-                   <a href="<?php echo URL; ?>caselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">read more</a></p>
+                   <a href="<?php echo URL; ?>mobilecaselaw.read?id=<?php echo $case_law[$i]['ref']; ?>&read=<?php echo $case_law[$i]['section_ID']; ?>&return=<?php echo $search_data; ?>">read more</a></p>
                        </td>
                           </tr>
                       <?php } ?>
@@ -110,7 +110,7 @@ $postData = base64_encode(json_encode($post));
 						  $count++ ?>
                        <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
-                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>document.read?id=<?php echo $doc[$key][$i]['ref']; ?>&read=<?php echo $doc[$key][$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $doc[$key][$i]['title']; ?></a></strong><br>
+                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>mobiledocument.read?id=<?php echo $doc[$key][$i]['ref']; ?>&read=<?php echo $doc[$key][$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $doc[$key][$i]['title']; ?></a></strong><br>
                   <strong style="color:#00F"><?php echo nl2br($common->getLine($doc[$key][$i]['section_no'])); ?></strong><br>
                    <?php 
                        echo nl2br($common->truncate($doc[$key][$i]['section_content'], 150));
@@ -148,7 +148,7 @@ $postData = base64_encode(json_encode($post));
 						  $count++ ?>
                           <tr>
                        <td valign="top"><strong><?php echo $count; ?></strong></td>
-                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>regulations.view?id=<?php echo $reg[$i]['ref']; ?>&read=<?php echo $reg[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $reg[$i]['title']; ?></a></strong><br>
+                       <td><p><strong style="color:#006"><a href="<?php echo URL; ?>mobile_regulations.view?id=<?php echo $reg[$i]['ref']; ?>&read=<?php echo $reg[$i]['section_ref']; ?>&return=<?php echo $search_data; ?>"><?php echo $reg[$i]['title']; ?></a></strong><br>
                        
                    <?php 
                    if ($reg[$i]['section_no'] == "") {

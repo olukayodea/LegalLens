@@ -346,19 +346,19 @@ style="display:inline-block;width:250px;height:250px"
                 <a href="#top" id="scroll-top"></a>
                 <!-- script -->
                <!-- <script type='text/javascript' src='js/jquery-1.8.3.min.js'></script> -->
-			   	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-                <script type='text/javascript' src='js/jquery.easing.1.34e44.js?ver=1.3'></script>
-                <script type='text/javascript' src='js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
-                <script type='text/javascript' src='js/jquery.liveSearchd5f7.js?ver=2.0'></script>
-				<script type='text/javascript' src='js/jflickrfeed.js'></script>
-                <script type='text/javascript' src='js/jquery.formd471.js?ver=3.18'></script>
-                <script type='text/javascript' src='js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
-                <script type='text/javascript' src="js/jquery-twitterFetcher.js"></script>
-                <script type='text/javascript' src='js/custom5152.js?ver=1.0'></script>
-                <script type='text/javascript' src='js/frontEnd.js'></script>
-				<script type='text/javascript' src="js/navAccordion.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <script src="js/pagination.js"></script>
+			   	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/jquery.easing.1.34e44.js?ver=1.3'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/prettyphoto/jquery.prettyPhotoaeb9.js?ver=3.1.4'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/jquery.liveSearchd5f7.js?ver=2.0'></script>
+				<script type='text/javascript' src='<?php echo URL; ?>js/jflickrfeed.js'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>js/jquery.formd471.js?ver=3.18'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>/js/jquery.validate.minfc6b.js?ver=1.10.0'></script>
+                <script type='text/javascript' src="<?php echo URL; ?>/js/jquery-twitterFetcher.js"></script>
+                <script type='text/javascript' src='<?php echo URL; ?>/js/custom5152.js?ver=1.0'></script>
+                <script type='text/javascript' src='<?php echo URL; ?>/js/frontEnd.js'></script>
+				<script type='text/javascript' src="<?php echo URL; ?>/js/navAccordion.min.js"></script>
+    <script src="<?php echo URL; ?>//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="<?php echo URL; ?>js/pagination.js"></script>
                 
                 
     <script>

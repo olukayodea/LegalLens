@@ -259,7 +259,7 @@ window.onload = function() {
                 checked.push(parseInt($(this).val()));
             });
 
-            $.post( "home_search.php", { parameter: checked, other_data: other_data })
+            $.post( "home_searc_mobile.php", { parameter: checked, other_data: other_data })
             .done(function( data ) {
               $('#search_result').html(data);
             });

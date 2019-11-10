@@ -1,7 +1,7 @@
 <?php
-	$redirect = "support";
+	$redirect = "mobilesupport";
 	include_once("includes/functions.php");
-	include_once("includes/session.php");
+	include_once("includes/mobile_session.php");
 	if (isset($_REQUEST['open'])) {
 		$list = $help->sortAll(0, "parent_id", "user_id", $ref, "status", 1);
 		$tag = "Showing Opened Support Tickets";
