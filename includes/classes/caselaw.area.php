@@ -25,7 +25,7 @@
 			}			
 			
 			try {
-				$sql = $db->prepare("INSERT INTO `caselaw_sections` (".$firstpart."`title`,`status`, `create_time`, `modify_time`)
+				$sql = $db->prepare("INSERT INTO `caselaw_area` (".$firstpart."`title`,`status`, `create_time`, `modify_time`)
 				VALUES (".$secondPArt.":title, :status, :create_time, :modify_time)
 					ON DUPLICATE KEY UPDATE 
 						`title` = :title,
