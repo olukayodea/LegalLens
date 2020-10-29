@@ -3,6 +3,7 @@
     $captcha_num = 'ABCDEFGHIJKLMNPQRTUVWXYZ12346789abcdefghijklmnpqrtuvwxyz';
     $captcha_num = substr(str_shuffle($captcha_num), 0, 6);
     $_SESSION["code"] = $captcha_num;
+    $_SESSION["captiaCode"] = $_GET["postToken"];
 
     $font_size = 30;
     $img_width = 130;

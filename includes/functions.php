@@ -2,6 +2,9 @@
 	session_start();
 	date_default_timezone_set("Africa/Lagos");
 	
+    // ini_set('display_errors', 1);
+	// error_reporting(E_ALL);
+	
 	$pageUR1 = $_SERVER["SERVER_NAME"];
 	$curdomain = str_replace("www.", "", $pageUR1);
 
@@ -23,7 +26,7 @@
 		$URL = "http://127.0.0.1/legallens/";
 		$servername = "localhost";
 		$dbusername = "root";
-		$dbpassword = "mysql";
+		$dbpassword = "root";
 		$dbname = "linnkste_legalens";
 	}
 
