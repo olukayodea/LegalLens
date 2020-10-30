@@ -3,7 +3,9 @@
 		protected $exclude = array(
 			"HenryTem",
 			"Michaelbem",
-			"Jameslob"
+			"Jameslob",
+			"Eric Jones",
+			"AliciaCrolf"
 		);
 		function curl_file_get_contents($url) {
 			if(strstr($url, "https") == 0) {
