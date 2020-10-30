@@ -7,7 +7,7 @@
 		);
 		function curl_file_get_contents($url) {
 			if(strstr($url, "https") == 0) {
-				return self::curl_file_get_contents_https($url);
+				return $this->curl_file_get_contents_https($url);
 			}
 			else {
 				$ch = curl_init();
