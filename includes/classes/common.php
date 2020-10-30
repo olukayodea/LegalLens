@@ -1,5 +1,10 @@
 <?php
 	class common {
+		protected $exclude = array(
+			"HenryTem",
+			"Michaelbem",
+			"Jameslob"
+		);
 		function curl_file_get_contents($url) {
 			if(strstr($url, "https") == 0) {
 				return self::curl_file_get_contents_https($url);
@@ -198,16 +203,6 @@
 				
 				$result = URL."news/".$id."/".$link."/";
 			} else {
-				$inventory = new inventory;
-				$row = $inventory->getOne($id);
-				
-				$id = $row['code'];
-				$name = trim(strtoupper($row['title']));
-				
-				$urlLink = explode(" ", $name);
-				$link = implode("-", $urlLink);
-				
-				$result = URL."items/".$id."/".$link."/";
 			}
 //			$result = URL."item?id=".$id;
 			
@@ -355,6 +350,10 @@
 			$reason = $this->get_prep($array['reason']);
 			$email = $this->get_prep($array['email']);
 			$message = $this->get_prep($array['message']);
+
+			if (in_array($name, $this->exclude)) {
+				return false;
+			}
 			
 			$messageToClient = "<p>You got the following message from<br />";
 			$messageToClient .= "Name: <strong>".$name."</strong><br>";
